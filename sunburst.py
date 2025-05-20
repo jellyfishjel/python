@@ -32,6 +32,11 @@ sunburst_data['Ent_Label'] = sunburst_data['Entrepreneurship']
 sunburst_data['Field_Label'] = sunburst_data['Field_of_Study']
 sunburst_data['Salary_Label'] = sunburst_data['Salary_Group']
 
+color_discrete_map = {
+    "Yes": "#1f77b4",  # xanh dương
+    "No": "#ffffff"    # trắng
+}
+
 # Mỗi ngành 1 màu
 field_colors = {
     'Engineering': '#1f77b4',
