@@ -37,13 +37,10 @@ field_colors = {
     'Engineering': '#ad2f00',
     'Business': '#08506c',
     'Arts': '#007ead',
-    'Science': '#f08f3f',
-    'IT': '#ffd244',
-    'Education': '#8c564b',
-    'Medicine': '#e377c2',
-    'Law': '#7f7f7f',
-    'Social Science': '#bcbd22',
-    'Other': '#17becf'
+    'Computer Science': '#f08f3f',
+    'Medicine': '#ffbe4f',
+    'Law': '#0ea7b5',
+    'Mathematics':'#e8702a'
 }
 
 # Vẽ biểu đồ – dùng màu theo Field
