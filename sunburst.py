@@ -5,7 +5,7 @@ import plotly.express as px
 # Set page config
 st.set_page_config(
     page_title="Career Path Sunburst",
-    layout="wide",
+    layout="narrow",
     page_icon="🌞"
 )
 
@@ -102,6 +102,6 @@ with col2:
       - **Entrepreneurship** (inner ring)  
       - **Field of Study** (middle ring)  
       - **Salary Group** (outer ring)
-    - To focus on specific salary details, click on a segment (e.g.,Arts) to **zoom in** and explore the salary distribution for that group.
+    - To focus on specific salary details, click on a segment (e.g., Arts) to **zoom in** and explore the salary distribution for that group.
     """
     )
