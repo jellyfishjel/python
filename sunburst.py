@@ -5,7 +5,7 @@ import plotly.express as px
 # Set page config
 st.set_page_config(
     page_title="Career Path Sunburst",
-    layout="narrow",
+    layout="wide",
     page_icon="🌞"
 )
 
