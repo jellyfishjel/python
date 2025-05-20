@@ -69,8 +69,8 @@ for ent in ['Yes', 'No']:
             color_map[key] = no_colors[field]
 
 # Gán màu cho vòng trong
-color_map['Yes'] = '#d49c6c'
-color_map['No'] = '#78c2d8'
+color_map['Yes'] = '#decc99'
+color_map['No'] = '#92d2f9'
 
 # Vẽ biểu đồ với color là cột 'Ent_Field'
 fig = px.sunburst(
