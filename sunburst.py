@@ -9,17 +9,18 @@ st.set_page_config(
     page_icon="🌞"
 )
 
-# Sidebar
-st.sidebar.title("📊 Sunburst Chart Explorer")
-st.sidebar.markdown(
+st.markdown(
     """
-    This interactive visualization shows the relationship between:
-    
-    - **Entrepreneurship**
-    - **Field of Study**
-    - **Starting Salary Group**
-    
-    Use it to explore how different education paths lead to various outcomes.
+    This interactive **sunburst chart** shows the relationship between:
+    - Whether someone became an **entrepreneur**
+    - Their **field of study**
+    - Their **starting salary range**
+
+    🔍 **How to use**:  
+    - Initially, the chart displays only two levels: **Entrepreneurship** (inner ring) and **Field of Study** (middle ring).
+    - Click on any segment to **drill down** and see the **Salary Group** (outer ring).
+
+    💡 Use this to explore how education and entrepreneurship relate to early career outcomes.
     """
 )
 st.title("Sunburst Chart – Salary, Field, and Entrepreneurship")
