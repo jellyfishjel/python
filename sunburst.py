@@ -48,7 +48,7 @@ yes_colors = {
 
 # Màu cho Entrepreneurship = No (xanh lá)
 no_colors = {
-    'Engineering': '#011f4b',
+    'Engineering': '#d2a56d',
     'Business': '#03396c',
     'Arts': '#005b96',
     'Computer Science': '#6497b1',
