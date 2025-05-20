@@ -82,7 +82,6 @@ for ent in ['Yes', 'No']:
 
 # Gán màu cho vòng trong
 color_map['Yes'] = '#d49c6c'
-color_map['No'] = '#78c2d8'
 
 
 # Vẽ biểu đồ với color là cột 'Ent_Field'
