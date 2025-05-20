@@ -2,7 +2,26 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-st.set_page_config(page_title="Sunburst Chart", layout="wide")
+# Set page config
+st.set_page_config(
+    page_title="Career Path Sunburst",
+    layout="wide",
+    page_icon="🌞"
+)
+
+# Sidebar
+st.sidebar.title("📊 Sunburst Chart Explorer")
+st.sidebar.markdown(
+    """
+    This interactive visualization shows the relationship between:
+    
+    - **Entrepreneurship**
+    - **Field of Study**
+    - **Starting Salary Group**
+    
+    Use it to explore how different education paths lead to various outcomes.
+    """
+)
 st.title("Sunburst Chart – Salary, Field, and Entrepreneurship")
 
 @st.cache_data
@@ -72,7 +91,7 @@ fig = px.sunburst(
     values='Count',
     color='Ent_Field',
     color_discrete_map=color_map,
-    title='Sunburst Chart: Entrepreneurship, Field, and Salary'
+    title='Career Path Insights: Education, Salary & Entrepreneurship'
 )
 
 fig.update_traces(
@@ -82,5 +101,20 @@ fig.update_traces(
     branchvalues="total"
 )
 
-# Show the chart
-st.plotly_chart(fig, use_container_width=True)
+# Layout with columns
+col1, col2 = st.columns([4, 1])
+
+with col1:
+    st.plotly_chart(fig, use_container_width=True)
+
+with col2:
+    st.markdown("### 🔍 Notes")
+    st.markdown(
+        """
+        - Inner ring: **Entrepreneurship (Yes/No)**
+        - Middle ring: **Field of Study**
+        - Outer ring: **Starting Salary Group**
+        
+        The colors represent different field + entrepreneurship combinations.
+        """
+    )
