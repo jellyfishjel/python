@@ -104,5 +104,4 @@ with col2:
       - **Salary Group** (outer ring)
     - To focus on specific salary details, click on a segment (e.g.,Arts) to **zoom in** and explore the salary distribution for that group.
     """
-    """
     )
