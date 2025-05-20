@@ -32,20 +32,40 @@ sunburst_data['Ent_Label'] = sunburst_data['Entrepreneurship']
 sunburst_data['Field_Label'] = sunburst_data['Field_of_Study']
 sunburst_data['Salary_Label'] = sunburst_data['Salary_Group']
 
-color_discrete_map = {
-    "Yes": "#1f77b4",  # xanh dương
-    "No": "#ffffff"    # trắng
+# Mỗi ngành 1 màu
+field_colors = {
+    'Engineering': '#1f77b4',
+    'Business': '#ff7f0e',
+    'Arts': '#2ca02c',
+    'Science': '#d62728',
+    'IT': '#9467bd',
+    'Education': '#8c564b',
+    'Medicine': '#e377c2',
+    'Law': '#7f7f7f',
+    'Social Science': '#bcbd22',
+    'Other': '#17becf'
 }
 
-# Vẽ biểu đồ
+# Vẽ biểu đồ – dùng màu theo Field
 fig = px.sunburst(
     sunburst_data,
     path=['Ent_Label', 'Field_Label', 'Salary_Label'],
     values='Count',
-    color='Entrepreneurship',
-    color_discrete_map=color_discrete_map,
-    title='🌞 Sunburst Chart' 
+    color='Field_Label',  # Dựa vào ngành để tô màu
+    color_discrete_map=field_colors,
+    title='🌞 Sunburst Chart'
 )
 
-fig.update_traces(maxdepth=2, branchvalues="total")
+# Hiện phần trăm và label
+fig.update_traces(
+    textinfo='label+percent entry',
+    insidetextorientation='radial',
+    maxdepth=2,
+    branchvalues="total"
+)
+
+# Ẩn legend (nếu muốn)
+fig.update_layout(showlegend=False)
+
+# Hiển thị biểu đồ
 st.plotly_chart(fig, use_container_width=True)
