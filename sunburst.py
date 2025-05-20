@@ -40,9 +40,9 @@ yes_colors = {
     'Engineering': '#d2a56d',
     'Business': '#ce8b54',
     'Arts': '#bd7e4a',
-    'Computer Science': '#96613d',
+    'Computer Science': '#ccaa87',
     'Medicine': '#83502e',
-    'Law': '#ccaa87',
+    'Law': '#96613d',
     'Mathematics': '#bd9c7b'
 }
 
