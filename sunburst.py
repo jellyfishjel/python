@@ -48,9 +48,9 @@ yes_colors = {
 }
 
 no_colors = {
-    'Engineering': '#009ac7',
+    'Engineering': '#005b96',
     'Business': '#03396c',
-    'Arts': '#005b96',
+    'Arts': '#009ac7',
     'Computer Science': '#8ed2ed',
     'Medicine': '#b3cde0',
     'Law': '#5dc4e1',
