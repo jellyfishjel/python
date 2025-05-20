@@ -27,24 +27,22 @@ df['Salary_Group'] = df['Starting_Salary'].apply(categorize_salary)
 # Gom nhóm
 sunburst_data = df.groupby(['Entrepreneurship', 'Field_of_Study', 'Salary_Group']).size().reset_index(name='Count')
 
-# Tạo nhãn
-sunburst_data['Ent_Label'] = sunburst_data['Entrepreneurship']
-sunburst_data['Field_Label'] = sunburst_data['Field_of_Study']
-sunburst_data['Salary_Label'] = sunburst_data['Salary_Group']
-sunburst_data['Color_Key'] = sunburst_data['Entrepreneurship'] + " / " + sunburst_data['Field_of_Study']
-
-
+# Vẽ biểu đồ
 fig = px.sunburst(
     sunburst_data,
     path=['Entrepreneurship', 'Field_of_Study', 'Salary_Group'],
     values='Count',
-    color='Count',  # Dựa vào số lượng để tô màu theo scale
+    color='Count',
     color_continuous_scale='RdBu',
     title='🌞 Sunburst Chart'
 )
 
-fig.update_traces(maxdepth=2, branchvalues="total")
-fig.update_layout(showlegend=False)  # Ẩn legend
+# Hiện phần trăm trực tiếp trên biểu đồ
+fig.update_traces(textinfo='label+percent entry', insidetextorientation='radial')
+
+# Ẩn thanh màu
+fig.update_coloraxes(showscale=False)
+
+
+# Hiển thị
 st.plotly_chart(fig, use_container_width=True)
-
-
