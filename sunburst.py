@@ -88,6 +88,12 @@ fig.update_traces(
     branchvalues="total"
 )
 
+fig.update_layout(
+    width=900,
+    height=900,
+    margin=dict(t=50, l=0, r=0, b=0)
+)
+
 # Layout with columns
 col1, col2 = st.columns([3, 1])
 
