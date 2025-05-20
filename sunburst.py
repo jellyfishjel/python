@@ -27,22 +27,47 @@ df['Salary_Group'] = df['Starting_Salary'].apply(categorize_salary)
 # Gom nhóm
 sunburst_data = df.groupby(['Entrepreneurship', 'Field_of_Study', 'Salary_Group']).size().reset_index(name='Count')
 
+# Gán nhãn
+sunburst_data['Ent_Label'] = sunburst_data['Entrepreneurship']
+sunburst_data['Field_Label'] = sunburst_data['Field_of_Study']
+sunburst_data['Salary_Label'] = sunburst_data['Salary_Group']
+sunburst_data['Color_Key'] = sunburst_data['Entrepreneurship'] + " / " + sunburst_data['Field_of_Study']
+
+# Màu theo ngành học
+field_colors = {
+    'Engineering': '#1f77b4',       # Blue
+    'Business': '#ff7f0e',          # Orange
+    'Arts': '#2ca02c',              # Green
+    'Science': '#d62728',           # Red
+    'IT': '#9467bd',                # Purple
+    'Education': '#8c564b',         # Brown
+    'Medicine': '#e377c2',          # Pink
+    'Law': '#7f7f7f',               # Gray
+    'Social Science': '#bcbd22',    # Yellow-green
+    'Other': '#17becf'              # Cyan
+}
+
+# Gán màu cho mỗi tổ hợp "Yes / Ngành" và "No / Ngành"
+color_discrete_map = {
+    "Yes": "#4CAF50",  # Xanh lá cây (thành công, tích cực)
+    "No": "#F44336"    # Đỏ cam (chưa thành công hoặc chọn khác lối đi)
+}
+
 # Vẽ biểu đồ
 fig = px.sunburst(
     sunburst_data,
-    path=['Entrepreneurship', 'Field_of_Study', 'Salary_Group'],
+    path=['Ent_Label', 'Field_Label', 'Salary_Label'],
     values='Count',
-    color='Count',
-    color_continuous_scale='RdBu',
+    color='Entrepreneurship',
+    color_discrete_map=color_discrete_map,
     title='🌞 Sunburst Chart'
 )
 
-# Hiện phần trăm trực tiếp trên biểu đồ
+# Hiện nhãn và phần trăm
 fig.update_traces(textinfo='label+percent entry', insidetextorientation='radial')
 
-# Ẩn thanh màu
-fig.update_coloraxes(showscale=False)
+# Ẩn thanh màu và legend
+fig.update_layout(showlegend=False)
 
-
-# Hiển thị
+# Hiển thị biểu đồ
 st.plotly_chart(fig, use_container_width=True)
