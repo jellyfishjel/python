@@ -10,16 +10,6 @@ def load_data():
     df = pd.read_excel("education_career_success.xlsx")
     return df
 
-        def categorize_salary(salary):
-            if salary < 30000:
-                return '<30K'
-            elif salary < 50000:
-                return '30K–50K'
-            elif salary < 70000:
-                return '50K–70K'
-            else:
-                return '70K+'
-
         df['Salary_Group'] = df['Starting_Salary'].apply(categorize_salary)
 
         sunburst_data = df.groupby(['Entrepreneurship', 'Field_of_Study', 'Salary_Group']).size().reset_index(name='Count')
