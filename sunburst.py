@@ -27,28 +27,25 @@ df['Salary_Group'] = df['Starting_Salary'].apply(categorize_salary)
 # Gom nhóm
 sunburst_data = df.groupby(['Entrepreneurship', 'Field_of_Study', 'Salary_Group']).size().reset_index(name='Count')
 
+# Tạo nhãn đơn giản cho từng cấp
+sunburst_data['Ent_Label'] = sunburst_data['Entrepreneurship']
+sunburst_data['Field_Label'] = sunburst_data['Field_of_Study']
+sunburst_data['Salary_Label'] = sunburst_data['Salary_Group']
+
+color_discrete_map = {
+    "Yes": "#1f77b4",  # xanh dương
+    "No": "#ffffff"    # trắng
+}
+
 # Vẽ biểu đồ
 fig = px.sunburst(
     sunburst_data,
-    path=['Entrepreneurship', 'Field_of_Study', 'Salary_Group'],
+    path=['Ent_Label', 'Field_Label', 'Salary_Label'],
     values='Count',
-    color='Entrepreneurship',  # Màu theo Yes / No
-    color_discrete_map={
-        'Yes': '#d62728',  # Đỏ đậm
-        'No': '#1f77b4'    # Xanh biển
-    },
-    title='🌞 Sunburst Chart'
+    color='Entrepreneurship',
+    color_discrete_map=color_discrete_map,
+    title='🌞 Sunburst Chart' 
 )
 
-# Hiện nhãn và phần trăm
-fig.update_traces(
-    textinfo='label+percent entry',
-    insidetextorientation='radial',
-    maxdepth=2  # Giới hạn 2 tầng
-)
-
-# Ẩn thanh màu và legend
-fig.update_layout(showlegend=False)
-
-# Hiển thị biểu đồ
+fig.update_traces(maxdepth=2, branchvalues="total")
 st.plotly_chart(fig, use_container_width=True)
