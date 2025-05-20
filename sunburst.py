@@ -34,8 +34,8 @@ sunburst_data['Salary_Label'] = sunburst_data['Salary_Group']
 
 # Tạo color key cho mỗi tổ hợp Yes/No + ngành
 color_discrete_map = {
-    "Yes": "#1f77b4",  # xanh dương
-    "No": "#ffffff"    # trắng
+    "Yes": "#ee7258",  # xanh dương
+    "No": "#c7d896"    # trắng
 }
 
 
