@@ -98,8 +98,11 @@ with col2:
     st.markdown("### 💡 How to use")
     st.markdown(
         """  
-        -The chart displays all three levels:
-        Entrepreneurship (inner ring), Field of Study (middle ring), and Salary Group (outer ring).
-        -However, to clearly view salary details, click on a segment — such as a specific field — to drill down and reveal the corresponding Salary Group.
+    - The chart displays all three levels:
+      - **Entrepreneurship** (inner ring)  
+      - **Field of Study** (middle ring)  
+      - **Salary Group** (outer ring)
+    - To focus on specific salary details, click on a segment (e.g.,Arts) to **zoom in** and explore the salary distribution for that group.
+    """
     """
     )
