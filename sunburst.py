@@ -36,18 +36,7 @@ sunburst_data['Salary_Label'] = sunburst_data['Salary_Group']
 sunburst_data['Color_Key'] = sunburst_data['Entrepreneurship'] + " / " + sunburst_data['Field_of_Study']
 
 # Tạo bảng màu riêng biệt
-yes_fields = sunburst_data[sunburst_data['Entrepreneurship'] == 'Yes']['Field_of_Study'].unique()
-no_fields = sunburst_data[sunburst_data['Entrepreneurship'] == 'No']['Field_of_Study'].unique()
-
-yes_colors = px.colors.qualitative.Set2
-no_colors = px.colors.qualitative.Pastel1
-
 color_discrete_map = {}
-
-for i, field in enumerate(yes_fields):
-    color_discrete_map[f"Yes / {field}"] = yes_colors[i % len(yes_colors)]
-for i, field in enumerate(no_fields):
-    color_discrete_map[f"No / {field}"] = no_colors[i % len(no_colors)]
 
 # Vẽ biểu đồ
 fig = px.sunburst(
