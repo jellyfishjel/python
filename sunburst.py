@@ -37,13 +37,13 @@ sunburst_data['Ent_Field'] = sunburst_data['Entrepreneurship'] + " - " + sunburs
 
 # Màu cho Entrepreneurship = Yes (xanh biển đậm)
 yes_colors = {
-    'Engineering': '#003366',
-    'Business': '#004080',
-    'Arts': '#0059b3',
-    'Computer Science': '#0073e6',
-    'Medicine': '#3399ff',
-    'Law': '#66b3ff',
-    'Mathematics': '#99ccff'
+    'Engineering': '#d2a56d',
+    'Business': '#ce8b54',
+    'Arts': '#bd7e4a',
+    'Computer Science': '#96613d',
+    'Medicine': '#83502e',
+    'Law': '#ccaa87',
+    'Mathematics': '#bd9c7b'
 }
 
 # Màu cho Entrepreneurship = No (xanh lá)
@@ -86,8 +86,6 @@ fig.update_traces(
     branchvalues="total"
 )
 
-# Ẩn legend (nếu muốn)
-fig.update_layout(showlegend=False)
 
 # Hiển thị biểu đồ
 st.plotly_chart(fig, use_container_width=True)
