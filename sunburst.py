@@ -3,15 +3,15 @@ import pandas as pd
 import plotly.express as px
 
 st.set_page_config(page_title="Sunburst Chart", layout="wide")
-st.title("🌞 Sunburst Chart – Salary, Field, and Entrepreneurship")
+st.title("Sunburst Chart – Salary, Field, and Entrepreneurship")
 
 @st.cache_data
 def load_data():
-    return pd.read_excel("education_career_success.xlsx", sheet_name='education_career_success')
+    return pd.read_excel("education_career_success.xlsx", sheet_name=0)
 
 df = load_data()
 
-# Nhóm lương
+# Categorize starting salary into ranges
 def categorize_salary(salary):
     if salary < 30000:
         return '<30K'
@@ -24,18 +24,13 @@ def categorize_salary(salary):
 
 df['Salary_Group'] = df['Starting_Salary'].apply(categorize_salary)
 
-# Gom nhóm
+# Group data for sunburst chart
 sunburst_data = df.groupby(['Entrepreneurship', 'Field_of_Study', 'Salary_Group']).size().reset_index(name='Count')
 
-# Tạo nhãn đơn giản cho từng cấp
-sunburst_data['Ent_Label'] = sunburst_data['Entrepreneurship']
-sunburst_data['Field_Label'] = sunburst_data['Field_of_Study']
-sunburst_data['Salary_Label'] = sunburst_data['Salary_Group']
-
-# Tạo cột nối tên để đánh màu riêng theo Entrepreneurship + Field
+# Create combined label for color mapping
 sunburst_data['Ent_Field'] = sunburst_data['Entrepreneurship'] + " - " + sunburst_data['Field_of_Study']
 
-# Màu cho Entrepreneurship = Yes (xanh biển đậm)
+# Define color maps
 yes_colors = {
     'Engineering': '#d2a56d',
     'Business': '#ce8b54',
@@ -46,7 +41,6 @@ yes_colors = {
     'Mathematics': '#bd9c7b'
 }
 
-# Màu cho Entrepreneurship = No (xanh lá)
 no_colors = {
     'Engineering': '#009ac7',
     'Business': '#03396c',
@@ -57,44 +51,30 @@ no_colors = {
     'Mathematics': '#0a70a9'
 }
 
-# Tạo dictionary màu cho Ent_Field
+# Build the color map
 color_map = {}
-
 for ent in ['Yes', 'No']:
-    for field in yes_colors.keys():
+    for field in df['Field_of_Study'].unique():
         key = f"{ent} - {field}"
         if ent == 'Yes':
-            color_map[key] = yes_colors[field]
+            color_map[key] = yes_colors.get(field, '#d49c6c')  # fallback color
         else:
-            color_map[key] = no_colors[field]
+            color_map[key] = no_colors.get(field, '#78c2d8')  # fallback color
 
-
-# Tạo dictionary màu cho Ent_Field
-color_map = {}
-
-for ent in ['Yes', 'No']:
-    for field in yes_colors.keys():
-        key = f"{ent} - {field}"
-        if ent == 'Yes':
-            color_map[key] = yes_colors[field]
-        else:
-            color_map[key] = no_colors[field]
-
-# Gán màu cho vòng trong
+# Add base colors for inner circle 
 color_map['Yes'] = '#d49c6c'
 color_map['No'] = '#78c2d8'
 
-# Vẽ biểu đồ với color là cột 'Ent_Field'
+# Create the sunburst chart
 fig = px.sunburst(
     sunburst_data,
-    path=['Ent_Label', 'Field_Label', 'Salary_Label'],
+    path=['Entrepreneurship', 'Field_of_Study', 'Salary_Group'],
     values='Count',
     color='Ent_Field',
     color_discrete_map=color_map,
-    title='🌞 Sunburst Chart'
+    title='🌞 Sunburst Chart: Entrepreneurship, Field, and Salary'
 )
 
-# Hiện phần trăm và label
 fig.update_traces(
     textinfo='label+percent entry',
     insidetextorientation='radial',
@@ -102,6 +82,5 @@ fig.update_traces(
     branchvalues="total"
 )
 
-
-# Hiển thị biểu đồ
+# Show the chart
 st.plotly_chart(fig, use_container_width=True)
