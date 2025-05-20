@@ -32,6 +32,10 @@ sunburst_data['Ent_Label'] = sunburst_data['Entrepreneurship']
 sunburst_data['Field_Label'] = sunburst_data['Field_of_Study']
 sunburst_data['Salary_Label'] = sunburst_data['Salary_Group']
 
+# Tạo cột nối tên để đánh màu riêng theo Entrepreneurship + Field
+sunburst_data['Ent_Field'] = sunburst_data['Entrepreneurship'] + " - " + sunburst_data['Field_of_Study']
+
+# Màu cho Entrepreneurship = Yes (xanh biển đậm)
 yes_colors = {
     'Engineering': '#003366',
     'Business': '#004080',
