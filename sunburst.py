@@ -27,44 +27,25 @@ df['Salary_Group'] = df['Starting_Salary'].apply(categorize_salary)
 # Gom nhóm
 sunburst_data = df.groupby(['Entrepreneurship', 'Field_of_Study', 'Salary_Group']).size().reset_index(name='Count')
 
-# Gán nhãn
-sunburst_data['Ent_Label'] = sunburst_data['Entrepreneurship']
-sunburst_data['Field_Label'] = sunburst_data['Field_of_Study']
-sunburst_data['Salary_Label'] = sunburst_data['Salary_Group']
-sunburst_data['Color_Key'] = sunburst_data['Entrepreneurship'] + " / " + sunburst_data['Field_of_Study']
-
-# Màu theo ngành học
-field_colors = {
-    'Engineering': '#1f77b4',       # Blue
-    'Business': '#ff7f0e',          # Orange
-    'Arts': '#2ca02c',              # Green
-    'Science': '#d62728',           # Red
-    'IT': '#9467bd',                # Purple
-    'Education': '#8c564b',         # Brown
-    'Medicine': '#e377c2',          # Pink
-    'Law': '#7f7f7f',               # Gray
-    'Social Science': '#bcbd22',    # Yellow-green
-    'Other': '#17becf'              # Cyan
-}
-
-# Gán màu cho mỗi tổ hợp "Yes / Ngành" và "No / Ngành"
-color_discrete_map = {}
-for field, color in field_colors.items():
-    color_discrete_map[f'Yes / {field}'] = color
-    color_discrete_map[f'No / {field}'] = color
-
 # Vẽ biểu đồ
 fig = px.sunburst(
     sunburst_data,
-    path=['Ent_Label', 'Field_Label', 'Salary_Label'],
+    path=['Entrepreneurship', 'Field_of_Study', 'Salary_Group'],
     values='Count',
-    color='Color_Key',
-    color_discrete_map=color_discrete_map,
+    color='Entrepreneurship',  # Màu theo Yes / No
+    color_discrete_map={
+        'Yes': '#d62728',  # Đỏ đậm
+        'No': '#1f77b4'    # Xanh biển
+    },
     title='🌞 Sunburst Chart'
 )
 
 # Hiện nhãn và phần trăm
-fig.update_traces(textinfo='label+percent entry', insidetextorientation='radial')
+fig.update_traces(
+    textinfo='label+percent entry',
+    insidetextorientation='radial',
+    maxdepth=2  # Giới hạn 2 tầng
+)
 
 # Ẩn thanh màu và legend
 fig.update_layout(showlegend=False)
