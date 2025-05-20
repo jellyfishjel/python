@@ -48,13 +48,13 @@ yes_colors = {
 
 # Màu cho Entrepreneurship = No (xanh lá)
 no_colors = {
-    'Engineering': '#004d00',
-    'Business': '#006600',
-    'Arts': '#008000',
-    'Computer Science': '#339933',
-    'Medicine': '#66b366',
-    'Law': '#99cc99',
-    'Mathematics': '#b3d9b3'
+    'Engineering': '#011f4b',
+    'Business': '#03396c',
+    'Arts': '#005b96',
+    'Computer Science': '#6497b1',
+    'Medicine': '#b3cde0',
+    'Law': '#5dc4e1',
+    'Mathematics': '#0a70a9'
 }
 
 # Tạo dictionary màu cho Ent_Field
