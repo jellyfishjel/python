@@ -33,20 +33,22 @@ sunburst_data['Field_Label'] = sunburst_data['Field_of_Study']
 sunburst_data['Salary_Label'] = sunburst_data['Salary_Group']
 
 # Tạo color key cho mỗi tổ hợp Yes/No + ngành
-sunburst_data['Color_Key'] = sunburst_data['Entrepreneurship'] + " / " + sunburst_data['Field_of_Study']
+color_discrete_map = {
+    "Yes": "#1f77b4",  # xanh dương
+    "No": "#ffffff"    # trắng
+}
 
-# Tạo bảng màu riêng biệt
-color_discrete_map = {}
 
 # Vẽ biểu đồ
 fig = px.sunburst(
     sunburst_data,
-    path=['Ent_Label', 'Field_Label', 'Salary_Label'],
+    path=['Entrepreneurship', 'Field_of_Study', 'Salary_Group'],
     values='Count',
-    color='Color_Key',
+    color='Entrepreneurship',
     color_discrete_map=color_discrete_map,
-    title='🌞 Sunburst Chart – Mỗi ngành 1 màu, Yes/No phân biệt rõ'
+    title='🌞 Sunburst Chart'
 )
+
 
 fig.update_traces(maxdepth=2, branchvalues="total")
 st.plotly_chart(fig, use_container_width=True)
