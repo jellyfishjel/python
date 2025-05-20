@@ -34,11 +34,11 @@ sunburst_data['Salary_Label'] = sunburst_data['Salary_Group']
 
 # Mỗi ngành 1 màu
 field_colors = {
-    'Engineering': '#1f77b4',
-    'Business': '#ff7f0e',
-    'Arts': '#2ca02c',
-    'Science': '#d62728',
-    'IT': '#9467bd',
+    'Engineering': '#ad2f00',
+    'Business': '#08506c',
+    'Arts': '#007ead',
+    'Science': '#f08f3f',
+    'IT': '#ffd244',
     'Education': '#8c564b',
     'Medicine': '#e377c2',
     'Law': '#7f7f7f',
