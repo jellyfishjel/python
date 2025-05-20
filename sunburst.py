@@ -48,17 +48,17 @@ field_colors = {
 }
 
 # Gán màu cho mỗi tổ hợp "Yes / Ngành" và "No / Ngành"
-color_discrete_map = {
-    "Yes": "#4CAF50",  # Xanh lá cây (thành công, tích cực)
-    "No": "#F44336"    # Đỏ cam (chưa thành công hoặc chọn khác lối đi)
-}
+color_discrete_map = {}
+for field, color in field_colors.items():
+    color_discrete_map[f'Yes / {field}'] = color
+    color_discrete_map[f'No / {field}'] = color
 
 # Vẽ biểu đồ
 fig = px.sunburst(
     sunburst_data,
     path=['Ent_Label', 'Field_Label', 'Salary_Label'],
     values='Count',
-    color='Entrepreneurship',
+    color='Color_Key',
     color_discrete_map=color_discrete_map,
     title='🌞 Sunburst Chart'
 )
