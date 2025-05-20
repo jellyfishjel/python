@@ -72,7 +72,7 @@ fig = px.sunburst(
     values='Count',
     color='Ent_Field',
     color_discrete_map=color_map,
-    title='🌞 Sunburst Chart: Entrepreneurship, Field, and Salary'
+    title='Sunburst Chart: Entrepreneurship, Field, and Salary'
 )
 
 fig.update_traces(
