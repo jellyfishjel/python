@@ -35,31 +35,14 @@ sunburst_data['Salary_Label'] = sunburst_data['Salary_Group']
 # Tạo cột nối tên để đánh màu riêng theo Entrepreneurship + Field
 sunburst_data['Ent_Field'] = sunburst_data['Entrepreneurship'] + " - " + sunburst_data['Field_of_Study']
 
-# Thêm dòng giả để gán màu cho 'Yes' và 'No' ở vòng trong
-yes_total = sunburst_data[sunburst_data['Ent_Label'] == 'Yes']['Count'].sum()
-no_total = sunburst_data[sunburst_data['Ent_Label'] == 'No']['Count'].sum()
-
-extra_rows = pd.DataFrame([
-    {'Ent_Label': 'Yes', 'Field_Label': '', 'Salary_Label': '', 'Count': yes_total, 'Ent_Field': 'Yes'},
-    {'Ent_Label': 'No', 'Field_Label': '', 'Salary_Label': '', 'Count': no_total, 'Ent_Field': 'No'}
-])
-
-# Nối thêm vào sunburst_data
-sunburst_data = pd.concat([sunburst_data, extra_rows], ignore_index=True)
-
-# Gán màu cho 'Yes' và 'No'
-color_map['Yes'] = '#d49c6c'  # cam trung tính
-color_map['No'] = '#78c2d8'   # xanh pastel
-
-
 # Màu cho Entrepreneurship = Yes (xanh biển đậm)
 yes_colors = {
     'Engineering': '#d2a56d',
     'Business': '#ce8b54',
     'Arts': '#bd7e4a',
-    'Computer Science': '#ccaa87',
+    'Computer Science': '#96613d',
     'Medicine': '#83502e',
-    'Law': '#96613d',
+    'Law': '#ccaa87',
     'Mathematics': '#bd9c7b'
 }
 
@@ -69,11 +52,39 @@ no_colors = {
     'Business': '#03396c',
     'Arts': '#005b96',
     'Computer Science': '#8ed2ed',
-    'Medicine': '#0a70a9',
+    'Medicine': '#b3cde0',
     'Law': '#5dc4e1',
-    'Mathematics': '#b3cde0'
+    'Mathematics': '#0a70a9'
 }
 
+# Tạo dictionary màu cho Ent_Field
+color_map = {}
+
+for ent in ['Yes', 'No']:
+    for field in yes_colors.keys():
+        key = f"{ent} - {field}"
+        if ent == 'Yes':
+            color_map[key] = yes_colors[field]
+        else:
+            color_map[key] = no_colors[field]
+
+
+# Tạo dictionary màu cho Ent_Field
+color_map = {}
+
+for ent in ['Yes', 'No']:
+    for field in yes_colors.keys():
+        key = f"{ent} - {field}"
+        if ent == 'Yes':
+            color_map[key] = yes_colors[field]
+        else:
+            color_map[key] = no_colors[field]
+
+# Gán màu cho vòng trong
+color_map['Yes','No'] = '#d49c6c'
+
+
+# Vẽ biểu đồ với color là cột 'Ent_Field'
 fig = px.sunburst(
     sunburst_data,
     path=['Ent_Label', 'Field_Label', 'Salary_Label'],
@@ -82,7 +93,6 @@ fig = px.sunburst(
     color_discrete_map=color_map,
     title='🌞 Sunburst Chart'
 )
-
 
 # Hiện phần trăm và label
 fig.update_traces(
