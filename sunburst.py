@@ -89,8 +89,8 @@ fig.update_traces(
 )
 
 fig.update_layout(
-    width=900,
-    height=900,
+    width=700,
+    height=700,
     margin=dict(t=50, l=0, r=0, b=0)
 )
 
