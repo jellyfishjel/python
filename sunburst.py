@@ -99,14 +99,14 @@ with col1:
 with col2:
     st.markdown("### 💡 How to use")
     st.markdown(
-        """  
-The chart displays all three levels:  
+        """
+-The chart displays all three levels:  
 
-  - Entrepreneurship (inner ring)  
-  - Field of Study (middle ring)  
-  - Salary Group (outer ring)  
-All labels include their percentage share in brackets (e.g., Engineering (20.1%))  
-Click on any segment to zoom in and explore deeper insights.
+  - "_Entrepreneurship_" (inner ring)  
+  - "_Field of Study_" (middle ring)  
+  - "_Salary Group_" (outer ring)  
+-All labels include their percentage share in brackets (e.g., Engineering (20.1%))  
+-Click on any segment to zoom in and explore deeper insights.
 
         """
     )
