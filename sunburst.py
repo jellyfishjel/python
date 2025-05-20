@@ -102,9 +102,9 @@ with col2:
         """
 -The chart displays all three levels:  
 
-  - "_Entrepreneurship_" (inner ring)  
-  - "_Field of Study_" (middle ring)  
-  - "_Salary Group_" (outer ring)  
+  - _Entrepreneurship_ (inner ring)  
+  - _Field of Study_ (middle ring)  
+  - _Salary Group_ (outer ring)  
 -All labels include their percentage share in brackets (e.g., Engineering (20.1%))  
 -Click on any segment to zoom in and explore deeper insights.
 
