@@ -89,7 +89,7 @@ fig.update_traces(
 )
 
 # Layout with columns
-col1, col2 = st.columns([4, 1])
+col1, col2 = st.columns([3, 1])
 
 with col1:
     st.plotly_chart(fig, use_container_width=True)
