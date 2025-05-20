@@ -29,13 +29,16 @@ sunburst_data = df.groupby(['Entrepreneurship', 'Field_of_Study', 'Salary_Group'
 total = sunburst_data['Count'].sum()
 sunburst_data['Percentage'] = (sunburst_data['Count'] / total * 100).round(2)
 
-# Tạo biểu đồ
+# Biểu đồ với màu gradient đẹp
 fig = px.sunburst(
     sunburst_data,
     path=['Entrepreneurship', 'Field_of_Study', 'Salary_Group'],
     values='Percentage',
-    title='🌞 Sunburst Chart – Grouped by Salary'
+    color='Percentage',
+    color_continuous_scale='Viridis',  # 🎨 Gradient đẹp mắt
+    title='🌿 Sunburst Chart – Salary Distribution'
 )
 
 fig.update_traces(maxdepth=2, branchvalues="total")
+fig.update_coloraxes(colorbar_title="Percentage (%)")  # Hiển thị thanh màu
 st.plotly_chart(fig, use_container_width=True)
