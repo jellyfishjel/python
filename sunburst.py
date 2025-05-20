@@ -9,7 +9,7 @@ st.set_page_config(
     page_icon="🌞"
 )
 
-st.title("Sunburst Chart – Salary, Field, and Entrepreneurship")
+st.title("Career Path Sunburst")
 
 @st.cache_data
 def load_data():
