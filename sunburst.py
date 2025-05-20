@@ -52,9 +52,9 @@ no_colors = {
     'Business': '#03396c',
     'Arts': '#005b96',
     'Computer Science': '#8ed2ed',
-    'Medicine': '#b3cde0',
+    'Medicine': '#0a70a9',
     'Law': '#5dc4e1',
-    'Mathematics': '#0a70a9'
+    'Mathematics': '#b3cde0'
 }
 
 # Tạo dictionary màu cho Ent_Field
