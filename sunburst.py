@@ -68,8 +68,8 @@ no_colors = {
     'Arts': '#009ac7',
     'Computer Science': '#8ed2ed',
     'Medicine': '#b3cde0',
-    'Law': '#5dc4e1',
-    'Mathematics': '#0a70a9'
+    'Law': '#ececa3',
+    'Mathematics': '#9bf09d'
 }
 
 color_map = {}
