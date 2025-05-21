@@ -53,13 +53,13 @@ green_shades = px.colors.sample_colorscale("Greens", [i / max(1, len(yes_fields)
 yes_colors = {field: green_shades[i] for i, field in enumerate(yes_fields)}
 
 yes_colors = {
-    'Engineering': '#2ca02c',
-    'Business': '#1f7a1f',
-    'Arts': '#3cb371',
-    'Computer Science': '#228b22',
-    'Medicine': '#006400',
+    'Engineering': '#dbf1d5',
+    'Business': '#aedea7',
+    'Arts': '#0c7734',
+    'Computer Science': '#73c375',
+    'Medicine': '#f7fcf5',
     'Law': '#32cd32',
-    'Mathematics': '#66cdaa'
+    'Mathematics': '#37a055'
 }
 
 no_colors = {
