@@ -53,15 +53,6 @@ green_shades = px.colors.sample_colorscale("Greens", [i / max(1, len(yes_fields)
 yes_colors = {field: green_shades[i] for i, field in enumerate(yes_fields)}
 
 
-no_colors = {
-   'Engineering': '#005b96',
-   'Business': '#03396c',
-   'Arts': '#009ac7',
-   'Computer Science': '#8ed2ed',
-   'Medicine': '#b3cde0',
-   'Law': '#5dc4e1',
-   'Mathematics': '#0a70a9'
-}
 
 
 color_map = {}
@@ -75,8 +66,6 @@ for ent in ['Yes', 'No']:
 
 
 
-color_map['Yes'] = '#2ECC71'
-color_map['No'] = '#78c2d8'
 
 
 fig = px.sunburst(
