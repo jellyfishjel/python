@@ -97,7 +97,11 @@ fig.update_traces(
     maxdepth=2,
     branchvalues="total",
     textinfo='label+text',
-    hovertemplate='<b>%{label}</b><br>Percentage: %{customdata[0]}%<extra></extra>'
+    hovertemplate=
+            "<b>%{label}</b><br>" +
+            "Value: %{value}<br>" +
+            "Percent of parent: %{percentParent:.1%}<br>" +
+            "Percent of root: %{percentRoot:.1%}<extra></extra>"
 )
 
 fig.update_layout(
