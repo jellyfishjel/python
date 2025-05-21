@@ -100,7 +100,6 @@ fig.update_traces(
     hovertemplate=
             "<b>%{label}</b><br>" +
             "Value: %{value}<br>" +
-            "Parent: %{parent}<br>" 
 )
 
 fig.update_layout(
