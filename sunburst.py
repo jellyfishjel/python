@@ -52,10 +52,10 @@ sunburst_data['Ent_Field'] = sunburst_data['Entrepreneurship'] + " - " + sunburs
 
 # Màu cho từng nhóm ngành
 yes_colors = {
-    'Engineering': '#f7fcf5',
+    'Engineering': '#aedea7',
     'Business': '#dbf1d5',
     'Arts': '#0c7734',
-    'Computer Science': '#00441b',
+    'Computer Science': '#73c375',
     'Medicine': '#00441b',
     'Law': '#f7fcf5',
     'Mathematics': '#37a055'
@@ -77,6 +77,9 @@ for field, color in yes_colors.items():
     color_map[f"Yes - {field}"] = color
 for field, color in no_colors.items():
     color_map[f"No - {field}"] = color
+
+color_map['Yes'] = '#ffd16a'
+color_map['No'] = '#ffd16a'
 
 # Biểu đồ Sunburst
 fig = px.sunburst(
