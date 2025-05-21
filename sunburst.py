@@ -99,7 +99,7 @@ fig.update_traces(
     textinfo='label+text',
     hovertemplate=
             "<b>%{label}</b><br>" +
-            "Value: %{value}<br>" +
+            "Value: %{value}<br>" 
 )
 
 fig.update_layout(
