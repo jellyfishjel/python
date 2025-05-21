@@ -79,7 +79,7 @@ for field, color in no_colors.items():
     color_map[f"No - {field}"] = color
 
 color_map['Yes'] = '#ffd16a'
-color_map['No'] = '#a8daf9'
+color_map['No'] = '#ffd16a'
 
 # Biểu đồ Sunburst
 fig = px.sunburst(
