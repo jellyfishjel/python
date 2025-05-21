@@ -46,7 +46,7 @@ sunburst_data['Ent_Label'] = sunburst_data['Entrepreneurship'] + '<br>' + sunbur
 sunburst_data['Field_Label'] = sunburst_data['Field_of_Study'] + '<br>' + sunburst_data['Field_Label'].astype(str) + '%'
 sunburst_data['Salary_Label'] = sunburst_data['Salary_Group'] + '<br>' + sunburst_data['Percentage'].astype(str) + '%'
 
-
+sunburst_data['Ent_Field'] = sunburst_data['Entrepreneurship'] + " - " + sunburst_data['Field_of_Study']
 
 yes_fields = df[df['Entrepreneurship'] == 'Yes']['Field_of_Study'].unique()
 green_shades = px.colors.sample_colorscale("Greens", [i / max(1, len(yes_fields) - 1) for i in range(len(yes_fields))])
