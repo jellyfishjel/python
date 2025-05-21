@@ -72,14 +72,14 @@ no_colors = {
     'Mathematics': '#0a70a9'
 }
 
-# Vòng lặp xây color_map:
 color_map = {}
 for ent, color_dict in [('Yes', yes_colors), ('No', no_colors)]:
     for field, color in color_dict.items():
         key = f"{ent} - {field}"
         color_map[key] = color
 
-
+color_map['Yes'] = '#2ECC71'
+color_map['No'] = '#78c2d8'
 
 fig = px.sunburst(
    sunburst_data,
