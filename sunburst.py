@@ -52,12 +52,12 @@ sunburst_data['Ent_Field'] = sunburst_data['Entrepreneurship'] + " - " + sunburs
 
 # Màu cho từng nhóm ngành
 yes_colors = {
-    'Engineering': '#dbf1d5',
-    'Business': '#aedea7',
+    'Engineering': '#f7fcf5',
+    'Business': '#dbf1d5',
     'Arts': '#0c7734',
-    'Computer Science': '#73c375',
-    'Medicine': '#f7fcf5',
-    'Law': '#32cd32',
+    'Computer Science': '#00441b',
+    'Medicine': '#00441b',
+    'Law': '#f7fcf5',
     'Mathematics': '#37a055'
 }
 
