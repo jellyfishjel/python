@@ -52,19 +52,32 @@ yes_fields = df[df['Entrepreneurship'] == 'Yes']['Field_of_Study'].unique()
 green_shades = px.colors.sample_colorscale("Greens", [i / max(1, len(yes_fields) - 1) for i in range(len(yes_fields))])
 yes_colors = {field: green_shades[i] for i, field in enumerate(yes_fields)}
 
+yes_colors = {
+    'Engineering': '#2ca02c',
+    'Business': '#1f7a1f',
+    'Arts': '#3cb371',
+    'Computer Science': '#228b22',
+    'Medicine': '#006400',
+    'Law': '#32cd32',
+    'Mathematics': '#66cdaa'
+}
 
+no_colors = {
+    'Engineering': '#005b96',
+    'Business': '#03396c',
+    'Arts': '#009ac7',
+    'Computer Science': '#8ed2ed',
+    'Medicine': '#b3cde0',
+    'Law': '#5dc4e1',
+    'Mathematics': '#0a70a9'
+}
 
-
+# Vòng lặp xây color_map:
 color_map = {}
-for ent in ['Yes', 'No']:
-   for field in df['Field_of_Study'].unique():
-       key = f"{ent} - {field}"
-       if ent == 'Yes':
-           color_map[key] = yes_colors.get(field, '#2ECC71')
-       else:
-           color_map[key] = no_colors.get(field, '#78c2d8')
-
-
+for ent, color_dict in [('Yes', yes_colors), ('No', no_colors)]:
+    for field, color in color_dict.items():
+        key = f"{ent} - {field}"
+        color_map[key] = color
 
 
 
