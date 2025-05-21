@@ -100,8 +100,7 @@ fig.update_traces(
     hovertemplate=
             "<b>%{label}</b><br>" +
             "Value: %{value}<br>" +
-            "Percent of parent: %{percentParent:.1%}<br>" +
-            "Percent of root: %{percentRoot:.1%}<extra></extra>"
+            "Parent: %{parent}<br>" 
 )
 
 fig.update_layout(
