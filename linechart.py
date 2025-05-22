@@ -2,9 +2,6 @@ import streamlit as st
 import plotly.graph_objects as go
 import pandas as pd
 
-st.set_page_config(
-    layout="wide" 
-)
 
 @st.cache_data
 def load_data():
