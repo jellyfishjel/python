@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-# Cấu hình trang
+
 st.set_page_config(
     page_title="Career Path Sunburst",
     layout="wide",
@@ -10,14 +10,14 @@ st.set_page_config(
 )
 st.title("🌞 Career Path Sunburst")
 
-# Tải dữ liệu
+
 @st.cache_data
 def load_data():
     return pd.read_excel("education_career_success.xlsx", sheet_name=0)
 
 df = load_data()
 
-# Phân loại mức lương
+
 def categorize_salary(salary):
     if salary < 30000:
         return '<30K'
@@ -30,12 +30,12 @@ def categorize_salary(salary):
 
 df['Salary_Group'] = df['Starting_Salary'].apply(categorize_salary)
 
-# Tạo dữ liệu cho sunburst
+
 sunburst_data = df.groupby(['Entrepreneurship', 'Field_of_Study', 'Salary_Group']).size().reset_index(name='Count')
 total_count = sunburst_data['Count'].sum()
 sunburst_data['Percentage'] = (sunburst_data['Count'] / total_count * 100).round(2)
 
-# Tạo nhãn theo phần trăm
+
 ent_totals = sunburst_data.groupby('Entrepreneurship')['Count'].sum()
 sunburst_data['Ent_Label'] = sunburst_data['Entrepreneurship'].map(
     lambda x: f"{x}<br>{round(ent_totals[x] / total_count * 100, 2)}%"
@@ -50,7 +50,7 @@ sunburst_data['Field_Label'] = sunburst_data.apply(
 sunburst_data['Salary_Label'] = sunburst_data['Salary_Group'] + '<br>' + sunburst_data['Percentage'].astype(str) + '%'
 sunburst_data['Ent_Field'] = sunburst_data['Entrepreneurship'] + " - " + sunburst_data['Field_of_Study']
 
-# Màu cho từng nhóm ngành
+
 yes_colors = {
     'Engineering': '#aedea7',
     'Business': '#dbf1d5',
@@ -71,7 +71,7 @@ no_colors = {
     'Mathematics': '#0a70a9'
 }
 
-# Ánh xạ màu
+
 color_map = {}
 for field, color in yes_colors.items():
     color_map[f"Yes - {field}"] = color
@@ -81,7 +81,7 @@ for field, color in no_colors.items():
 color_map['Yes'] = '#ffd16a'
 color_map['No'] = '#ffd16a'
 
-# Biểu đồ Sunburst
+
 fig = px.sunburst(
     sunburst_data,
     path=['Ent_Label', 'Field_Label', 'Salary_Label'],
@@ -108,7 +108,7 @@ fig.update_layout(
     margin=dict(t=50, l=0, r=0, b=0)
 )
 
-# Hiển thị
+
 col1, col2 = st.columns([3, 1])
 
 with col1:
