@@ -3,7 +3,6 @@ import plotly.graph_objects as go
 import pandas as pd
 
 st.set_page_config(
-    page_title="Education & Career Success Dashboard",
     layout="wide" 
 )
 
