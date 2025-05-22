@@ -87,3 +87,6 @@ fig.update_layout(
         spikecolor="gray"
     )
 )
+
+st.plotly_chart(fig, use_container_width=True)
+
