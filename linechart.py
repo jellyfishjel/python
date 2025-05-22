@@ -2,14 +2,12 @@ import streamlit as st
 import plotly.graph_objects as go
 import pandas as pd
 
-# Đọc dữ liệu từ file Excel
 @st.cache_data
 def load_data():
     return pd.read_excel("education_career_success.xlsx")
 
 df = load_data()
 
-# Pivot lại dữ liệu
 df = df.pivot_table(
     index='Years_to_Promotion',
     columns='Current_Job_Level',
@@ -17,7 +15,7 @@ df = df.pivot_table(
 ).reset_index()
 df.columns.name = None
 
-# Tạo biểu đồ
+
 fig = go.Figure()
 levels = {
     "Entry": "blue",
