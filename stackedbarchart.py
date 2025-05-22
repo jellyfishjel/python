@@ -2,7 +2,11 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-df = pd.read_csv('education_career_success.csv')
+def load_data():
+    return pd.read_excel("education_career_success.xlsx", sheet_name=0)
+
+df = load_data()
+
 df = df[df['Entrepreneurship'].isin(['Yes', 'No'])]
 
 df_grouped = df.groupby(['Current_Job_Level', 'Age', 'Entrepreneurship']).size().reset_index(name='Count')
