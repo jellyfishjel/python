@@ -7,8 +7,8 @@ def load_data():
     return pd.read_excel("education_career_success.xlsx", sheet_name=0)
 
 df = load_data()
-
 df = df[df['Entrepreneurship'].isin(['Yes', 'No'])]
+
 
 df_grouped = df.groupby(['Current_Job_Level', 'Age', 'Entrepreneurship']).size().reset_index(name='Count')
 df_grouped['Percentage'] = df_grouped.groupby(['Current_Job_Level', 'Age'])['Count'].transform(lambda x: x / x.sum())
