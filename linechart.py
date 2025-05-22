@@ -7,10 +7,24 @@ import pandas as pd
 def load_data():
     return pd.read_excel("education_career_success.xlsx", sheet_name=0)
 
-df = load_data()
+raw_df = load_data()
 
-# Hiển thị bảng dữ liệu để kiểm tra
-st.write("📄 Dữ liệu từ file Excel:")
+# Hiển thị dữ liệu gốc
+st.write("📄 Dữ liệu gốc:")
+st.dataframe(raw_df)
+
+# Pivot lại dữ liệu: tạo dataframe dạng mỗi job level là một cột
+df = raw_df.pivot_table(
+    index='Years_to_Promotion',
+    columns='Current_Job_Level',
+    values='Average_Work_Life_Balance'
+).reset_index()
+
+# Đổi tên cột columns để tiện dùng
+df.columns.name = None  # xóa tên group của cột
+
+# Hiển thị dữ liệu sau khi pivot
+st.write("📊 Dữ liệu sau khi pivot:")
 st.dataframe(df)
 
 # Tạo biểu đồ
@@ -24,7 +38,7 @@ levels = {
     "Executive": "red"
 }
 
-# Thêm từng nhóm vào biểu đồ nếu cột đó tồn tại
+# Thêm từng nhóm vào biểu đồ nếu có
 for level, color in levels.items():
     if level in df.columns:
         fig.add_trace(go.Scatter(
@@ -45,5 +59,5 @@ fig.update_layout(
     template="plotly_dark"
 )
 
-# Hiển thị biểu đồ trên Streamlit
+# Hiển thị biểu đồ
 st.plotly_chart(fig)
