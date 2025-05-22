@@ -2,26 +2,14 @@ import streamlit as st
 import plotly.graph_objects as go
 import pandas as pd
 
-# Đọc dữ liệu từ file Excel
-@st.cache_data
-def load_data():
-    return pd.read_excel("education_career_success.xlsx", sheet_name=0)
+# Đọc dữ liệu từ file CSV
+df = pd.read_csv("education_career_success.csv")
 
-raw_df = load_data()
+# Tính trung bình Work-Life Balance theo từng Job Level và Years to Promotion
+avg_wlb = df.groupby(["Years_to_Promotion", "Current_Job_Level"])["Work_Life_Balance"].mean().reset_index()
 
-# Hiển thị dữ liệu gốc
-st.write("📄 Dữ liệu gốc:")
-st.dataframe(raw_df)
-
-# Pivot lại dữ liệu: tạo dataframe dạng mỗi job level là một cột
-df = raw_df.pivot_table(
-    index='Years_to_Promotion',
-    columns='Current_Job_Level',
-    values='Work_Life_Balance'
-).reset_index()
-
-# Đổi tên cột columns để tiện dùng
-df.columns.name = None  # xóa tên group của cột
+# Pivot lại cho đúng định dạng như DataFrame tay ban đầu
+pivot_df = avg_wlb.pivot(index="Years_to_Promotion", columns="Current_Job_Level", values="Work_Life_Balance").reset_index()
 
 # Tạo biểu đồ
 fig = go.Figure()
@@ -34,16 +22,16 @@ levels = {
     "Executive": "red"
 }
 
-# Thêm từng nhóm vào biểu đồ nếu có
+# Thêm từng nhóm vào biểu đồ
 for level, color in levels.items():
-    if level in df.columns:
+    if level in pivot_df.columns:
         fig.add_trace(go.Scatter(
-            x=df["Years_to_Promotion"],
-            y=df[level],
+            x=pivot_df["Years_to_Promotion"],
+            y=pivot_df[level],
             mode="lines+markers",
             name=level,
             line=dict(color=color),
-            hovertemplate=f"%{{y:.2f}}"
+            hovertemplate=f"%{{y:.2f}}"  # tooltip hiển thị giá trị y
         ))
 
 # Cài đặt layout
@@ -55,5 +43,5 @@ fig.update_layout(
     template="plotly_dark"
 )
 
-# Hiển thị biểu đồ
+# Hiển thị biểu đồ trong Streamlit
 st.plotly_chart(fig)
