@@ -5,7 +5,7 @@ import pandas as pd
 # Đọc dữ liệu từ file Excel
 @st.cache_data
 def load_data():
-    return pd.read_excel("/mnt/data/education_career_success.xlsx")
+    return pd.read_excel("education_career_success.xlsx", sheet_name=0)
 
 df = load_data()
 
