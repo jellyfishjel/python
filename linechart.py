@@ -1,75 +1,72 @@
 import streamlit as st
 import pandas as pd
-import plotly.express as px
+import plotly.graph_objects as go
 
 # Load dữ liệu
 @st.cache_data
 def load_data():
-    return pd.read_excel("education_career_success.xlsx", sheet_name=0)
+    return pd.read_csv("education_career_success.csv")
 
 df = load_data()
 
-# Tính trung bình Work-Life Balance theo từng Job Level và Years_to_Promotion
+# Tính trung bình Work-Life Balance theo Job Level và Years_to_Promotion
 avg_balance = (
     df.groupby(['Current_Job_Level', 'Years_to_Promotion'])['Work_Life_Balance']
     .mean()
     .reset_index()
 )
 
-# Sắp xếp các cấp bậc theo thứ tự mong muốn
+# Sắp xếp thứ tự cấp bậc công việc
 job_levels_order = ['Entry', 'Mid', 'Senior', 'Executive']
 avg_balance['Current_Job_Level'] = pd.Categorical(
     avg_balance['Current_Job_Level'], categories=job_levels_order, ordered=True
 )
 
-# Sidebar Filter
+# Sidebar chọn cấp bậc
 selected_levels = st.sidebar.multiselect(
     "Select Job Levels to Display",
     options=job_levels_order + ["All"],
     default=["All"]
 )
 
-# Lọc dữ liệu theo lựa chọn người dùng
 if "All" in selected_levels or not selected_levels:
     filtered_data = avg_balance
 else:
     filtered_data = avg_balance[avg_balance["Current_Job_Level"].isin(selected_levels)]
 
-# Plot
-fig = px.line(
-    filtered_data,
-    x="Years_to_Promotion",
-    y="Work_Life_Balance",
-    color="Current_Job_Level",
-    markers=True,
-    line_shape="linear",
-    hover_name="Current_Job_Level",
-    hover_data={
-        "Years_to_Promotion": True,
-        "Work_Life_Balance": ':.2f',
-        "Current_Job_Level": False  # đã hiển thị ở hover_name
-    },
-    color_discrete_map={
-        "Entry": "#1f77b4",
-        "Mid": "#ff7f0e",
-        "Senior": "#2ca02c",
-        "Executive": "#d62728"
-    },
-    labels={
-        "Years_to_Promotion": "Years to Promotion",
-        "Work_Life_Balance": "Average Work-Life Balance",
-        "Current_Job_Level": "Job Level"
-    },
-    title="Average Work-Life Balance by Years to Promotion"
-)
+# Tạo biểu đồ bằng go.Figure
+fig = go.Figure()
 
+colors = {
+    "Entry": "#1f77b4",      # blue
+    "Mid": "#ff7f0e",        # orange
+    "Senior": "#2ca02c",     # green
+    "Executive": "#d62728"   # red
+}
+
+# Thêm từng trace cho mỗi Job Level
+for level in job_levels_order:
+    if "All" in selected_levels or level in selected_levels:
+        data_level = filtered_data[filtered_data["Current_Job_Level"] == level]
+        fig.add_trace(go.Scatter(
+            x=data_level["Years_to_Promotion"],
+            y=data_level["Work_Life_Balance"],
+            mode="lines+markers",
+            name=level,
+            line=dict(color=colors[level]),
+            hovertemplate=f"%{{y:.2f}}"  # chỉ hiện giá trị, tên & màu trace tự hiển thị theo format 'x unified'
+        ))
+
+# Cấu hình layout
 fig.update_layout(
+    title="Average Work-Life Balance by Years to Promotion",
+    xaxis_title="Years to Promotion",
+    yaxis_title="Average Work-Life Balance",
     height=600,
     width=900,
-    legend_title_text="Job Level",
     title_x=0.5,
-    hovermode="x",  # Compare data on hover (tương tự biểu đồ trắng)
-
+    legend_title_text="Job Level",
+    hovermode="x unified",  # Tooltip gom nhóm & hiển thị line màu như ảnh mẫu
     xaxis=dict(
         showspikes=True,
         spikemode="across",
@@ -88,5 +85,5 @@ fig.update_layout(
     )
 )
 
+# Hiển thị biểu đồ
 st.plotly_chart(fig, use_container_width=True)
-
