@@ -23,10 +23,6 @@ df = raw_df.pivot_table(
 # Đổi tên cột columns để tiện dùng
 df.columns.name = None  # xóa tên group của cột
 
-# Hiển thị dữ liệu sau khi pivot
-st.write("📊 Dữ liệu sau khi pivot:")
-st.dataframe(df)
-
 # Tạo biểu đồ
 fig = go.Figure()
 
