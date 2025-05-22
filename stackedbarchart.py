@@ -2,6 +2,11 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
+st.set_page_config(
+    page_title="Education & Career Success Dashboard",
+    layout="wide" 
+)
+
 @st.cache_data
 def load_data():
     return pd.read_excel("education_career_success.xlsx", sheet_name=0)
@@ -75,7 +80,7 @@ for i, lvl in enumerate(levels_to_show):
         category_orders={'Entrepreneurship': ['No', 'Yes'], 'Age': sorted(data_lvl['Age'].unique())},
         text=data_lvl[y_col].apply(fmt),
         labels={'Age': 'Age', y_col: y_axis_title},
-        height=500,
+        height=00,
         width=500,
         title=f"{lvl} Level"
     )
