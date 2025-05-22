@@ -75,8 +75,8 @@ for i, lvl in enumerate(levels_to_show):
         category_orders={'Entrepreneurship': ['No', 'Yes'], 'Age': sorted(data_lvl['Age'].unique())},
         text=data_lvl[y_col].apply(fmt),
         labels={'Age': 'Age', y_col: y_axis_title},
-        height=350,
-        width=600,
+        height=500,
+        width=500,
         title=f"{lvl} Level"
     )
 
