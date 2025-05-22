@@ -2,6 +2,11 @@ import streamlit as st
 import plotly.graph_objects as go
 import pandas as pd
 
+st.set_page_config(
+    page_title="Education & Career Success Dashboard",
+    layout="wide" 
+)
+
 @st.cache_data
 def load_data():
     return pd.read_excel("education_career_success.xlsx")
