@@ -8,7 +8,7 @@ df = pd.read_csv("education_career_success.csv")
 # Tính trung bình Work-Life Balance theo từng Job Level và Years to Promotion
 avg_wlb = df.groupby(["Years_to_Promotion", "Current_Job_Level"])["Work_Life_Balance"].mean().reset_index()
 
-# Pivot lại cho đúng định dạng như DataFrame tay ban đầu
+# Pivot lại cho đúng định dạng
 pivot_df = avg_wlb.pivot(index="Years_to_Promotion", columns="Current_Job_Level", values="Work_Life_Balance").reset_index()
 
 # Tạo biểu đồ
@@ -31,7 +31,7 @@ for level, color in levels.items():
             mode="lines+markers",
             name=level,
             line=dict(color=color),
-            hovertemplate=f"%{{y:.2f}}"  # tooltip hiển thị giá trị y
+            hovertemplate=f"%{{y:.2f}}"
         ))
 
 # Cài đặt layout
@@ -43,5 +43,5 @@ fig.update_layout(
     template="plotly_dark"
 )
 
-# Hiển thị biểu đồ trong Streamlit
+# Chỉ hiển thị biểu đồ
 st.plotly_chart(fig)
