@@ -5,23 +5,19 @@ import pandas as pd
 # Đọc dữ liệu từ file Excel
 @st.cache_data
 def load_data():
-    return pd.read_excel("/mnt/data/education_career_success.xlsx")
+    return pd.read_excel("education_career_success.xlsx")
 
-raw_df = load_data()
+df = load_data()
 
 # Pivot lại dữ liệu: tạo dataframe dạng mỗi job level là một cột
-df = raw_df.pivot_table(
+df = df.pivot_table(
     index='Years_to_Promotion',
     columns='Current_Job_Level',
-    values='Average_Work_Life_Balance'
+    values='Work_Life_Balance'
 ).reset_index()
 
 # Đổi tên cột columns để tiện dùng
 df.columns.name = None  # xóa tên group của cột
-
-# Hiển thị dữ liệu sau khi pivot
-st.write("📊 Dữ liệu sau khi pivot:")
-st.dataframe(df)
 
 # Tạo biểu đồ
 fig = go.Figure()
