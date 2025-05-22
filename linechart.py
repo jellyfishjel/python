@@ -17,7 +17,7 @@ st.dataframe(raw_df)
 df = raw_df.pivot_table(
     index='Years_to_Promotion',
     columns='Current_Job_Level',
-    values='Average_Work_Life_Balance'
+    values='Work_Life_Balance'
 ).reset_index()
 
 # Đổi tên cột columns để tiện dùng
