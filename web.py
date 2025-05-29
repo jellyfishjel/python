@@ -55,7 +55,7 @@ st.markdown('<div class="main-title">Education & Career Success</div>', unsafe_a
 # Load data function (csv, fixed path)
 @st.cache_data
 def load_data():
-    return pd.read_csv("D:\\VGU\\education_career_success.csv")
+    return pd.read_excel("education_career_success.xlsx")
 
 df = load_data()
 
