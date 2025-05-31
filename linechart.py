@@ -1,7 +1,8 @@
 import streamlit as st
-import plotly.graph_objects as go
 import pandas as pd
+import plotly.graph_objects as go
 
+# Load dữ liệu
 
 @st.cache_data
 def load_data():
@@ -87,3 +88,5 @@ fig.update_layout(
 
 # Hiển thị biểu đồ
 st.plotly_chart(fig, use_container_width=True)
+
+
