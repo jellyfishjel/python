@@ -2,6 +2,19 @@ import streamlit as st
 from streamlit_extras.switch_page_button import switch_page
 from PIL import Image
 
+# === CSS for full-page background ===
+page_bg_img = '''
+<style>
+.stApp {
+    background-image: url("images/homepage_bg.png");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+</style>
+'''
+st.markdown(page_bg_img, unsafe_allow_html=True)
+
 # === SETUP PAGE ===
 st.set_page_config(page_title="Education Career App", layout="wide")
 
