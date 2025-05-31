@@ -2,7 +2,7 @@ import streamlit as st
 from streamlit_extras.switch_page_button import switch_page
 from PIL import Image
 
-# === SETUP PAGE === (⚠️ dòng này phải đứng đầu!)
+# === SETUP PAGE ===
 st.set_page_config(page_title="Education Career App", layout="wide")
 
 # === CSS for full-page background ===
