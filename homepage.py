@@ -2,6 +2,9 @@ import streamlit as st
 from streamlit_extras.switch_page_button import switch_page
 from PIL import Image
 
+# === SETUP PAGE === (⚠️ dòng này phải đứng đầu!)
+st.set_page_config(page_title="Education Career App", layout="wide")
+
 # === CSS for full-page background ===
 page_bg_img = '''
 <style>
@@ -14,9 +17,6 @@ page_bg_img = '''
 </style>
 '''
 st.markdown(page_bg_img, unsafe_allow_html=True)
-
-# === SETUP PAGE ===
-st.set_page_config(page_title="Education Career App", layout="wide")
 
 # === NAVIGATION BAR ===
 st.markdown("""
@@ -66,7 +66,6 @@ st.markdown("""
 st.markdown('<a name="team"></a>', unsafe_allow_html=True)
 st.subheader("Our Team ✨")
 
-# === PAGE STATE ===
 if "team_page" not in st.session_state:
     st.session_state.team_page = 1
 
@@ -86,7 +85,6 @@ def show_team(page):
     start = 0 if page == 1 else 4
     end = 4 if page == 1 else 7
     chunk = members[start:end]
-
     cols = [col1, col2, col3, col4] if page == 1 else [col1, col2, col3]
 
     for i, (name, img_path) in enumerate(chunk):
