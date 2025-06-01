@@ -21,9 +21,10 @@ with tab1:
     st.subheader("🧑‍🎓 Career Path Sunburst")
 
     @st.cache_data
-    def load_sunburst_data():
-        df = pd.read_csv("education_career_success.csv")
-        return df
+    def load_data():
+        return pd.read_excel("education_career_success.xlsx")
+
+    df = load_data()
 
     df1 = load_sunburst_data()
 
