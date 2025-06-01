@@ -45,10 +45,11 @@ fig = px.scatter(
     title="GPA vs. Starting Salary"
 )
 
-fig.update_layout(
-    plot_bgcolor='rgba(0,0,0,0)',  # nền trong suốt
-    paper_bgcolor='rgba(0,0,0,0)', # nền trong suốt
-    font=dict(color="#FFFFFF"),     # chữ màu trắng cho dark mode (thay đổi tùy thích)
-)
+# Đổi màu đường hồi quy thành đỏ
+fig.data[1].line.color = 'red'
 
+# Tăng chiều cao biểu đồ
+fig.update_layout(
+    height=500,
+)
 st.plotly_chart(fig, use_container_width=True)
