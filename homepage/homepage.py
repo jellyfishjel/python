@@ -68,7 +68,7 @@ st.subheader("Our Team")
 st.markdown("""
     <style>
     .block-container {
-        background: url("images/team_bg.png");
+        background: url("images/team_section_bg.png");
         background-size: cover;
         background-position: center;
         border-radius: 12px;
@@ -77,7 +77,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# ===== TEAM MEMBERS DATA (corrected paths) =====
+# ===== TEAM MEMBERS DATA  =====
 team_members = [
     {"name": "Kiều Anh", "image": "images/team/Nguyễn Kiều Anh.png"},
     {"name": "Khánh Phương", "image": "images/team/Lê Nguyễn Khánh Phương.png"},
