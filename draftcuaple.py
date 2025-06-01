@@ -264,3 +264,21 @@ for level in visible_levels:
         st.plotly_chart(fig_bar, use_container_width=True)
     with col2:
         st.plotly_chart(fig_area, use_container_width=True)
+# --- KPI Summary at top ---
+st.title("📊 Education & Career Insights Dashboard")
+st.markdown("---")
+with st.container():
+    st.subheader("📌 Key Performance Indicators")
+    col1, col2, col3, col4 = st.columns(4)
+    
+    avg_salary = df['Starting_Salary'].mean()
+    pct_entrepreneurs = (df['Entrepreneurship'] == 'Yes').mean() * 100
+    avg_work_life = df['Work_Life_Balance'].mean()
+    avg_years_promo = df['Years_to_Promotion'].mean()
+    
+    col1.metric("Avg Starting Salary (USD)", f"${avg_salary:,.0f}")
+    col2.metric("% Entrepreneurs", f"{pct_entrepreneurs:.1f}%")
+    col3.metric("Avg Work-Life Balance", f"{avg_work_life:.2f} / 5")
+    col4.metric("Avg Years to Promotion", f"{avg_years_promo:.1f} years")
+
+st.markdown("---")
