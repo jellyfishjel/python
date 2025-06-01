@@ -50,6 +50,6 @@ fig.data[1].line.color = 'red'
 
 # Tăng chiều cao biểu đồ
 fig.update_layout(
-    height=500,
+    height=700,
 )
 st.plotly_chart(fig, use_container_width=True)
