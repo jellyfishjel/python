@@ -6,11 +6,11 @@ import matplotlib.pyplot as plt
 st.set_page_config(page_title="GPA vs Salary", layout="centered")
 st.title("🎓 University GPA vs. Starting Salary")
 
-@st.cache_data
-def load_data():
-    return pd.read_excel("education_career_success.xlsx")
+# Upload file
+uploaded_file = st.file_uploader("📂 Upload your Excel file", type=["xlsx"])
 
-df = load_data()
+# Load Excel
+df = pd.read_excel(uploaded_file, sheet_name="education_career_success")
 
     # Group GPA into categories
     gpa_bins = [2.0, 2.5, 3.0, 3.5, 4.0]
