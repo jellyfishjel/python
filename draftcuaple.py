@@ -6,11 +6,6 @@ import plotly.graph_objects as go
 
 st.set_page_config(page_title="📊 Education & Career Insights", layout="wide")
 
-
-# Title
-st.title("📊 Education & Career Insights Dashboard")
-
-
 # Load Excel data (assumes all data is in the same file)
 @st.cache_data
 def load_data():
@@ -18,6 +13,23 @@ def load_data():
 
 
 df = load_data()
+
+# Calculate key indicators
+total_respondents = len(df)
+percent_entrepreneurs = round((df['Entrepreneurship'] == 'Yes').mean() * 100, 2)
+average_starting_salary = round(df['Starting_Salary'].mean(), 2)
+average_work_life_balance = round(df['Work_Life_Balance'].mean(), 2)
+
+# Display key indicators in columns
+col1, col2, col3, col4 = st.columns(4)
+
+col1.metric(label="Total Respondents", value=f"{total_respondents}")
+col2.metric(label="Entrepreneurs (%)", value=f"{percent_entrepreneurs} %")
+col3.metric(label="Avg Starting Salary", value=f"${average_starting_salary:,.0f}")
+col4.metric(label="Avg Work-Life Balance", value=f"{average_work_life_balance:.2f}")
+
+# Title
+st.title("📊 Education & Career Insights Dashboard")
 
 # ------------------------ 1. SUNBURST CHART ------------------------
 st.header("🌞 Career Path Sunburst")
