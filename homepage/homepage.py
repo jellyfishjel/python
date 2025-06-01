@@ -1,5 +1,6 @@
 import streamlit as st
 from PIL import Image
+import os
 
 # ===== SETUP PAGE =====
 st.set_page_config(page_title="Education Career App", layout="wide")
@@ -9,7 +10,7 @@ st.markdown(
     """
     <style>
     .stApp {
-        background-image: url("images/homepage_bg.png");
+        background-image: url("homepage/images/homepage_bg.png");
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
@@ -68,7 +69,7 @@ st.subheader("Our Team")
 st.markdown("""
     <style>
     .block-container {
-        background: url("images/team_section_bg.png");
+        background: url("homepage/images/team_section_bg.png");
         background-size: cover;
         background-position: center;
         border-radius: 12px;
@@ -79,13 +80,13 @@ st.markdown("""
 
 # ===== TEAM MEMBERS DATA  =====
 team_members = [
-    {"name": "Kiều Anh", "image": "images/team/Nguyễn Kiều Anh.png"},
-    {"name": "Khánh Phương", "image": "images/team/Lê Nguyễn Khánh Phương.png"},
-    {"name": "Bảo Ngọc", "image": "images/team/Nguyễn Bảo Ngọc.png"},
-    {"name": "Khánh Linh", "image": "images/team/Nguyễn Trần Khánh Linh.png"},
-    {"name": "Bảo Nguyên", "image": "images/team/Nguyễn Huỳnh Bảo Nguyên.png"},
-    {"name": "Thu Thảo", "image": "images/team/Vũ Thị Thu Thảo.png"},
-    {"name": "Bội Ngọc", "image": "images/team/Sazahng.png"},
+    {"name": "Kiều Anh", "image": "homepage/images/team/Nguyễn Kiều Anh.png"},
+    {"name": "Khánh Phương", "image": "homepage/images/team/Lê Nguyễn Khánh Phương.png"},
+    {"name": "Bảo Ngọc", "image": "homepage/images/team/Nguyễn Bảo Ngọc.png"},
+    {"name": "Khánh Linh", "image": "homepage/images/team/Nguyễn Trần Khánh Linh.png"},
+    {"name": "Bảo Nguyên", "image": "homepage/images/team/Nguyễn Huỳnh Bảo Nguyên.png"},
+    {"name": "Thu Thảo", "image": "homepage/images/team/Vũ Thị Thu Thảo.png"},
+    {"name": "Bội Ngọc", "image": "homepage/images/team/Sazahng.png"},
 ]
 
 # ===== PAGINATION =====
@@ -100,7 +101,10 @@ def show_team(page):
     cols = st.columns(len(members))
     for col, member in zip(cols, members):
         with col:
-            st.image(member["image"], width=180)
+            try:
+                st.image(member["image"], width=180)
+            except Exception as e:
+                st.error(f"Không thể hiển thị ảnh: {member['name']} - {e}")
             st.markdown(f"<div style='text-align: center; font-weight: bold;'>{member['name']}</div>", unsafe_allow_html=True)
 
     col1, col2 = st.columns([1, 9])
@@ -114,4 +118,3 @@ def show_team(page):
                 st.session_state.team_page = 2
 
 show_team(st.session_state.team_page)
-
