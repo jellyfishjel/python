@@ -16,32 +16,54 @@ def load_data():
     return pd.read_excel("education_career_success.xlsx", sheet_name=0)
 
 df = load_data()
+# Sidebar Filters - Shared across charts and indicators
+job_levels = sorted(df['Current_Job_Level'].dropna().unique())
+selected_bar_levels = st.sidebar.multiselect("Select Job Levels (Bar/Area Charts)", job_levels, default=job_levels)
+
+min_age, max_age = int(df['Age'].min()), int(df['Age'].max())
+age_range = st.sidebar.slider("Select Age Range", min_value=min_age, max_value=max_age, value=(min_age, max_age))
+
+selected_statuses = st.sidebar.multiselect("Select Entrepreneurship Status", ['Yes', 'No'], default=['Yes', 'No'])
+
+# Apply filters to dataset
+filtered_df = df[
+    df['Current_Job_Level'].isin(selected_bar_levels) &
+    df['Entrepreneurship'].isin(selected_statuses) &
+    df['Age'].between(age_range[0], age_range[1])
+]
 
 # ------------------------ KEY INDICATORS ------------------------
-st.markdown("## 📌 Key Indicators")
+st.markdown("## 📌 Key Indicators (Based on Filters)")
 
 col1, col2, col3, col4 = st.columns(4)
 
 with col1:
-    avg_salary = df['Starting_Salary'].mean()
-    st.metric("💰 Avg Starting Salary", f"${avg_salary:,.0f}")
+    if not filtered_df.empty:
+        avg_salary = filtered_df['Starting_Salary'].mean()
+        st.metric("💰 Avg Starting Salary", f"${avg_salary:,.0f}")
+    else:
+        st.metric("💰 Avg Starting Salary", "N/A")
 
 with col2:
-    entrepreneur_pct = (df['Entrepreneurship'].value_counts(normalize=True).get('Yes', 0)) * 100
-    st.metric("🚀 Entrepreneurs (%)", f"{entrepreneur_pct:.1f}%")
+    if not filtered_df.empty:
+        entrepreneur_pct = (filtered_df['Entrepreneurship'].value_counts(normalize=True).get('Yes', 0)) * 100
+        st.metric("🚀 Entrepreneurs (%)", f"{entrepreneur_pct:.1f}%")
+    else:
+        st.metric("🚀 Entrepreneurs (%)", "N/A")
 
 with col3:
-    most_common_field = df['Field_of_Study'].mode()[0]
-    st.metric("🎓 Top Field of Study", most_common_field)
+    if not filtered_df.empty:
+        most_common_field = filtered_df['Field_of_Study'].mode()[0]
+        st.metric("🎓 Top Field of Study", most_common_field)
+    else:
+        st.metric("🎓 Top Field of Study", "N/A")
 
 with col4:
-    avg_wlb = df['Work_Life_Balance'].mean()
-    st.metric("⚖️ Avg Work-Life Balance", f"{avg_wlb:.2f}")
-    
-# Load Excel data (assumes all data is in the same file)
-@st.cache_data
-def load_data():
-    return pd.read_excel("education_career_success.xlsx", sheet_name=0)
+    if not filtered_df.empty:
+        avg_wlb = filtered_df['Work_Life_Balance'].mean()
+        st.metric("⚖️ Avg Work-Life Balance", f"{avg_wlb:.2f}")
+    else:
+        st.metric("⚖️ Avg Work-Life Balance", "N/A")
 
 
 # ------------------------ 1. SUNBURST CHART ------------------------
