@@ -10,28 +10,44 @@ st.set_page_config(page_title="📊 Education & Career Insights", layout="wide")
 @st.cache_data
 def load_data():
     return pd.read_excel("education_career_success.xlsx", sheet_name=0)
-
-
 df = load_data()
 
-# Title
+# Sidebar filters – placed early so they affect key indicators and all charts
+job_levels = sorted(df['Current_Job_Level'].dropna().unique())
+selected_levels = st.sidebar.multiselect("Select Job Levels (All Visuals)", job_levels + ["All"], default=["All"])
+
+entrepreneurship_options = ['Yes', 'No']
+selected_statuses = st.sidebar.multiselect("Select Entrepreneurship Status", entrepreneurship_options, default=entrepreneurship_options)
+
+min_age, max_age = int(df['Age'].min()), int(df['Age'].max())
+age_range = st.sidebar.slider("Select Age Range", min_value=min_age, max_value=max_age, value=(min_age, max_age))
+
+# Apply filters to create filtered_df
+filtered_df = df[
+    (df['Entrepreneurship'].isin(selected_statuses)) &
+    (df['Age'].between(age_range[0], age_range[1])) &
+    (
+        ("All" in selected_levels) |
+        (df['Current_Job_Level'].isin(selected_levels))
+    )
+]
+
 st.title("📊 Education & Career Insights Dashboard")
 
 # ------------------------ KEY INDICATOR SECTION ------------------------
 st.subheader("📌 Key Indicators")
 
-# Calculate key indicators
-total_respondents = len(df)
-percent_entrepreneurs = round((df['Entrepreneurship'] == 'Yes').mean() * 100, 2)
-average_starting_salary = round(df['Starting_Salary'].mean(), 2)
-average_work_life_balance = round(df['Work_Life_Balance'].mean(), 2)
+total_respondents = len(filtered_df)
+percent_entrepreneurs = round((filtered_df['Entrepreneurship'] == 'Yes').mean() * 100, 2) if total_respondents > 0 else 0
+average_starting_salary = round(filtered_df['Starting_Salary'].mean(), 2) if total_respondents > 0 else 0
+average_work_life_balance = round(filtered_df['Work_Life_Balance'].mean(), 2) if total_respondents > 0 else 0
 
-# Display metrics in columns
 col1, col2, col3, col4 = st.columns(4)
 col1.metric(label="Total Respondents", value=f"{total_respondents}")
 col2.metric(label="Entrepreneurs (%)", value=f"{percent_entrepreneurs} %")
 col3.metric(label="Avg Starting Salary", value=f"${average_starting_salary:,.0f}")
 col4.metric(label="Avg Work-Life Balance", value=f"{average_work_life_balance:.2f}")
+
 
 # ------------------------ 1. SUNBURST CHART ------------------------
 st.header("🌞 Career Path Sunburst")
