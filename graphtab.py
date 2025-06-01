@@ -233,3 +233,50 @@ for level in visible_levels:
         st.plotly_chart(fig_bar, use_container_width=True)
     with col2:
         st.plotly_chart(fig_area, use_container_width=True)
+# ------------------------ 5. SCATTER PLOT GPA vs Starting Salary ------------------------
+st.header("🎓 University GPA vs. Starting Salary")
+
+# Nhóm GPA theo khoảng
+df["GPA_Group"] = pd.cut(
+    df["University_GPA"],
+    bins=[2.0, 2.5, 3.0, 3.5, 4.0],
+    labels=["2.0–2.5", "2.5–3.0", "3.0–3.5", "3.5–4.0"],
+    include_lowest=True
+)
+
+selected_gpa = st.selectbox("Select GPA Group", ["All"] + df["GPA_Group"].cat.categories.tolist())
+salary_min, salary_max = int(df["Starting_Salary"].min()), int(df["Starting_Salary"].max())
+salary_range = st.slider("Select Starting Salary Range", salary_min, salary_max, (salary_min, salary_max), 1000)
+
+# Filter dữ liệu theo lựa chọn
+mask = df["Starting_Salary"].between(*salary_range)
+if selected_gpa != "All":
+    mask &= (df["GPA_Group"] == selected_gpa)
+filtered_df = df[mask]
+
+# Vẽ scatter plot với đường hồi quy
+fig_scatter = px.scatter(
+    filtered_df,
+    x="University_GPA",
+    y="Starting_Salary",
+    trendline="ols",
+    opacity=0.7,
+    labels={
+        "University_GPA": "University GPA",
+        "Starting_Salary": "Starting Salary"
+    },
+    title="GPA vs. Starting Salary"
+)
+
+# Đổi màu đường hồi quy (đổi thành cam)
+fig_scatter.data[1].line.color = '#FFA500'
+
+# Đổi màu điểm scatter (xanh dương sáng)
+fig_scatter.data[0].marker.color = '#00BFFF'
+
+# Tăng chiều cao và chỉnh màu nền + chữ cho hợp giao diện tối (nếu bạn dùng theme tối)
+fig_scatter.update_layout(
+    height=700,
+)
+
+st.plotly_chart(fig_scatter, use_container_width=True)
