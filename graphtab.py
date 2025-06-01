@@ -146,23 +146,43 @@ with st.expander("📊 Entrepreneurship by Age & Job Level", expanded=True):
         fig_bar.update_yaxes(tickformat=".0%")
 
         fig_area = px.area(
-            data, x='Age', y='Count', color='Entrepreneurship', markers=True,
-            color_discrete_map=color_map, height=400, width=chart_width,
-            title=f"{level} Level – Entrepreneurship by Age (Count)"
-        )
+    data, x='Age', y='Count', color='Entrepreneurship', markers=True,
+    color_discrete_map=color_map, height=400, width=chart_width,
+    title=f"{level} Level – Entrepreneurship by Age (Count)"
+)
 
-        for status in ['Yes', 'No']:
-            avg_age = data[data['Entrepreneurship'] == status]['Age'].mean()
-            fig_area.add_vline(x=avg_age, line_dash="dot", line_color=color_map[status], line_width=1.2)
-            fig_area.add_trace(go.Scatter(x=[None], y=[None], mode='markers',
-                                          marker=dict(symbol='circle', size=10, color=color_map[status]),
-                                          name=f"{status} Avg Age: {avg_age:.1f}"))
+# Cập nhật layout để cho phép hover theo chuột với spike lines
+fig_area.update_layout(
+    hovermode='x',
+    spikedistance=-1,
+    xaxis=dict(
+        showspikes=True,
+        spikemode='across',
+        spikesnap='cursor',
+        showline=True,
+        spikethickness=1,
+        spikecolor="gray",
+        spikedash="dot"
+    ),
+    yaxis=dict(
+        showspikes=True,
+        spikemode='across',
+        spikesnap='cursor',
+        showline=True,
+        spikethickness=1,
+        spikecolor="gray",
+        spikedash="dot"
+    )
+)
 
-        col1, col2 = st.columns(2)
-        with col1:
-            st.plotly_chart(fig_bar, use_container_width=True)
-        with col2:
-            st.plotly_chart(fig_area, use_container_width=True)
+# Vẽ đường gạch đứng tại vị trí tuổi trung bình + thêm chú thích ẩn
+for status in ['Yes', 'No']:
+    avg_age = data[data['Entrepreneurship'] == status]['Age'].mean()
+    fig_area.add_vline(x=avg_age, line_dash="dot", line_color=color_map[status], line_width=1.2)
+    fig_area.add_trace(go.Scatter(x=[None], y=[None], mode='markers',
+                                  marker=dict(symbol='circle', size=10, color=color_map[status]),
+                                  name=f"{status} Avg Age: {avg_age:.1f}"))
+
 
 # === SECTION 3: GPA vs. Salary Scatter Plot ===
 with st.expander("🎓 GPA vs. Starting Salary", expanded=True):
