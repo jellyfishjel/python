@@ -81,7 +81,8 @@ def categorize_salary(salary):
         return '70K+'
 
 
-df['Salary_Group'] = df['Starting_Salary'].apply(categorize_salary)
+filtered_df['Salary_Group'] = filtered_df['Starting_Salary'].apply(categorize_salary)
+sunburst_data = filtered_df.groupby(['Entrepreneurship', 'Field_of_Study', 'Salary_Group']).size().reset_index(name='Count')
 
 
 sunburst_data = df.groupby(['Entrepreneurship', 'Field_of_Study', 'Salary_Group']).size().reset_index(name='Count')
@@ -144,7 +145,7 @@ st.header("📈 Work-Life Balance by Job Level and Promotion Timeline")
 
 
 avg_balance = (
-    df.groupby(['Current_Job_Level', 'Years_to_Promotion'])['Work_Life_Balance']
+    filtered_df.groupby(['Current_Job_Level', 'Years_to_Promotion'])['Work_Life_Balance']
     .mean().reset_index()
 )
 
