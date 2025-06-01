@@ -9,6 +9,8 @@ st.set_page_config(page_title="📊 Education & Career Insights", layout="wide")
 
 # Title
 st.title("📊 Education & Career Insights Dashboard")
+
+df = load_data()
 # ------------------------ KEY INDICATORS ------------------------
 st.markdown("## 📌 Key Indicators")
 
@@ -34,9 +36,6 @@ with col4:
 @st.cache_data
 def load_data():
     return pd.read_excel("education_career_success.xlsx", sheet_name=0)
-
-
-df = load_data()
 
 
 # ------------------------ 1. SUNBURST CHART ------------------------
