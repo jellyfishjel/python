@@ -10,7 +10,7 @@ st.markdown(
     """
     <style>
     .stApp {
-        background-image: url("homepage/images/homepage_bg.png");
+        background-image: url("https://github.com/jellyfishjel/python/blob/ced718eff3fe11376937983c8eb776d510aa7de9/homepage/images/homepage_bg.png");
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
