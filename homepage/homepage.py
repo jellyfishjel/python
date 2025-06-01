@@ -80,13 +80,13 @@ st.markdown("""
 
 # ===== TEAM MEMBERS DATA  =====
 team_members = [
-    {"name": "Kiều Anh", "image": "homepage/team/Nguyen Kieu Anh.png"},
-    {"name": "Khánh Phương", "image": "homepage/team/Le Nguyen Khanh Phuong.png"},
-    {"name": "Bảo Ngọc", "image": "homepage/team/Nguyen Bao Ngoc.png"},
-    {"name": "Khánh Linh", "image": "homepage/team/Nguyen Tran Khanh Linh.png"},
-    {"name": "Bảo Nguyên", "image": "homepage/team/Nguyen Huynh Bao Nguyen.png"},
-    {"name": "Thu Thảo", "image": "homepage/team/Vu Thi Thu Thao.png"},
-    {"name": "Bội Ngọc", "image": "homepage/team/Nguyen Boi Ngoc.png"},
+    {"name": "Kiều Anh", "image": "team/Nguyen Kieu Anh.png"},
+    {"name": "Khánh Phương", "image": "team/Le Nguyen Khanh Phuong.png"},
+    {"name": "Bảo Ngọc", "image": "team/Nguyen Bao Ngoc.png"},
+    {"name": "Khánh Linh", "image": "team/Nguyen Tran Khanh Linh.png"},
+    {"name": "Bảo Nguyên", "image": "team/Nguyen Huynh Bao Nguyen.png"},
+    {"name": "Thu Thảo", "image": "team/Vu Thi Thu Thao.png"},
+    {"name": "Bội Ngọc", "image": "team/Nguyen Boi Ngoc.png"},
 ]
 
 # ===== PAGINATION =====
