@@ -145,28 +145,19 @@ st.plotly_chart(fig2, use_container_width=True)
 with st.expander("📌 Click to read chart interpretation note"):
     st.markdown("""
     <style>
-    @keyframes fadeSlideIn {
-        0% {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        100% {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    .animated-box {
-        animation: fadeSlideIn 0.8s ease-in-out;
-        background-color: #f0f2f6;
-        border-left: 6px solid #4b6cb7;
-        padding: 16px;
-        border-radius: 8px;
-        margin-top: 10px;
-        margin-bottom: 30px;  /* 👈 Add space to bottom */
+    .custom-box {
+        background-color: #f9f9fc;    
+        border-left: 6px solid #3366cc;
+        padding: 20px;                 
+        border-radius: 10px;           
+        margin-top: 12px;             
+        font-size: 15px;               
+        color: #333333;              
+        line-height: 1.6;           
     }
     </style>
 
-    <div class="animated-box">
+    <div class="custom-box">
         <strong>Note:</strong><br>
         The given line graph shows the connection between average work-life balance and years to promotion of 4 job levels, including <em>Entry</em>, <em>Mid</em>, <em>Senior</em>, and <em>Executive</em>, to answer whether the time taken to receive the first promotion and work-life balance skills affect the current job level.
         <br><br>
