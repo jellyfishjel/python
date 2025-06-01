@@ -138,14 +138,5 @@ def show_team(page):
                 unsafe_allow_html=True
             )
 
-    # Điều chỉnh lại nút chuyển trang đẹp hơn
-    col1, col2, col3 = st.columns([1, 1, 8])
-    with col1:
-        if st.session_state.team_page == 2:
-            if st.button("⬅️", key="prev"):
-                st.session_state.team_page = 1
-    with col2:
-        if st.session_state.team_page == 1:
-            if st.button("➡️", key="next"):
-                st.session_state.team_page = 2
+    show_team(st.session_state.team_page)
 
