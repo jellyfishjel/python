@@ -103,17 +103,12 @@ def show_team(page):
         with col:
             try:
                 img = Image.open(member["image"])
-                img = img.resize((220, 220))
-                st.image(img, width=220)
+                st.image(img, width=180)
             except:
                 st.warning(f"Không tìm thấy ảnh: {member['image']}")
-            st.markdown(
-                f"<div style='text-align: center; font-size: 16px; font-weight: bold; margin-top: 8px;'>{member['name']}</div>",
-                unsafe_allow_html=True
-            )
+            st.markdown(f"<div style='text-align: center; font-weight: bold;'>{member['name']}</div>", unsafe_allow_html=True)
 
-    # Nút chuyển trang
-    col1, col2, col3 = st.columns([1, 1, 8])
+    col1, col2 = st.columns([1, 9])
     with col1:
         if st.session_state.team_page == 2:
             if st.button("⬅️", key="prev"):
@@ -123,6 +118,4 @@ def show_team(page):
             if st.button("➡️", key="next"):
                 st.session_state.team_page = 2
 
-# Gọi hàm hiển thị
 show_team(st.session_state.team_page)
-
