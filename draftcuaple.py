@@ -9,22 +9,26 @@ st.set_page_config(page_title="📊 Education & Career Insights", layout="wide")
 
 # Title
 st.title("📊 Education & Career Insights Dashboard")
-st.markdown("---")
-with st.container():
-    st.subheader("📌 Key Performance Indicators")
-    col1, col2, col3, col4 = st.columns(4)
-    
-    avg_salary = df['Starting_Salary'].mean()
-    pct_entrepreneurs = (df['Entrepreneurship'] == 'Yes').mean() * 100
-    avg_work_life = df['Work_Life_Balance'].mean()
-    avg_years_promo = df['Years_to_Promotion'].mean()
-    
-    col1.metric("Avg Starting Salary (USD)", f"${avg_salary:,.0f}")
-    col2.metric("% Entrepreneurs", f"{pct_entrepreneurs:.1f}%")
-    col3.metric("Avg Work-Life Balance", f"{avg_work_life:.2f} / 5")
-    col4.metric("Avg Years to Promotion", f"{avg_years_promo:.1f} years")
+# ------------------------ KEY INDICATORS ------------------------
+st.markdown("## 📌 Key Indicators")
 
-st.markdown("---")
+col1, col2, col3, col4 = st.columns(4)
+
+with col1:
+    avg_salary = df['Starting_Salary'].mean()
+    st.metric("💰 Avg Starting Salary", f"${avg_salary:,.0f}")
+
+with col2:
+    entrepreneur_pct = (df['Entrepreneurship'].value_counts(normalize=True).get('Yes', 0)) * 100
+    st.metric("🚀 Entrepreneurs (%)", f"{entrepreneur_pct:.1f}%")
+
+with col3:
+    most_common_field = df['Field_of_Study'].mode()[0]
+    st.metric("🎓 Top Field of Study", most_common_field)
+
+with col4:
+    avg_wlb = df['Work_Life_Balance'].mean()
+    st.metric("⚖️ Avg Work-Life Balance", f"{avg_wlb:.2f}")
 
 # Load Excel data (assumes all data is in the same file)
 @st.cache_data
@@ -279,4 +283,3 @@ for level in visible_levels:
         st.plotly_chart(fig_bar, use_container_width=True)
     with col2:
         st.plotly_chart(fig_area, use_container_width=True)
-
