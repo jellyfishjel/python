@@ -2,7 +2,11 @@ import pandas as pd
 import streamlit as st
 
 # Load dataset
-df = pd.read_csv("education_career_success.csv")
+@st.cache_data
+def load_data():
+    return pd.read_excel("education_career_success.xlsx")
+
+df = load_data()
 
 # Set up the app layout
 st.set_page_config(page_title="Education & Career Success", layout="wide")
