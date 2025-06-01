@@ -1,3 +1,171 @@
+import streamlit as st
+import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
+
+
+st.set_page_config(page_title="📊 Education & Career Insights", layout="wide")
+
+
+# Title
+st.title("📊 Education & Career Insights Dashboard")
+
+
+# Load Excel data (assumes all data is in the same file)
+@st.cache_data
+def load_data():
+    return pd.read_excel("education_career_success.xlsx", sheet_name=0)
+
+
+df = load_data()
+
+
+# ------------------------ 1. SUNBURST CHART ------------------------
+st.header("🌞 Career Path Sunburst")
+
+
+def categorize_salary(salary):
+    if salary < 30000:
+        return '<30K'
+    elif salary < 50000:
+        return '30K–50K'
+    elif salary < 70000:
+        return '50K–70K'
+    else:
+        return '70K+'
+
+
+df['Salary_Group'] = df['Starting_Salary'].apply(categorize_salary)
+
+
+sunburst_data = df.groupby(['Entrepreneurship', 'Field_of_Study', 'Salary_Group']).size().reset_index(name='Count')
+total_count = sunburst_data['Count'].sum()
+sunburst_data['Percentage'] = (sunburst_data['Count'] / total_count * 100).round(2)
+
+
+ent_totals = sunburst_data.groupby('Entrepreneurship')['Count'].sum()
+sunburst_data['Ent_Label'] = sunburst_data['Entrepreneurship'].map(
+    lambda x: f"{x}<br>{round(ent_totals[x] / total_count * 100, 2)}%"
+)
+
+
+field_totals = sunburst_data.groupby(['Entrepreneurship', 'Field_of_Study'])['Count'].sum()
+sunburst_data['Field_Label'] = sunburst_data.apply(
+    lambda row: f"{row['Field_of_Study']}<br>{round(field_totals[(row['Entrepreneurship'], row['Field_of_Study'])] / total_count * 100, 2)}%",
+    axis=1
+)
+
+
+sunburst_data['Salary_Label'] = sunburst_data['Salary_Group'] + '<br>' + sunburst_data['Percentage'].astype(str) + '%'
+sunburst_data['Ent_Field'] = sunburst_data['Entrepreneurship'] + " - " + sunburst_data['Field_of_Study']
+
+
+yes_colors = {
+    'Engineering': '#aedea7', 'Business': '#dbf1d5', 'Arts': '#0c7734',
+    'Computer Science': '#73c375', 'Medicine': '#00441b', 'Law': '#f7fcf5', 'Mathematics': '#37a055'
+}
+no_colors = {
+    'Engineering': '#005b96', 'Business': '#03396c', 'Arts': '#009ac7',
+    'Computer Science': '#8ed2ed', 'Medicine': '#b3cde0', 'Law': '#5dc4e1', 'Mathematics': '#0a70a9'
+}
+color_map = {f"Yes - {k}": v for k, v in yes_colors.items()}
+color_map.update({f"No - {k}": v for k, v in no_colors.items()})
+color_map.update({'Yes': '#ffd16a', 'No': '#ffd16a'})
+
+
+fig1 = px.sunburst(
+    sunburst_data,
+    path=['Ent_Label', 'Field_Label', 'Salary_Label'],
+    values='Count',
+    color='Ent_Field',
+    color_discrete_map=color_map,
+    custom_data=['Percentage'],
+    title='Career Path Insights: Education, Salary & Entrepreneurship',
+    height = 500
+)
+fig1.update_traces(
+    insidetextorientation='radial',
+    maxdepth=2,
+    branchvalues="total",
+    textinfo='label+text',
+    hovertemplate="<b>%{label}</b><br>Value: %{value}<br>"
+)
+st.plotly_chart(fig1, use_container_width=True)
+
+
+# ------------------------ 2. LINE CHART ------------------------
+st.header("📈 Work-Life Balance by Job Level and Promotion Timeline")
+
+
+avg_balance = (
+    df.groupby(['Current_Job_Level', 'Years_to_Promotion'])['Work_Life_Balance']
+    .mean().reset_index()
+)
+
+
+job_levels_order = ['Entry', 'Mid', 'Senior', 'Executive']
+avg_balance['Current_Job_Level'] = pd.Categorical(avg_balance['Current_Job_Level'],
+                                                  categories=job_levels_order, ordered=True)
+
+
+selected_levels = st.sidebar.multiselect("Select Job Levels (Line Chart)", job_levels_order + ["All"], default=["All"])
+filtered_line_data = avg_balance if "All" in selected_levels or not selected_levels else \
+    avg_balance[avg_balance["Current_Job_Level"].isin(selected_levels)]
+
+
+fig2 = go.Figure()
+colors = {"Entry": "#1f77b4", "Mid": "#ff7f0e", "Senior": "#2ca02c", "Executive": "#d62728"}
+
+
+for level in job_levels_order:
+    if "All" in selected_levels or level in selected_levels:
+        data_level = filtered_line_data[filtered_line_data["Current_Job_Level"] == level]
+        fig2.add_trace(go.Scatter(
+            x=data_level["Years_to_Promotion"],
+            y=data_level["Work_Life_Balance"],
+            mode="lines+markers",
+            name=level,
+            line=dict(color=colors[level]),
+            hovertemplate=f"%{{y:.2f}}"
+        ))
+
+
+fig2.update_layout(
+    title="Average Work-Life Balance by Years to Promotion",
+    xaxis_title="Years to Promotion",
+    yaxis_title="Average Work-Life Balance",
+    height=600,
+    title_x=0.5,
+    legend_title_text="Job Level",
+    hovermode="x unified",
+    xaxis=dict(showspikes=True, spikemode="across", spikesnap="cursor", spikedash="dot", spikecolor="gray"),
+    yaxis=dict(showspikes=True, spikemode="across", spikesnap="cursor", spikedash="dot", spikecolor="gray")
+)
+st.plotly_chart(fig2, use_container_width=True)
+with st.expander("📌 Click to read chart interpretation note"):
+    st.markdown("""
+    <style>
+    .custom-box {
+        background-color: #f9f9fc;    
+        border-left: 6px solid #3366cc;
+        padding: 20px;                 
+        border-radius: 10px;           
+        margin-top: 12px;
+        margin-bottom: 30px;
+        font-size: 15px;               
+        color: #333333;              
+        line-height: 1.6;           
+    }
+    </style>
+
+    <div class="custom-box">
+        <strong>Note:</strong><br>
+        The given line graph shows the connection between average work-life balance and years to promotion of 4 job levels, including <em>Entry</em>, <em>Mid</em>, <em>Senior</em>, and <em>Executive</em>, to answer whether the time taken to receive the first promotion and work-life balance skills affect the current job level.
+        <br><br>
+        <strong>Insight:</strong> The <em>Mid</em> and <em>Senior</em> groups record an upward trajectory, while the others follow a contrasting pattern. The <em>Executive</em> level undergoes the most dramatic downfall among the four.
+    </div>
+    """, unsafe_allow_html=True)
+
 # ------------------------ 3 & 4. BAR + AREA ------------------------
 st.header("📊 Entrepreneurship by Age and Job Level")
 
