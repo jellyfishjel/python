@@ -15,19 +15,30 @@ df = load_data()  # <<<<< Moved this ABOVE the title and key indicators
 # Title
 st.title("📊 Education & Career Insights Dashboard")
 
+# Filter DataFrame based on sidebar selections for dynamic syncing
+df_filtered_kpi = df[
+    (df['Current_Job_Level'].isin(selected_bar_levels)) &
+    (df['Entrepreneurship'].isin(selected_statuses)) &
+    (df['Age'].between(age_range[0], age_range[1]))
+]
+
 # --- Key Indicators Section ---
-st.markdown("## 🧭 Key Indicators")
+st.markdown("## 🧭 Key Indicators (Filtered)")
 
-total_respondents = len(df)
-avg_salary = df['Starting_Salary'].mean()
-percent_entrepreneurs = (df['Entrepreneurship'] == 'Yes').mean() * 100
-avg_wlb = df['Work_Life_Balance'].mean()
+# Handle case with no data after filtering
+if df_filtered_kpi.empty:
+    st.warning("⚠️ No data available for the selected filters.")
+else:
+    total_respondents = len(df_filtered_kpi)
+    avg_salary = df_filtered_kpi['Starting_Salary'].mean()
+    percent_entrepreneurs = (df_filtered_kpi['Entrepreneurship'] == 'Yes').mean() * 100
+    avg_wlb = df_filtered_kpi['Work_Life_Balance'].mean()
 
-col1, col2, col3, col4 = st.columns(4)
-col1.metric("👥 Total Respondents", f"{total_respondents:,}")
-col2.metric("💰 Avg. Starting Salary", f"${avg_salary:,.0f}")
-col3.metric("🚀 Entrepreneurs", f"{percent_entrepreneurs:.1f}%")
-col4.metric("⚖️ Avg. Work-Life Balance", f"{avg_wlb:.2f}/10")
+    col1, col2, col3, col4 = st.columns(4)
+    col1.metric("👥 Total Respondents", f"{total_respondents:,}")
+    col2.metric("💰 Avg. Starting Salary", f"${avg_salary:,.0f}")
+    col3.metric("🚀 Entrepreneurs", f"{percent_entrepreneurs:.1f}%")
+    col4.metric("⚖️ Avg. Work-Life Balance", f"{avg_wlb:.2f}/10")
 
 
 # ------------------------ 1. SUNBURST CHART ------------------------
