@@ -142,13 +142,15 @@ fig2.update_layout(
     yaxis=dict(showspikes=True, spikemode="across", spikesnap="cursor", spikedash="dot", spikecolor="gray")
 )
 st.plotly_chart(fig2, use_container_width=True)
-# Interactive note under line chart
-with st.expander("📌 Interpretation Note"):
+with st.expander("📌 Click to read chart interpretation note"):
     st.markdown("""
-    The given line graph shows the connection between average work-life balance and years to promotion of 4 job levels, including *Entry*, *Mid*, *Senior*, and *Executive*, to answer whether the time taken to receive the first promotion and work-life balance skills affect the current job level.
-
-    **Overall**, the *Mid* and *Senior* groups record an upward trajectory, while the others follow a contrasting pattern. The *Executive* level undergoes the most dramatic downfall among the four.
-    """)
+    <div style="background-color: #f0f2f6; border-left: 6px solid #4b6cb7; padding: 16px; border-radius: 8px; margin-top: 10px;">
+        <strong>Note:</strong><br>
+        The given line graph shows the connection between average work-life balance and years to promotion of 4 job levels, including <em>Entry</em>, <em>Mid</em>, <em>Senior</em>, and <em>Executive</em>, to answer whether the time taken to receive the first promotion and work-life balance skills affect the current job level.
+        <br><br>
+        <strong>Insight:</strong> The <em>Mid</em> and <em>Senior</em> groups record an upward trajectory, while the others follow a contrasting pattern. The <em>Executive</em> level undergoes the most dramatic downfall among the four.
+    </div>
+    """, unsafe_allow_html=True)
 
 # ------------------------ 3 & 4. BAR + AREA ------------------------
 st.header("📊 Entrepreneurship by Age and Job Level")
