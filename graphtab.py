@@ -142,7 +142,10 @@ fig2.update_layout(
     yaxis=dict(showspikes=True, spikemode="across", spikesnap="cursor", spikedash="dot", spikecolor="gray")
 )
 st.plotly_chart(fig2, use_container_width=True)
-with st.expander("📌 Click to read chart interpretation note"):
+with st.expander(
+    label="""<span style='font-size:18px; color:#1a4e9a; font-weight:600;'>📌 Click to read chart interpretation note</span>""",
+    expanded=False
+):
     st.markdown("""
     <style>
     @keyframes fadeSlideIn {
@@ -162,7 +165,8 @@ with st.expander("📌 Click to read chart interpretation note"):
         padding: 16px;
         border-radius: 8px;
         margin-top: 10px;
-        margin-bottom: 30px;  /* 👈 Add space to bottom */
+        margin-bottom: 30px;
+        font-family: 'Segoe UI', sans-serif;
     }
     </style>
 
