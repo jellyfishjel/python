@@ -10,6 +10,20 @@ st.set_page_config(page_title="📊 Education & Career Insights", layout="wide")
 # Title
 st.title("📊 Education & Career Insights Dashboard")
 
+# --- Key Indicators Section ---
+st.markdown("## 🧭 Key Indicators")
+
+total_respondents = len(df)
+avg_salary = df['Starting_Salary'].mean()
+percent_entrepreneurs = (df['Entrepreneurship'] == 'Yes').mean() * 100
+avg_wlb = df['Work_Life_Balance'].mean()
+
+col1, col2, col3, col4 = st.columns(4)
+col1.metric("👥 Total Respondents", f"{total_respondents:,}")
+col2.metric("💰 Avg. Starting Salary", f"${avg_salary:,.0f}")
+col3.metric("🚀 Entrepreneurs", f"{percent_entrepreneurs:.1f}%")
+col4.metric("⚖️ Avg. Work-Life Balance", f"{avg_wlb:.2f}/10")
+
 
 # Load Excel data (assumes all data is in the same file)
 @st.cache_data
