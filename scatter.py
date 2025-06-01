@@ -36,7 +36,7 @@ fig = px.scatter(
     filtered_df,
     x="University_GPA",
     y="Starting_Salary",
-    trendline="ols", 
+    trendline="ols",  # thêm đường hồi quy tuyến tính
     opacity=0.7,
     labels={
         "University_GPA": "University GPA",
@@ -46,9 +46,9 @@ fig = px.scatter(
 )
 
 fig.update_layout(
-    plot_bgcolor='rgba(0,0,0,0)', 
-    paper_bgcolor='rgba(0,0,0,0)', 
-    font=dict(color="#FFFFFF"),    
+    plot_bgcolor='rgba(0,0,0,0)',  # nền trong suốt
+    paper_bgcolor='rgba(0,0,0,0)', # nền trong suốt
+    font=dict(color="#FFFFFF"),     # chữ màu trắng cho dark mode (thay đổi tùy thích)
 )
 
 st.plotly_chart(fig, use_container_width=True)
