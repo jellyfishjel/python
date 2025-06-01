@@ -3,9 +3,14 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 
-
 st.set_page_config(page_title="📊 Education & Career Insights", layout="wide")
 
+# Load Excel data (assumes all data is in the same file)
+@st.cache_data
+def load_data():
+    return pd.read_excel("education_career_success.xlsx", sheet_name=0)
+
+df = load_data()  # <<<<< Moved this ABOVE the title and key indicators
 
 # Title
 st.title("📊 Education & Career Insights Dashboard")
@@ -24,43 +29,6 @@ col2.metric("💰 Avg. Starting Salary", f"${avg_salary:,.0f}")
 col3.metric("🚀 Entrepreneurs", f"{percent_entrepreneurs:.1f}%")
 col4.metric("⚖️ Avg. Work-Life Balance", f"{avg_wlb:.2f}/10")
 
-
-# Load Excel data (assumes all data is in the same file)
-@st.cache_data
-def load_data():
-    return pd.read_excel("education_career_success.xlsx", sheet_name=0)
-
-
-df = load_data()
-# ------------------------ KEY INDICATORS ------------------------
-st.markdown("## 🧭 Key Indicators")
-
-# Apply filters consistently across the dataset
-df_filtered_main = df.copy()
-
-# Filter for Job Level (from line chart sidebar)
-if selected_levels and "All" not in selected_levels:
-    df_filtered_main = df_filtered_main[df_filtered_main["Current_Job_Level"].isin(selected_levels)]
-
-# Filter for Bar/Area charts
-df_filtered_main = df_filtered_main[
-    (df_filtered_main['Current_Job_Level'].isin(selected_bar_levels)) &
-    (df_filtered_main['Entrepreneurship'].isin(selected_statuses)) &
-    (df_filtered_main['Age'].between(age_range[0], age_range[1]))
-]
-
-# Calculate KPIs
-total_records = len(df_filtered_main)
-avg_salary = df_filtered_main['Starting_Salary'].mean()
-avg_balance = df_filtered_main['Work_Life_Balance'].mean()
-entrepreneur_rate = (df_filtered_main['Entrepreneurship'] == 'Yes').mean() * 100
-
-# Display KPIs
-col1, col2, col3, col4 = st.columns(4)
-col1.metric("🎓 Total Records", f"{total_records:,}")
-col2.metric("💰 Avg. Starting Salary", f"${avg_salary:,.0f}" if pd.notna(avg_salary) else "N/A")
-col3.metric("⚖️ Avg. Work-Life Balance", f"{avg_balance:.2f}" if pd.notna(avg_balance) else "N/A")
-col4.metric("🚀 Entrepreneurship Rate", f"{entrepreneur_rate:.1f}%")
 
 # ------------------------ 1. SUNBURST CHART ------------------------
 st.header("🌞 Career Path Sunburst")
