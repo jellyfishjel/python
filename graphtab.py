@@ -80,7 +80,7 @@ fig1 = px.sunburst(
     color='Ent_Field',
     color_discrete_map=color_map,
     custom_data=['Percentage'],
-    title='Career Path Insights: Education, Salary & Entrepreneurship'
+    title='Career Path Insights: Education, Salary & Entrepreneurship',
     height = 700
 )
 fig1.update_traces(
