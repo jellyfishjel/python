@@ -81,6 +81,7 @@ fig1 = px.sunburst(
     color_discrete_map=color_map,
     custom_data=['Percentage'],
     title='Career Path Insights: Education, Salary & Entrepreneurship'
+    height = 700
 )
 fig1.update_traces(
     insidetextorientation='radial',
