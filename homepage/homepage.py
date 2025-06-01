@@ -29,7 +29,6 @@ st.markdown("""
             gap: 40px;
             font-size: 18px;
             margin-bottom: 30px;
-            top: 70px;  
         }
         .navbar a {
             color: white;
