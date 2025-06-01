@@ -14,7 +14,6 @@ st.markdown(
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
-         border: 5px solid red;
     }
     </style>
     """,
