@@ -162,7 +162,7 @@ with st.expander("📌 Click to read chart interpretation note"):
         padding: 16px;
         border-radius: 8px;
         margin-top: 10px;
-        margin-bottom: 30px;
+        margin-bottom: 30px;  /* 👈 Add space to bottom */
     }
     </style>
 
@@ -173,24 +173,6 @@ with st.expander("📌 Click to read chart interpretation note"):
         <strong>Insight:</strong> The <em>Mid</em> and <em>Senior</em> groups record an upward trajectory, while the others follow a contrasting pattern. The <em>Executive</em> level undergoes the most dramatic downfall among the four.
     </div>
     """, unsafe_allow_html=True)
-
-    # JavaScript to retrigger animation
-    components.html("""
-    <script>
-    document.querySelectorAll('details').forEach(function(expander) {
-        expander.addEventListener('toggle', function() {
-            if (expander.open) {
-                let animatedBox = expander.querySelector('.animated-box');
-                if (animatedBox) {
-                    animatedBox.style.animation = 'none';
-                    void animatedBox.offsetWidth;
-                    animatedBox.style.animation = 'fadeSlideIn 0.8s ease-in-out';
-                }
-            }
-        });
-    });
-    </script>
-    """, height=0)
 
 # ------------------------ 3 & 4. BAR + AREA ------------------------
 st.header("📊 Entrepreneurship by Age and Job Level")
