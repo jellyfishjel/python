@@ -117,4 +117,35 @@ def show_team(page):
             if st.button("➡️", key="next"):
                 st.session_state.team_page = 2
 
-show_team(st.session_state.team_page)
+def show_team(page):
+    start = 0 if page == 1 else 4
+    end = 4 if page == 1 else len(team_members)
+    members = team_members[start:end]
+
+    cols = st.columns(len(members))
+    for col, member in zip(cols, members):
+        with col:
+            try:
+                img = Image.open(member["image"])
+                # Resize ảnh về cùng 1 kích thước (square)
+                img = img.resize((220, 220))
+                st.image(img, width=220)
+            except:
+                st.warning(f"Không tìm thấy ảnh: {member['image']}")
+            # Tên căn giữa dưới ảnh
+            st.markdown(
+                f"<div style='text-align: center; font-size: 16px; font-weight: bold; margin-top: 8px;'>{member['name']}</div>",
+                unsafe_allow_html=True
+            )
+
+    # Điều chỉnh lại nút chuyển trang đẹp hơn
+    col1, col2, col3 = st.columns([1, 1, 8])
+    with col1:
+        if st.session_state.team_page == 2:
+            if st.button("⬅️", key="prev"):
+                st.session_state.team_page = 1
+    with col2:
+        if st.session_state.team_page == 1:
+            if st.button("➡️", key="next"):
+                st.session_state.team_page = 2
+
