@@ -4,7 +4,7 @@ from PIL import Image
 # ===== SETUP PAGE =====
 st.set_page_config(page_title="Education Career App", layout="wide")
 
-# ===== CSS: Custom Background + Navigation =====
+# ===== CSS: Set background image =====
 st.markdown(
     """
     <style>
@@ -14,25 +14,6 @@ st.markdown(
         background-position: center;
         background-attachment: fixed;
     }
-    .navbar {
-        display: flex;
-        justify-content: center;
-        gap: 40px;
-        font-size: 18px;
-        margin-bottom: 30px;
-    }
-    .navbar a {
-        color: white;
-        text-decoration: none;
-        font-weight: bold;
-    }
-    .team-section {
-        background-image: url("images/team_section_bg.png");
-        background-size: cover;
-        background-position: center;
-        padding: 50px 30px;
-        border-radius: 16px;
-    }
     </style>
     """,
     unsafe_allow_html=True
@@ -40,47 +21,63 @@ st.markdown(
 
 # ===== NAVIGATION BAR =====
 st.markdown("""
-<div class="navbar">
-    <a href="#home">Homepage</a>
-    <a href="#dataset">Dataset Overview</a>
-    <a href="#plot">Plot</a>
-    <a href="#code">Code</a>
-</div>
+    <style>
+        .navbar {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+    <div class="navbar">
+        <a href="#home">Homepage</a>
+        <a href="#dataset">Dataset Overview</a>
+        <a href="#plot">Plot</a>
+        <a href="#code">Code</a>
+    </div>
 """, unsafe_allow_html=True)
 
 # ===== HOMEPAGE SECTION =====
 st.markdown('<a name="home"></a>', unsafe_allow_html=True)
 
 st.markdown("""
-<div style="background: rgba(0, 0, 0, 0.5); 
-            color: white; 
-            text-align: left; 
-            padding: 60px 20px; 
-            border-radius: 15px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;">
-    <div style="font-size: 64px; font-weight: bold;">
-        EDUCATION<br>CAREER<br>SUCCESS
+    <div style="background: rgba(0, 0, 0, 0.5); 
+                color: white; 
+                text-align: center; 
+                padding: 60px 20px; 
+                border-radius: 15px;">
+        <h1 style="font-size: 64px;">EDUCATION<br>CAREER<br>SUCCESS</h1>
+        <br><br>
+        <a href="#team">
+            <button style="margin: 10px; padding: 12px 24px; font-size: 18px; border-radius: 12px;">Learn about us</button>
+        </a>
     </div>
-    <div>
-        <img src="https://upload.wikimedia.org/wikipedia/commons/8/84/Example.svg" width="300">
-    </div>
-</div>
-<br><br>
-<a href="#team">
-    <button style="margin: 10px; padding: 12px 24px; font-size: 18px; border-radius: 20px; background: linear-gradient(to right, #f3ccab, #e2dbc2); border: none;">
-        Learn about us
-    </button>
-</a>
 """, unsafe_allow_html=True)
 
 # ===== TEAM SECTION =====
 st.markdown('<a name="team"></a>', unsafe_allow_html=True)
-st.markdown("<div class='team-section'>", unsafe_allow_html=True)
-st.subheader("Our team ⭐")
+st.subheader("Our Team")
 
-# === Team Members List ===
+# ===== Optional: Add background for team section =====
+st.markdown("""
+    <style>
+    .block-container {
+        background: url("images/team_bg.png");
+        background-size: cover;
+        background-position: center;
+        border-radius: 12px;
+        padding: 20px;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# ===== TEAM MEMBERS DATA (corrected paths) =====
 team_members = [
     {"name": "Kiều Anh", "image": "images/team/Nguyễn Kiều Anh.png"},
     {"name": "Khánh Phương", "image": "images/team/Lê Nguyễn Khánh Phương.png"},
@@ -91,7 +88,7 @@ team_members = [
     {"name": "Bội Ngọc", "image": "images/team/Sazahng.png"},
 ]
 
-# === Pagination State ===
+# ===== PAGINATION =====
 if "team_page" not in st.session_state:
     st.session_state.team_page = 1
 
@@ -104,21 +101,17 @@ def show_team(page):
     for col, member in zip(cols, members):
         with col:
             st.image(member["image"], width=180)
-            st.markdown(f"<div style='text-align: center; font-weight: bold; font-size: 18px'>{member['name']}</div>", unsafe_allow_html=True)
+            st.markdown(f"<div style='text-align: center; font-weight: bold;'>{member['name']}</div>", unsafe_allow_html=True)
 
-    # Navigation Buttons
-    nav_col1, nav_col2 = st.columns([10, 1])
-    with nav_col1:
-        pass
-    with nav_col2:
-        left, right = st.columns(2)
-        with left:
-            if st.session_state.team_page == 2 and st.button("⬅️", key="prev"):
+    col1, col2 = st.columns([1, 9])
+    with col1:
+        if st.session_state.team_page == 2:
+            if st.button("⬅️", key="prev"):
                 st.session_state.team_page = 1
-        with right:
-            if st.session_state.team_page == 1 and st.button("➡️", key="next"):
+    with col2:
+        if st.session_state.team_page == 1:
+            if st.button("➡️", key="next"):
                 st.session_state.team_page = 2
 
 show_team(st.session_state.team_page)
 
-st.markdown("</div>", unsafe_allow_html=True)
