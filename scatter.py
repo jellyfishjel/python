@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
+import plotly.express as px
 
 st.title("🎓 University GPA vs. Starting Salary")
 
@@ -11,6 +10,7 @@ def load_data():
 
 df = load_data()
 
+# Tạo nhóm GPA
 df["GPA_Group"] = pd.cut(
     df["University_GPA"],
     bins=[2.0, 2.5, 3.0, 3.5, 4.0],
@@ -18,21 +18,37 @@ df["GPA_Group"] = pd.cut(
     include_lowest=True
 )
 
+# Lựa chọn nhóm GPA
 selected_gpa = st.selectbox("Select GPA Group", ["All"] + df["GPA_Group"].cat.categories.tolist())
+
+# Lựa chọn khoảng lương
 salary_min, salary_max = int(df["Starting_Salary"].min()), int(df["Starting_Salary"].max())
 salary_range = st.slider("Select Starting Salary Range", salary_min, salary_max, (salary_min, salary_max), 1000)
 
-# Filter
-mask = (df["Starting_Salary"].between(*salary_range))
+# Lọc dữ liệu
+mask = df["Starting_Salary"].between(*salary_range)
 if selected_gpa != "All":
     mask &= (df["GPA_Group"] == selected_gpa)
 filtered_df = df[mask]
 
-# Plot
-fig, ax = plt.subplots(figsize=(8, 6))
-sns.regplot(x='University_GPA', y='Starting_Salary', data=filtered_df, ax=ax, scatter_kws={'alpha': 0.7})
-ax.set_xlabel('University GPA')
-ax.set_ylabel('Starting Salary')
-ax.grid(True)
-st.pyplot(fig)
+# Vẽ biểu đồ scatter plot có đường hồi quy bằng plotly express
+fig = px.scatter(
+    filtered_df,
+    x="University_GPA",
+    y="Starting_Salary",
+    trendline="ols", 
+    opacity=0.7,
+    labels={
+        "University_GPA": "University GPA",
+        "Starting_Salary": "Starting Salary"
+    },
+    title="GPA vs. Starting Salary"
+)
 
+fig.update_layout(
+    plot_bgcolor='rgba(0,0,0,0)', 
+    paper_bgcolor='rgba(0,0,0,0)', 
+    font=dict(color="#FFFFFF"),    
+)
+
+st.plotly_chart(fig, use_container_width=True)
