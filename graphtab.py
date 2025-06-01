@@ -162,6 +162,7 @@ with st.expander("📌 Click to read chart interpretation note"):
         padding: 16px;
         border-radius: 8px;
         margin-top: 10px;
+        margin-bottom: 30px;  /* 👈 Add space to bottom */
     }
     </style>
 
