@@ -81,7 +81,7 @@ st.markdown("""
 # ===== TEAM MEMBERS DATA  =====
 team_members = [
     {"name": "Kiều Anh", "image": "homepage/team/Nguyen Kieu Anh.png"},
-    {"name": "Khánh Phương", "image": "homepage/team/LeNguyen Khanh Phuong.png"},
+    {"name": "Khánh Phương", "image": "homepage/team/Le Nguyen Khanh Phuong.png"},
     {"name": "Bảo Ngọc", "image": "homepage/team/Nguyen Bao Ngoc.png"},
     {"name": "Khánh Linh", "image": "homepage/team/Nguyen Tran Khanh Linh.png"},
     {"name": "Bảo Nguyên", "image": "homepage/team/Nguyen Huynh Bao Nguyen.png"},
