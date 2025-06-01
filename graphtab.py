@@ -150,7 +150,8 @@ with st.expander("📌 Click to read chart interpretation note"):
         border-left: 6px solid #3366cc;
         padding: 20px;                 
         border-radius: 10px;           
-        margin-top: 12px;             
+        margin-top: 12px;
+        margin-bottom: 30px;
         font-size: 15px;               
         color: #333333;              
         line-height: 1.6;           
