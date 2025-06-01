@@ -65,17 +65,17 @@ st.markdown("""
 
 # ===== TEAM SECTION =====
 st.markdown('<a name="team"></a>', unsafe_allow_html=True)
-st.subheader("Our Team ✨")
+st.subheader("Our Team")
 
 # Save team data
 team_members = [
-    {"name": "Nguyễn Kiều Anh", "image": "team/Nguyễn Kiều Anh.png"},
-    {"name": "Lê Nguyễn Khánh Phương", "image": "team/Lê Nguyễn Khánh Phương.png"},
-    {"name": "Nguyễn Bảo Ngọc", "image": "team/Nguyễn Bảo Ngọc.png"},
-    {"name": "Nguyễn Trần Khánh Linh", "image": "team/Nguyễn Trần Khánh Linh.png"},
-    {"name": "Nguyễn Huỳnh Bảo Nguyên", "image": "team/Nguyễn Huỳnh Bảo Nguyên.png"},
-    {"name": "Vũ Thị Thu Thảo", "image": "team/Vũ Thị Thu Thảo.png"},
-    {"name": "Sazahng", "image": "team/Sazahng.png"},
+    {"name": "Kiều Anh", "image": "team/Nguyễn Kiều Anh.png"},
+    {"name": "Khánh Phương", "image": "team/Lê Nguyễn Khánh Phương.png"},
+    {"name": "Bảo Ngọc", "image": "team/Nguyễn Bảo Ngọc.png"},
+    {"name": "Khánh Linh", "image": "team/Nguyễn Trần Khánh Linh.png"},
+    {"name": "Bảo Nguyên", "image": "team/Nguyễn Huỳnh Bảo Nguyên.png"},
+    {"name": "Thu Thảo", "image": "team/Vũ Thị Thu Thảo.png"},
+    {"name": "Bội Ngọc", "image": "team/Sazahng.png"},
 ]
 
 # Chia nhóm thành 2 trang hiển thị
