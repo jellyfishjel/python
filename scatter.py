@@ -45,8 +45,9 @@ fig = px.scatter(
     title="GPA vs. Starting Salary"
 )
 
-# Đổi màu đường hồi quy thành đỏ
-fig.data[1].line.color = 'red'
+fig.data[1].line.color = '#FFA500'  # màu cam
+
+fig.data[0].marker.color = '#00BFFF'  # màu DeepSkyBlue (xanh dương sáng)
 
 # Tăng chiều cao biểu đồ
 fig.update_layout(
