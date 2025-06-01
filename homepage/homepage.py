@@ -10,7 +10,7 @@ st.markdown(
     """
     <style>
     .stApp {
-        background-image: url("https://www.google.com/url?sa=i&url=https%3A%2F%2Fen.wikipedia.org%2Fwiki%2FList_of_most_popular_dog_breeds_in_the_United_States&psig=AOvVaw2_oqR-EayWEQDdyke1KheU&ust=1748851198812000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCJDaifLfz40DFQAAAAAdAAAAABAL");
+        background-image: url("homepage/images/homepage_bg.png");
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
