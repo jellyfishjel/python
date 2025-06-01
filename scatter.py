@@ -5,10 +5,11 @@ import matplotlib.pyplot as plt
 
 st.title("🎓 University GPA vs. Starting Salary")
 
-uploaded_file = st.file_uploader("Upload your Excel file", type=["xlsx"])
+@st.cache_data
+def load_data():
+    return pd.read_excel("education_career_success.xlsx", sheet_name=0)
 
-if uploaded_file:
-    df = pd.read_excel(uploaded_file, sheet_name="education_career_success")
+df = load_data()
 
     # Group GPA
     df["GPA_Group"] = pd.cut(
