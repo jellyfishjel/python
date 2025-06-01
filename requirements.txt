@@ -4,3 +4,4 @@ plotly
 openpyxl
 seaborn
 streamlit-extras
+statsmodels
