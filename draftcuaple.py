@@ -1,296 +1,266 @@
 import streamlit as st
 import pandas as pd
-import plotly.graph_objects as go
 import plotly.express as px
-import base64
+import plotly.graph_objects as go
 
-# === PAGE CONFIGURATION ===
-st.set_page_config(
-    page_title="Education & Career Success",
-    layout="wide",
-    initial_sidebar_state="collapsed"
-)
 
-# === BACKGROUND IMAGE SETUP ===
-def get_base64(file_path):
-    with open(file_path, "rb") as f:
-        return base64.b64encode(f.read()).decode()
+st.set_page_config(page_title="📊 Education & Career Insights", layout="wide")
 
-img_path = r"D:\bg.png"
-img_base64 = get_base64(img_path)
 
-# === INJECT BACKGROUND CSS ===
-st.markdown(
-    f"""
-    <style>
-    .stApp {{
-        background-image: url("data:image/png;base64,{img_base64}");
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-attachment: fixed;
-        background-position: center;
-    }}
-    .main-title {{
-        text-align: center;
-        color: #FF6F00;
-        font-size: 40px;
-        font-weight: bold;
-        margin-bottom: 30px;
-    }}
-    .stTabs [data-baseweb="tab-list"] {{
-        gap: 8px;
-        justify-content: flex-start;
-    }}
-    .stTabs [data-baseweb="tab"] {{
-        background-color: #FFE0B2;
-        border-radius: 16px;
-        padding: 6px 14px;
-        font-size: 18px;
-        font-weight: 600;
-        color: #E65100;
-        transition: all 0.3s ease;
-        height: 42px;
-        min-width: 120px;
-        text-align: center;
-        border: none;
-        box-shadow: none;
-    }}
-    .stTabs [aria-selected="true"] {{
-        background: linear-gradient(135deg, #FF9800, #FF7043);
-        color: white;
-        transform: none;
-        box-shadow: none;
-    }}
-    .stTabs [data-baseweb="tab"]:hover {{
-        background: linear-gradient(135deg, #FFD180, #FFB74D);
-        cursor: pointer;
-    }}
-    </style>
-    """,
-    unsafe_allow_html=True
-)
+# Title
+st.title("📊 Education & Career Insights Dashboard")
 
-# === MAIN TITLE ===
-st.markdown('<div class="main-title">Education & Career Success</div>', unsafe_allow_html=True)
 
-# === LOAD DATA ===
+# Load Excel data (assumes all data is in the same file)
 @st.cache_data
 def load_data():
-    return pd.read_csv("D:\\VGU\\education_career_success.csv")
+    return pd.read_excel("education_career_success.xlsx", sheet_name=0)
+
 
 df = load_data()
 
-# === SIDEBAR FILTERS ===
-st.sidebar.title("Filters")
 
-# Job Levels
-job_levels = sorted(df['Current_Job_Level'].dropna().unique())
-selected_levels = st.sidebar.multiselect("Job Levels", job_levels, default=job_levels)
+# ------------------------ 1. SUNBURST CHART ------------------------
+st.header("🌞 Career Path Sunburst")
 
-# Ages
-ages = sorted(df['Age'].dropna().unique())
-ages_all = ['ALL'] + [str(a) for a in ages]
-selected_ages = st.sidebar.multiselect("Ages", ages_all, default=['ALL'])
 
-# Entrepreneurship
-statuses = ['Yes', 'No']
-selected_statuses = st.sidebar.multiselect("Entrepreneurship", statuses, default=statuses)
+def categorize_salary(salary):
+    if salary < 30000:
+        return '<30K'
+    elif salary < 50000:
+        return '30K–50K'
+    elif salary < 70000:
+        return '50K–70K'
+    else:
+        return '70K+'
 
-# Mode
-mode = st.sidebar.radio("Show as:", ["Percentage (%)", "Count"], index=0)
 
-# Filtered Data
-df_filtered = df[
-    df['Current_Job_Level'].isin(selected_levels) &
-    df['Entrepreneurship'].isin(selected_statuses)
+df['Salary_Group'] = df['Starting_Salary'].apply(categorize_salary)
+
+
+sunburst_data = df.groupby(['Entrepreneurship', 'Field_of_Study', 'Salary_Group']).size().reset_index(name='Count')
+total_count = sunburst_data['Count'].sum()
+sunburst_data['Percentage'] = (sunburst_data['Count'] / total_count * 100).round(2)
+
+
+ent_totals = sunburst_data.groupby('Entrepreneurship')['Count'].sum()
+sunburst_data['Ent_Label'] = sunburst_data['Entrepreneurship'].map(
+    lambda x: f"{x}<br>{round(ent_totals[x] / total_count * 100, 2)}%"
+)
+
+
+field_totals = sunburst_data.groupby(['Entrepreneurship', 'Field_of_Study'])['Count'].sum()
+sunburst_data['Field_Label'] = sunburst_data.apply(
+    lambda row: f"{row['Field_of_Study']}<br>{round(field_totals[(row['Entrepreneurship'], row['Field_of_Study'])] / total_count * 100, 2)}%",
+    axis=1
+)
+
+
+sunburst_data['Salary_Label'] = sunburst_data['Salary_Group'] + '<br>' + sunburst_data['Percentage'].astype(str) + '%'
+sunburst_data['Ent_Field'] = sunburst_data['Entrepreneurship'] + " - " + sunburst_data['Field_of_Study']
+
+
+yes_colors = {
+    'Engineering': '#aedea7', 'Business': '#dbf1d5', 'Arts': '#0c7734',
+    'Computer Science': '#73c375', 'Medicine': '#00441b', 'Law': '#f7fcf5', 'Mathematics': '#37a055'
+}
+no_colors = {
+    'Engineering': '#005b96', 'Business': '#03396c', 'Arts': '#009ac7',
+    'Computer Science': '#8ed2ed', 'Medicine': '#b3cde0', 'Law': '#5dc4e1', 'Mathematics': '#0a70a9'
+}
+color_map = {f"Yes - {k}": v for k, v in yes_colors.items()}
+color_map.update({f"No - {k}": v for k, v in no_colors.items()})
+color_map.update({'Yes': '#ffd16a', 'No': '#ffd16a'})
+
+
+fig1 = px.sunburst(
+    sunburst_data,
+    path=['Ent_Label', 'Field_Label', 'Salary_Label'],
+    values='Count',
+    color='Ent_Field',
+    color_discrete_map=color_map,
+    custom_data=['Percentage'],
+    title='Career Path Insights: Education, Salary & Entrepreneurship',
+    height = 500
+)
+fig1.update_traces(
+    insidetextorientation='radial',
+    maxdepth=2,
+    branchvalues="total",
+    textinfo='label+text',
+    hovertemplate="<b>%{label}</b><br>Value: %{value}<br>"
+)
+st.plotly_chart(fig1, use_container_width=True)
+
+
+# ------------------------ 2. LINE CHART ------------------------
+st.header("📈 Work-Life Balance by Job Level and Promotion Timeline")
+
+
+avg_balance = (
+    df.groupby(['Current_Job_Level', 'Years_to_Promotion'])['Work_Life_Balance']
+    .mean().reset_index()
+)
+
+
+job_levels_order = ['Entry', 'Mid', 'Senior', 'Executive']
+avg_balance['Current_Job_Level'] = pd.Categorical(avg_balance['Current_Job_Level'],
+                                                  categories=job_levels_order, ordered=True)
+
+
+selected_levels = st.sidebar.multiselect("Select Job Levels (Line Chart)", job_levels_order + ["All"], default=["All"])
+filtered_line_data = avg_balance if "All" in selected_levels or not selected_levels else \
+    avg_balance[avg_balance["Current_Job_Level"].isin(selected_levels)]
+
+
+fig2 = go.Figure()
+colors = {"Entry": "#1f77b4", "Mid": "#ff7f0e", "Senior": "#2ca02c", "Executive": "#d62728"}
+
+
+for level in job_levels_order:
+    if "All" in selected_levels or level in selected_levels:
+        data_level = filtered_line_data[filtered_line_data["Current_Job_Level"] == level]
+        fig2.add_trace(go.Scatter(
+            x=data_level["Years_to_Promotion"],
+            y=data_level["Work_Life_Balance"],
+            mode="lines+markers",
+            name=level,
+            line=dict(color=colors[level]),
+            hovertemplate=f"%{{y:.2f}}"
+        ))
+
+
+fig2.update_layout(
+    title="Average Work-Life Balance by Years to Promotion",
+    xaxis_title="Years to Promotion",
+    yaxis_title="Average Work-Life Balance",
+    height=600,
+    title_x=0.5,
+    legend_title_text="Job Level",
+    hovermode="x unified",
+    xaxis=dict(showspikes=True, spikemode="across", spikesnap="cursor", spikedash="dot", spikecolor="gray"),
+    yaxis=dict(showspikes=True, spikemode="across", spikesnap="cursor", spikedash="dot", spikecolor="gray")
+)
+st.plotly_chart(fig2, use_container_width=True)
+with st.expander("📌 Click to read chart interpretation note"):
+    st.markdown("""
+    <style>
+    @keyframes fadeSlideIn {
+        0% {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    .animated-box {
+        animation: fadeSlideIn 0.8s ease-in-out;
+        background-color: #f0f2f6;
+        border-left: 6px solid #4b6cb7;
+        padding: 16px;
+        border-radius: 8px;
+        margin-top: 10px;
+        margin-bottom: 30px;  /* 👈 Add space to bottom */
+    }
+    </style>
+
+    <div class="animated-box">
+        <strong>Note:</strong><br>
+        The given line graph shows the connection between average work-life balance and years to promotion of 4 job levels, including <em>Entry</em>, <em>Mid</em>, <em>Senior</em>, and <em>Executive</em>, to answer whether the time taken to receive the first promotion and work-life balance skills affect the current job level.
+        <br><br>
+        <strong>Insight:</strong> The <em>Mid</em> and <em>Senior</em> groups record an upward trajectory, while the others follow a contrasting pattern. The <em>Executive</em> level undergoes the most dramatic downfall among the four.
+    </div>
+    """, unsafe_allow_html=True)
+
+# ------------------------ 3 & 4. BAR + AREA ------------------------
+st.header("📊 Entrepreneurship by Age and Job Level")
+
+
+df_filtered = df[df['Entrepreneurship'].isin(['Yes', 'No'])]
+df_grouped = df_filtered.groupby(['Current_Job_Level', 'Age', 'Entrepreneurship']).size().reset_index(name='Count')
+df_grouped['Percentage'] = df_grouped.groupby(['Current_Job_Level', 'Age'])['Count'].transform(lambda x: x / x.sum())
+
+
+job_levels = sorted(df_grouped['Current_Job_Level'].unique())
+selected_bar_levels = st.sidebar.multiselect("Select Job Levels (Bar/Area Charts)", job_levels, default=job_levels)
+min_age, max_age = int(df_grouped['Age'].min()), int(df_grouped['Age'].max())
+age_range = st.sidebar.slider("Select Age Range", min_value=min_age, max_value=max_age, value=(min_age, max_age))
+selected_statuses = st.sidebar.multiselect("Select Entrepreneurship Status", ['Yes', 'No'], default=['Yes', 'No'])
+
+
+filtered = df_grouped[
+    (df_grouped['Current_Job_Level'].isin(selected_bar_levels)) &
+    (df_grouped['Entrepreneurship'].isin(selected_statuses)) &
+    (df_grouped['Age'].between(age_range[0], age_range[1]))
 ]
 
-if 'ALL' not in selected_ages:
-    selected_ages_int = [int(a) for a in selected_ages]
-    df_filtered = df_filtered[df_filtered['Age'].isin(selected_ages_int)]
 
-# === TABS ===
-tab1, tab2, tab3 = st.tabs(["Homepage", "Visualisation", "Insights"])
+def get_font_size(n): return {1: 20, 2: 18, 3: 16, 4: 14, 5: 12, 6: 11, 7: 10, 8: 9, 9: 8, 10: 7}.get(n, 6)
 
-with tab1:
-    st.subheader("Welcome to the Education & Career Success Portal")
-    st.write("This platform explores the relationship between education and career outcomes.")
 
-with tab2:
-    st.subheader("Data Visualisation")
+color_map = {'Yes': '#FFD700', 'No': '#004080'}
+level_order = ['Entry', 'Executive', 'Mid', 'Senior']
+visible_levels = [lvl for lvl in level_order if lvl in selected_bar_levels]
 
-    # === LINE CHART ===
-    df_line = df_filtered.pivot_table(
-        index='Years_to_Promotion',
-        columns='Current_Job_Level',
-        values='Work_Life_Balance'
-    ).reset_index()
-    df_line.columns.name = None
 
-    fig_line = go.Figure()
-    levels = {
-        "Entry": "blue",
-        "Mid": "orange",
-        "Senior": "green",
-        "Executive": "red"
-    }
+for level in visible_levels:
+    data = filtered[filtered['Current_Job_Level'] == level]
+    if data.empty:
+        st.write(f"### {level} – No data available")
+        continue
 
-    for level, color in levels.items():
-        if level in df_line.columns:
-            fig_line.add_trace(go.Scatter(
-                x=df_line["Years_to_Promotion"],
-                y=df_line[level],
-                mode="lines+markers",
-                name=level,
-                line=dict(color=color),
-                hovertemplate=f"%{{y:.2f}}"
-            ))
 
-    fig_line.update_layout(
-        title="Average Work-Life Balance by Years to Promotion",
-        xaxis_title="Years to Promotion",
-        yaxis_title="Average Work-Life Balance",
-        hovermode="x unified",
-        template="plotly_dark",
-        plot_bgcolor='rgba(0,0,0,0)',
-        paper_bgcolor='rgba(0,0,0,0)'
+    ages = sorted(data['Age'].unique())
+    font_size = get_font_size(len(ages))
+    chart_width = max(400, min(1200, 50 * len(ages) + 100))
+
+
+    fig_bar = px.bar(
+        data, x='Age', y='Percentage', color='Entrepreneurship', barmode='stack',
+        color_discrete_map=color_map, category_orders={'Entrepreneurship': ['No', 'Yes'], 'Age': ages},
+        labels={'Age': 'Age', 'Percentage': 'Percentage'}, height=400, width=chart_width,
+        title=f"{level} Level – Entrepreneurship by Age (%)"
     )
 
-    st.plotly_chart(fig_line, use_container_width=True)
 
-    with st.expander("📈 **Line Chart Description**"):
-        st.markdown("""<div style="background-color: #FFFFFF; padding: 25px; border-radius: 20px; color: #5D4037; font-size: 16px; line-height: 1.6; font-weight: 500;">
-        The given line graph shows the connection between average work-life balance and years to promotion of 4 job levels... [Cắt ngắn phần mô tả nếu cần]
-        </div>""", unsafe_allow_html=True)
+    for status in ['No', 'Yes']:
+        for _, row in data[data['Entrepreneurship'] == status].iterrows():
+            if row['Percentage'] > 0:
+                y_pos = 0.20 if status == 'No' else 0.90
+                fig_bar.add_annotation(
+                    x=row['Age'], y=y_pos, text=f"{row['Percentage']:.0%}",
+                    showarrow=False, font=dict(color="white", size=font_size),
+                    xanchor="center", yanchor="middle"
+                )
 
-    # === SUNBURST CHART ===
-    def categorize_salary(salary):
-        if salary < 30000:
-            return '<30K'
-        elif salary < 50000:
-            return '30K–50K'
-        elif salary < 70000:
-            return '50K–70K'
-        else:
-            return '70K+'
 
-    df_filtered['Salary_Group'] = df_filtered['Starting_Salary'].apply(categorize_salary)
-
-    sunburst_data = df_filtered.groupby(['Entrepreneurship', 'Field_of_Study', 'Salary_Group']).size().reset_index(name='Count')
-    total_count = sunburst_data['Count'].sum()
-    sunburst_data['Percentage'] = (sunburst_data['Count'] / total_count * 100).round(2)
-
-    ent_totals = sunburst_data.groupby('Entrepreneurship')['Count'].sum()
-    sunburst_data['Ent_Label'] = sunburst_data['Entrepreneurship'].map(lambda x: f"{x}<br>{round(ent_totals[x] / total_count * 100, 2)}%")
-
-    field_totals = sunburst_data.groupby(['Entrepreneurship', 'Field_of_Study'])['Count'].sum()
-    sunburst_data['Field_Label'] = sunburst_data.apply(
-        lambda row: f"{row['Field_of_Study']}<br>{round(field_totals[(row['Entrepreneurship'], row['Field_of_Study'])] / total_count * 100, 2)}%", axis=1)
-
-    sunburst_data['Salary_Label'] = sunburst_data['Salary_Group'] + '<br>' + sunburst_data['Percentage'].astype(str) + '%'
-    sunburst_data['Ent_Field'] = sunburst_data['Entrepreneurship'] + " - " + sunburst_data['Field_of_Study']
-
-    yes_colors = {
-        'Engineering': '#aedea7', 'Business': '#dbf1d5', 'Arts': '#0c7734',
-        'Computer Science': '#73c375', 'Medicine': '#00441b', 'Law': '#f7fcf5', 'Mathematics': '#37a055'
-    }
-    no_colors = {
-        'Engineering': '#005b96', 'Business': '#03396c', 'Arts': '#009ac7',
-        'Computer Science': '#8ed2ed', 'Medicine': '#b3cde0', 'Law': '#5dc4e1', 'Mathematics': '#0a70a9'
-    }
-
-    color_map = {}
-    for field, color in yes_colors.items():
-        color_map[f"Yes - {field}"] = color
-    for field, color in no_colors.items():
-        color_map[f"No - {field}"] = color
-    color_map['Yes'] = '#ffd16a'
-    color_map['No'] = '#ffd16a'
-
-    fig_sunburst = px.sunburst(
-        sunburst_data,
-        path=['Ent_Label', 'Field_Label', 'Salary_Label'],
-        values='Count',
-        color='Ent_Field',
-        color_discrete_map=color_map,
-        custom_data=['Percentage'],
-        title='Career Path Insights: Education, Salary & Entrepreneurship'
+    fig_bar.update_layout(
+        margin=dict(t=40, l=40, r=40, b=40),
+        legend_title_text='Entrepreneurship',
+        xaxis_tickangle=90, bargap=0.1
     )
+    fig_bar.update_yaxes(tickformat=".0%", title="Percentage")
 
-    fig_sunburst.update_traces(
-        insidetextorientation='radial',
-        maxdepth=2,
-        branchvalues="total",
-        textinfo='label+text',
-        hovertemplate="<b>%{label}</b><br>Value: %{value}<br>"
+
+    fig_area = px.area(
+        data, x='Age', y='Count', color='Entrepreneurship', markers=True,
+        color_discrete_map=color_map, category_orders={'Entrepreneurship': ['No', 'Yes'], 'Age': ages},
+        labels={'Age': 'Age', 'Count': 'Count'}, height=400, width=chart_width,
+        title=f"{level} Level – Entrepreneurship by Age (Count)"
     )
-
-    fig_sunburst.update_layout(
-        width=500,
-        height=500,
-        margin=dict(t=50, l=0, r=0, b=0),
-        plot_bgcolor='rgba(0,0,0,0)',
-        paper_bgcolor='rgba(0,0,0,0)'
+    fig_area.update_traces(line=dict(width=2), marker=dict(size=8))
+    fig_area.update_layout(
+        margin=dict(t=40, l=40, r=40, b=40),
+        legend_title_text='Entrepreneurship',
+        xaxis_tickangle=90
     )
+    fig_area.update_yaxes(title="Count")
 
-    st.plotly_chart(fig_sunburst, use_container_width=True)
 
-    # === STACKED BAR CHART ===
-    df_grouped = df_filtered.groupby(['Current_Job_Level', 'Age', 'Entrepreneurship']).size().reset_index(name='Count')
-    df_grouped['Percentage'] = df_grouped.groupby(['Current_Job_Level', 'Age'])['Count'].transform(lambda x: x / x.sum())
-
-    colors = {'Yes': '#FFD700', 'No': '#004080'}
-    order_levels = ['Entry', 'Mid', 'Senior', 'Executive']
-    levels_to_show = [lvl for lvl in order_levels if lvl in selected_levels]
-
-    cols = st.columns(2)
-
-    for i, lvl in enumerate(levels_to_show):
-        data_lvl = df_grouped[df_grouped['Current_Job_Level'] == lvl]
-        if data_lvl.empty:
-            with cols[i % 2]:
-                st.write(f"### {lvl} — No data")
-            continue
-
-        y_col = 'Percentage' if mode == "Percentage (%)" else 'Count'
-        fmt = (lambda x: f"{x:.0%}") if mode == "Percentage (%)" else (lambda x: str(x))
-        y_axis_title = "Percentage" if mode == "Percentage (%)" else "Count"
-        y_tick_format = ".0%" if mode == "Percentage (%)" else ""
-
-        fig_bar = go.Figure()
-
-        for status in selected_statuses:
-            filtered_status = data_lvl[data_lvl['Entrepreneurship'] == status]
-            fig_bar.add_trace(go.Bar(
-                x=filtered_status['Age'].astype(str),
-                y=filtered_status[y_col],
-                name=status,
-                marker_color=colors.get(status, '#CCCCCC'),
-                text=filtered_status[y_col].apply(fmt),
-                textposition='inside'
-            ))
-
-        fig_bar.update_layout(
-            title=f"Entrepreneurship Distribution — {lvl}",
-            barmode='stack',
-            xaxis_title="Age",
-            yaxis_title=y_axis_title,
-            yaxis_tickformat=y_tick_format,
-            yaxis_range=[0, 1] if mode == "Percentage (%)" else None,
-            template="plotly_white",
-            legend_title_text="Entrepreneurship",
-            plot_bgcolor='rgba(0,0,0,0)',
-            paper_bgcolor='rgba(0,0,0,0)'
-        )
-
-        with cols[i % 2]:
-            st.plotly_chart(fig_bar, use_container_width=True)
-
-    with st.expander("📊 **Stacked Bar Chart Description**"):
-        st.markdown("""<div style="background-color: #FFFFFF; padding: 25px; border-radius: 20px; color: #5D4037; font-size: 16px; line-height: 1.6; font-weight: 500;">
-        The plot provides a visual representation of the proportion of entrepreneurship across different job levels and age groups... [Cắt ngắn phần mô tả nếu cần]
-        </div>""", unsafe_allow_html=True)
-
-with tab3:
-    st.subheader("Insights & Conclusions")
-    st.write("Summary of key insights from the visualisations.")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.plotly_chart(fig_bar, use_container_width=True)
+    with col2:
+        st.plotly_chart(fig_area, use_container_width=True)
