@@ -261,4 +261,4 @@ fig.update_layout(
                spikedash="dot", spikethickness=1, spikecolor="gray")
 )
 
-    st.plotly_chart(fig, use_container_width=True)
+st.plotly_chart(fig, use_container_width=True)
