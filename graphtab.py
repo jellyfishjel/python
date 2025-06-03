@@ -16,17 +16,18 @@ df = load_data()
 # === SECTION 1: Career Path Sunburst ===
 st.subheader("🌞 Career Path Sunburst")
 sunburst_df = df.copy()
-def categorize_salary(salary):
-    if salary < 30000:
-        return '<30K'
-    elif salary < 50000:
-        return '30K–50K'
-    elif salary < 70000:
-        return '50K–70K'
-        else:
-        return '70K+'
 
-    sunburst_df['Salary_Group'] = sunburst_df['Starting_Salary'].apply(categorize_salary)
+def categorize_salary(salary):
+        if salary < 30000:
+            return '<30K'
+        elif salary < 50000:
+            return '30K–50K'
+        elif salary < 70000:
+            return '50K–70K'
+        else:
+            return '70K+'
+
+sunburst_df['Salary_Group'] = sunburst_df['Starting_Salary'].apply(categorize_salary)
 
     sunburst_data = sunburst_df.groupby(['Entrepreneurship', 'Field_of_Study', 'Salary_Group']).size().reset_index(name='Count')
     total_count = sunburst_data['Count'].sum()
@@ -110,7 +111,6 @@ def categorize_salary(salary):
 - Labels include percentage share  
 - Click to zoom into segments  
         """)
-
 # === SECTION 2: Job Level vs Age (Bar + Area) ===
 with st.expander("📊 Entrepreneurship by Age & Job Level", expanded=True):
     job_df = df[df['Entrepreneurship'].isin(['Yes', 'No'])].copy()
