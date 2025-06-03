@@ -14,103 +14,101 @@ def load_data():
 df = load_data()
 
 # === SECTION 1: Career Path Sunburst ===
-with st.expander("🌞 Career Path Sunburst", expanded=True):
-    sunburst_df = df.copy()
+st.markdown("## 🌞 Career Path Sunburst")
 
-    def categorize_salary(salary):
-        if salary < 30000:
-            return '<30K'
-        elif salary < 50000:
-            return '30K–50K'
-        elif salary < 70000:
-            return '50K–70K'
-        else:
-            return '70K+'
+sunburst_df = df.copy()
 
-    sunburst_df['Salary_Group'] = sunburst_df['Starting_Salary'].apply(categorize_salary)
+def categorize_salary(salary):
+    if salary < 30000:
+        return '<30K'
+    elif salary < 50000:
+        return '30K–50K'
+    elif salary < 70000:
+        return '50K–70K'
+    else:
+        return '70K+'
 
-    sunburst_data = sunburst_df.groupby(['Entrepreneurship', 'Field_of_Study', 'Salary_Group']).size().reset_index(name='Count')
-    total_count = sunburst_data['Count'].sum()
-    sunburst_data['Percentage'] = (sunburst_data['Count'] / total_count * 100).round(2)
+sunburst_df['Salary_Group'] = sunburst_df['Starting_Salary'].apply(categorize_salary)
 
-    ent_totals = sunburst_data.groupby('Entrepreneurship')['Count'].sum()
-    sunburst_data['Ent_Label'] = sunburst_data['Entrepreneurship'].map(
-        lambda x: f"{x}<br>{round(ent_totals[x] / total_count * 100, 2)}%"
-    )
+sunburst_data = sunburst_df.groupby(['Entrepreneurship', 'Field_of_Study', 'Salary_Group']).size().reset_index(name='Count')
+total_count = sunburst_data['Count'].sum()
+sunburst_data['Percentage'] = (sunburst_data['Count'] / total_count * 100).round(2)
 
-    field_totals = sunburst_data.groupby(['Entrepreneurship', 'Field_of_Study'])['Count'].sum()
-    sunburst_data['Field_Label'] = sunburst_data.apply(
-        lambda row: f"{row['Field_of_Study']}<br>{round(field_totals[(row['Entrepreneurship'], row['Field_of_Study'])] / total_count * 100, 2)}%",
-        axis=1
-    )
+ent_totals = sunburst_data.groupby('Entrepreneurship')['Count'].sum()
+sunburst_data['Ent_Label'] = sunburst_data['Entrepreneurship'].map(
+    lambda x: f"{x}<br>{round(ent_totals[x] / total_count * 100, 2)}%"
+)
 
-    sunburst_data['Salary_Label'] = sunburst_data['Salary_Group'] + '<br>' + sunburst_data['Percentage'].astype(str) + '%'
-    sunburst_data['Ent_Field'] = sunburst_data['Entrepreneurship'] + " - " + sunburst_data['Field_of_Study']
+field_totals = sunburst_data.groupby(['Entrepreneurship', 'Field_of_Study'])['Count'].sum()
+sunburst_data['Field_Label'] = sunburst_data.apply(
+    lambda row: f"{row['Field_of_Study']}<br>{round(field_totals[(row['Entrepreneurship'], row['Field_of_Study'])] / total_count * 100, 2)}%",
+    axis=1
+)
 
-    yes_colors = {
-        'Engineering': '#aedea7',
-        'Business': '#dbf1d5',
-        'Arts': '#0c7734',
-        'Computer Science': '#73c375',
-        'Medicine': '#00441b',
-        'Law': '#f7fcf5',
-        'Mathematics': '#37a055'
-    }
+sunburst_data['Salary_Label'] = sunburst_data['Salary_Group'] + '<br>' + sunburst_data['Percentage'].astype(str) + '%'
+sunburst_data['Ent_Field'] = sunburst_data['Entrepreneurship'] + " - " + sunburst_data['Field_of_Study']
 
-    no_colors = {
-        'Engineering': '#005b96',
-        'Business': '#03396c',
-        'Arts': '#009ac7',
-        'Computer Science': '#8ed2ed',
-        'Medicine': '#b3cde0',
-        'Law': '#5dc4e1',
-        'Mathematics': '#0a70a9'
-    }
+yes_colors = {
+    'Engineering': '#aedea7',
+    'Business': '#dbf1d5',
+    'Arts': '#0c7734',
+    'Computer Science': '#73c375',
+    'Medicine': '#00441b',
+    'Law': '#f7fcf5',
+    'Mathematics': '#37a055'
+}
 
-    # Tạo color_map: vòng trong (Ent_Label) màu vàng, vòng giữa (Ent_Field) giữ như cũ
-    color_map = {}
+no_colors = {
+    'Engineering': '#005b96',
+    'Business': '#03396c',
+    'Arts': '#009ac7',
+    'Computer Science': '#8ed2ed',
+    'Medicine': '#b3cde0',
+    'Law': '#5dc4e1',
+    'Mathematics': '#0a70a9'
+}
 
-    # Màu vàng cho Yes / No (vòng trong)
-    for status in ['Yes', 'No']:
-        label = f"{status}<br>{round(ent_totals[status] / total_count * 100, 2)}%"
-        color_map[label] = '#FFD700'
+color_map = {}
 
-    # Màu riêng cho từng ngành trong vòng giữa
-    for field, color in yes_colors.items():
-        color_map[f"Yes - {field}"] = color
-    for field, color in no_colors.items():
-        color_map[f"No - {field}"] = color
+for status in ['Yes', 'No']:
+    label = f"{status}<br>{round(ent_totals[status] / total_count * 100, 2)}%"
+    color_map[label] = '#FFD700'
 
-    fig1 = px.sunburst(
-        sunburst_data,
-        path=['Ent_Label', 'Field_Label', 'Salary_Label'],
-        values='Count',
-        color='Ent_Field',  # dùng vòng giữa để gán màu
-        color_discrete_map=color_map,
-        custom_data=['Percentage'],
-        title='Career Path Insights: Education, Salary & Entrepreneurship'
-    )
+for field, color in yes_colors.items():
+    color_map[f"Yes - {field}"] = color
+for field, color in no_colors.items():
+    color_map[f"No - {field}"] = color
 
-    fig1.update_traces(
-        insidetextorientation='radial',
-        maxdepth=2,
-        branchvalues="total",
-        textinfo='label+text',
-        hovertemplate="<b>%{label}</b><br>Value: %{value}<br>"
-    )
+fig1 = px.sunburst(
+    sunburst_data,
+    path=['Ent_Label', 'Field_Label', 'Salary_Label'],
+    values='Count',
+    color='Ent_Field',
+    color_discrete_map=color_map,
+    custom_data=['Percentage'],
+    title='Career Path Insights: Education, Salary & Entrepreneurship'
+)
 
-    col1, col2 = st.columns([3, 1])
-    with col1:
-        st.plotly_chart(fig1, use_container_width=True)
-    with col2:
-        st.markdown("### 💡 How to use")
-        st.markdown("""
+fig1.update_traces(
+    insidetextorientation='radial',
+    maxdepth=2,
+    branchvalues="total",
+    textinfo='label+text',
+    hovertemplate="<b>%{label}</b><br>Value: %{value}<br>"
+)
+
+col1, col2 = st.columns([3, 1])
+with col1:
+    st.plotly_chart(fig1, use_container_width=True)
+with col2:
+    st.markdown("### 💡 How to use")
+    st.markdown("""
 - **Inner ring**: Entrepreneurship  
 - **Middle**: Field of Study  
 - **Outer**: Salary group  
 - Labels include percentage share  
 - Click to zoom into segments  
-        """)
+    """)
 
 # === SECTION 2: Job Level vs Age (Bar + Area) ===
 with st.expander("📊 Entrepreneurship by Age & Job Level", expanded=True):
