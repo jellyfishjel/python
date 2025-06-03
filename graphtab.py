@@ -111,7 +111,7 @@ with col2:
     """)
 
 # === SECTION 2: Job Level vs Age (Bar + Area) ===
-with st.expander("📊 Entrepreneurship by Age & Job Level")
+st.markdown("📊 Entrepreneurship by Age & Job Level")
     job_df = df[df['Entrepreneurship'].isin(['Yes', 'No'])].copy()
     grouped = job_df.groupby(['Current_Job_Level', 'Age', 'Entrepreneurship']).size().reset_index(name='Count')
     grouped['Percentage'] = grouped.groupby(['Current_Job_Level', 'Age'])['Count'].transform(lambda x: x / x.sum())
@@ -183,7 +183,7 @@ with st.expander("📊 Entrepreneurship by Age & Job Level")
 
 
 # === SECTION 3: GPA vs. Salary Scatter Plot ===
-with st.expander("🎓 GPA vs. Starting Salary", expanded=True):
+st.markdown("🎓 GPA vs. Starting Salary", expanded=True)
     df["GPA_Group"] = pd.cut(df["University_GPA"], bins=[2.0, 2.5, 3.0, 3.5, 4.0],
                              labels=["2.0–2.5", "2.5–3.0", "3.0–3.5", "3.5–4.0"], include_lowest=True)
 
