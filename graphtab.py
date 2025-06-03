@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 
-st.set_page_config(page_title="Education & Career Success Dashboard", layout="wide", page_icon="\ud83d\udcca")
+st.set_page_config(page_title="Education & Career Success Dashboard", layout="wide")
 st.title("\ud83d\udcca Education & Career Success Dashboard")
 
 # === Caching and shared data ===
