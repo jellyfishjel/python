@@ -111,7 +111,7 @@ with col2:
     """)
 
 # === SECTION 2: Job Level vs Age (Bar + Area) ===
-with st.expander("📊 Entrepreneurship by Age & Job Level", expanded=True):
+with st.expander("📊 Entrepreneurship by Age & Job Level")
     job_df = df[df['Entrepreneurship'].isin(['Yes', 'No'])].copy()
     grouped = job_df.groupby(['Current_Job_Level', 'Age', 'Entrepreneurship']).size().reset_index(name='Count')
     grouped['Percentage'] = grouped.groupby(['Current_Job_Level', 'Age'])['Count'].transform(lambda x: x / x.sum())
@@ -206,7 +206,7 @@ with st.expander("🎓 GPA vs. Starting Salary", expanded=True):
     st.plotly_chart(fig3, use_container_width=True)
 
 # === SECTION 4: Work-Life Balance Line Chart ===
-with st.expander("⚖️ Work-Life Balance by Promotion Time", expanded=True):
+with st.expander("⚖️ Work-Life Balance by Promotion Time")
     avg_balance = df.groupby(['Current_Job_Level', 'Years_to_Promotion'])['Work_Life_Balance'].mean().reset_index()
     job_levels_order = ['Entry', 'Mid', 'Senior', 'Executive']
     avg_balance['Current_Job_Level'] = pd.Categorical(avg_balance['Current_Job_Level'],
