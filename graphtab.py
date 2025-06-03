@@ -67,7 +67,15 @@ with st.expander("🌞 Career Path Sunburst", expanded=True):
         'Mathematics': '#0a70a9'
     }
 
+    # Tạo color_map: vòng trong (Ent_Label) màu vàng, vòng giữa (Ent_Field) giữ như cũ
     color_map = {}
+
+    # Màu vàng cho Yes / No (vòng trong)
+    for status in ['Yes', 'No']:
+        label = f"{status}<br>{round(ent_totals[status] / total_count * 100, 2)}%"
+        color_map[label] = '#FFD700'
+
+    # Màu riêng cho từng ngành trong vòng giữa
     for field, color in yes_colors.items():
         color_map[f"Yes - {field}"] = color
     for field, color in no_colors.items():
@@ -77,7 +85,7 @@ with st.expander("🌞 Career Path Sunburst", expanded=True):
         sunburst_data,
         path=['Ent_Label', 'Field_Label', 'Salary_Label'],
         values='Count',
-        color='Ent_Field',
+        color='Ent_Field',  # dùng vòng giữa để gán màu
         color_discrete_map=color_map,
         custom_data=['Percentage'],
         title='Career Path Insights: Education, Salary & Entrepreneurship'
@@ -145,7 +153,7 @@ with st.expander("📊 Entrepreneurship by Age & Job Level", expanded=True):
         fig_bar.update_layout(margin=dict(t=40, l=40, r=40, b=40), xaxis_tickangle=90, bargap=0.1)
         fig_bar.update_yaxes(tickformat=".0%")
 
-        # === Area Chart with spike/hover enhancements ===
+
         fig_area = px.area(
             data, x='Age', y='Count', color='Entrepreneurship', markers=True,
             color_discrete_map=color_map, height=400, width=chart_width,
@@ -153,34 +161,27 @@ with st.expander("📊 Entrepreneurship by Age & Job Level", expanded=True):
         )
 
         fig_area.update_layout(
-            hovermode='x',
-            spikedistance=-1,
-            xaxis=dict(
-                showspikes=True,
-                spikemode='across',
-                spikesnap='cursor',
-                showline=True,
-                spikethickness=1,
-                spikecolor="gray",
-                spikedash="dot"
-            ),
-            yaxis=dict(
-                showspikes=True,
-                spikemode='across',
-                spikesnap='cursor',
-                showline=True,
-                spikethickness=1,
-                spikecolor="gray",
-                spikedash="dot"
-            )
-        )
+    hovermode='x',
+    spikedistance=-1,
+    xaxis=dict(
+        showspikes=True,
+        spikemode='toaxis',      
+        spikesnap='cursor',       
+        showline=True,
+        spikethickness=1,
+        spikecolor="gray",
+        spikedash="dot"
+    ),
+    yaxis=dict(
+        showspikes=False  
+    )
+)
 
         col1, col2 = st.columns(2)
         with col1:
             st.plotly_chart(fig_bar, use_container_width=True)
         with col2:
             st.plotly_chart(fig_area, use_container_width=True)
-
 
 
 # === SECTION 3: GPA vs. Salary Scatter Plot ===
@@ -198,15 +199,20 @@ with st.expander("🎓 GPA vs. Starting Salary", expanded=True):
     filtered_df = df[mask]
 
     fig3 = px.scatter(
-        filtered_df, x="University_GPA", y="Starting_Salary",
-        trendline="ols", opacity=0.7,
-        title="GPA vs. Starting Salary"
-    )
-    fig3.data[1].line.color = '#FFA500'
+    filtered_df, x="University_GPA", y="Starting_Salary",
+    opacity=0.7,
+    title="GPA vs. Starting Salary"
+)
     fig3.data[0].marker.color = '#00BFFF'
     fig3.update_layout(height=700)
     st.plotly_chart(fig3, use_container_width=True)
 
+# === SECTION 4: Work-Life Balance Line Chart ===
+with st.expander("⚖️ Work-Life Balance by Promotion Time", expanded=True):
+    avg_balance = df.groupby(['Current_Job_Level', 'Years_to_Promotion'])['Work_Life_Balance'].mean().reset_index()
+    job_levels_order = ['Entry', 'Mid', 'Senior', 'Executive']
+    avg_balance['Current_Job_Level'] = pd.Categorical(avg_balance['Current_Job_Level'],
+                                                      categories=job_levels_order, ordered=True)
 # === SECTION 4: Work-Life Balance Line Chart ===
 with st.expander("⚖️ Work-Life Balance by Promotion Time", expanded=True):
     avg_balance = (
