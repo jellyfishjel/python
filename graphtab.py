@@ -215,50 +215,56 @@ color_map = {'Yes': '#FFD700', 'No': '#004080'}
 level_order = ['Entry', 'Executive', 'Mid', 'Senior']
 visible_levels = [lvl for lvl in level_order if lvl in selected_levels]
 
-# Duyệt theo từng cặp Job Level (2 level = 4 biểu đồ)
+# Duyệt qua từng cặp Job Level, mỗi cặp hiển thị 4 biểu đồ (bar + area cho mỗi level)
 for i in range(0, len(visible_levels), 2):
-    cols = st.columns(2)
-    for j, level in enumerate(visible_levels[i:i+2]):
-        with cols[j]:
-            data = filtered[filtered['Current_Job_Level'] == level]
-            if data.empty:
-                st.markdown(f"### {level} – No data available")
-                continue
+    level_pair = visible_levels[i:i+2]
+    cols = st.columns(4)  # 4 biểu đồ mỗi hàng
+    col_index = 0
 
-            fig_bar = px.bar(
-                data, x='Age', y='Percentage', color='Entrepreneurship', barmode='stack',
-                color_discrete_map=color_map, height=300,
-                title=f"{level} – Entrepreneurship by Age (%)"
-            )
-            fig_bar.update_layout(
-                margin=dict(t=40, l=20, r=20, b=40),
-                xaxis_tickangle=90,
-                bargap=0.1,
-                legend_title=None
-            )
-            fig_bar.update_yaxes(tickformat=".0%")
+    for level in level_pair:
+        data = filtered[filtered['Current_Job_Level'] == level]
+        if data.empty:
+            cols[col_index].markdown(f"#### {level} – No data")
+            cols[col_index + 1].empty()
+            col_index += 2
+            continue
 
-            fig_area = px.area(
-                data, x='Age', y='Count', color='Entrepreneurship', markers=True,
-                color_discrete_map=color_map, height=300,
-                title=f"{level} – Entrepreneurship by Age (Count)"
-            )
-            fig_area.update_layout(
-                hovermode='x',
-                spikedistance=-1,
-                xaxis=dict(
-                    showspikes=True,
-                    spikemode='toaxis',
-                    spikesnap='cursor',
-                    showline=True,
-                    spikethickness=1,
-                    spikecolor="gray",
-                    spikedash="dot"
-                ),
-                yaxis=dict(showspikes=False),
-                margin=dict(t=40, l=20, r=20, b=40),
-                legend_title=None
-            )
+        fig_bar = px.bar(
+            data, x='Age', y='Percentage', color='Entrepreneurship', barmode='stack',
+            color_discrete_map=color_map, height=300,
+            title=f"{level} – %"
+        )
+        fig_bar.update_layout(
+            margin=dict(t=30, l=20, r=20, b=30),
+            xaxis_tickangle=90,
+            bargap=0.15,
+            legend_title=None
+        )
+        fig_bar.update_yaxes(tickformat=".0%")
 
-            st.plotly_chart(fig_bar, use_container_width=True)
-            st.plotly_chart(fig_area, use_container_width=True)
+        fig_area = px.area(
+            data, x='Age', y='Count', color='Entrepreneurship', markers=True,
+            color_discrete_map=color_map, height=300,
+            title=f"{level} – Count"
+        )
+        fig_area.update_layout(
+            hovermode='x',
+            spikedistance=-1,
+            xaxis=dict(
+                showspikes=True,
+                spikemode='toaxis',
+                spikesnap='cursor',
+                showline=True,
+                spikethickness=1,
+                spikecolor="gray",
+                spikedash="dot"
+            ),
+            yaxis=dict(showspikes=False),
+            margin=dict(t=30, l=20, r=20, b=30),
+            legend_title=None
+        )
+
+        cols[col_index].plotly_chart(fig_bar, use_container_width=True)
+        cols[col_index + 1].plotly_chart(fig_area, use_container_width=True)
+        col_index += 2
+
