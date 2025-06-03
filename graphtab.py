@@ -192,6 +192,7 @@ fig3.data[0].marker.color = '#00BFFF'
 fig3.update_layout(height=700)
 st.plotly_chart(fig3, use_container_width=True)
 
+# === SECTION 4: Job Level vs Age (Bar + Area) ===
 st.subheader("📊 Entrepreneurship by Age & Job Level")
 job_df = df[df['Entrepreneurship'].isin(['Yes', 'No'])].copy()
 grouped = job_df.groupby(['Current_Job_Level', 'Age', 'Entrepreneurship']).size().reset_index(name='Count')
@@ -214,31 +215,33 @@ color_map = {'Yes': '#FFD700', 'No': '#004080'}
 level_order = ['Entry', 'Executive', 'Mid', 'Senior']
 visible_levels = [lvl for lvl in level_order if lvl in selected_levels]
 
-# Chia nhóm mỗi 2 level thành 1 hàng
+# Duyệt theo từng cặp Job Level (2 level = 4 biểu đồ)
 for i in range(0, len(visible_levels), 2):
     cols = st.columns(2)
     for j, level in enumerate(visible_levels[i:i+2]):
         with cols[j]:
             data = filtered[filtered['Current_Job_Level'] == level]
             if data.empty:
-                st.write(f"### {level} – No data available")
+                st.markdown(f"### {level} – No data available")
                 continue
-
-            ages = sorted(data['Age'].unique())
-            chart_width = 500  # fix nhỏ để fit 2 chart / column
 
             fig_bar = px.bar(
                 data, x='Age', y='Percentage', color='Entrepreneurship', barmode='stack',
-                color_discrete_map=color_map, height=300, width=chart_width,
-                title=f"{level} Level – Entrepreneurship by Age (%)"
+                color_discrete_map=color_map, height=300,
+                title=f"{level} – Entrepreneurship by Age (%)"
             )
-            fig_bar.update_layout(margin=dict(t=40, l=40, r=40, b=40), xaxis_tickangle=90, bargap=0.1)
+            fig_bar.update_layout(
+                margin=dict(t=40, l=20, r=20, b=40),
+                xaxis_tickangle=90,
+                bargap=0.1,
+                legend_title=None
+            )
             fig_bar.update_yaxes(tickformat=".0%")
 
             fig_area = px.area(
                 data, x='Age', y='Count', color='Entrepreneurship', markers=True,
-                color_discrete_map=color_map, height=300, width=chart_width,
-                title=f"{level} Level – Entrepreneurship by Age (Count)"
+                color_discrete_map=color_map, height=300,
+                title=f"{level} – Entrepreneurship by Age (Count)"
             )
             fig_area.update_layout(
                 hovermode='x',
@@ -252,10 +255,10 @@ for i in range(0, len(visible_levels), 2):
                     spikecolor="gray",
                     spikedash="dot"
                 ),
-                yaxis=dict(showspikes=False)
+                yaxis=dict(showspikes=False),
+                margin=dict(t=40, l=20, r=20, b=40),
+                legend_title=None
             )
 
-            # Hiển thị 2 biểu đồ trong cùng cột
-            with st.container():
-                st.plotly_chart(fig_bar, use_container_width=True)
-                st.plotly_chart(fig_area, use_container_width=True)
+            st.plotly_chart(fig_bar, use_container_width=True)
+            st.plotly_chart(fig_area, use_container_width=True)
