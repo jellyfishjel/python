@@ -14,7 +14,9 @@ def load_data():
 df = load_data()
 
 # === SECTION 1: Career Path Sunburst ===
-st.subheader("🌞 Career Path Sunburst")
+with st.expander("🌞 Career Path Sunburst", expanded=True):
+    sunburst_df = df.copy()
+
     def categorize_salary(salary):
         if salary < 30000:
             return '<30K'
