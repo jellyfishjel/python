@@ -112,106 +112,105 @@ with col2:
 - Click to zoom into segments  
         """)
 # === SECTION 2: Job Level vs Age (Bar + Area) ===
-with st.expander("📊 Entrepreneurship by Age & Job Level", expanded=True):
-    job_df = df[df['Entrepreneurship'].isin(['Yes', 'No'])].copy()
-    grouped = job_df.groupby(['Current_Job_Level', 'Age', 'Entrepreneurship']).size().reset_index(name='Count')
-    grouped['Percentage'] = grouped.groupby(['Current_Job_Level', 'Age'])['Count'].transform(lambda x: x / x.sum())
+st.subheader("📊 Entrepreneurship by Age & Job Level")
+job_df = df[df['Entrepreneurship'].isin(['Yes', 'No'])].copy()
+grouped = job_df.groupby(['Current_Job_Level', 'Age', 'Entrepreneurship']).size().reset_index(name='Count')
+grouped['Percentage'] = grouped.groupby(['Current_Job_Level', 'Age'])['Count'].transform(lambda x: x / x.sum())
 
-    st.sidebar.title("Filters")
-    job_levels = sorted(grouped['Current_Job_Level'].unique())
-    selected_levels = st.sidebar.multiselect("Select Job Levels", job_levels, default=job_levels)
-    age_min, age_max = int(grouped['Age'].min()), int(grouped['Age'].max())
-    age_range = st.sidebar.slider("Select Age Range", min_value=age_min, max_value=age_max, value=(age_min, age_max))
-    selected_statuses = st.sidebar.multiselect("Select Entrepreneurship Status", ['Yes', 'No'], default=['Yes', 'No'])
+st.sidebar.title("Filters")
+job_levels = sorted(grouped['Current_Job_Level'].unique())
+selected_levels = st.sidebar.multiselect("Select Job Levels", job_levels, default=job_levels)
+age_min, age_max = int(grouped['Age'].min()), int(grouped['Age'].max())
+age_range = st.sidebar.slider("Select Age Range", min_value=age_min, max_value=age_max, value=(age_min, age_max))
+selected_statuses = st.sidebar.multiselect("Select Entrepreneurship Status", ['Yes', 'No'], default=['Yes', 'No'])
 
-    filtered = grouped[
-        (grouped['Current_Job_Level'].isin(selected_levels)) &
-        (grouped['Entrepreneurship'].isin(selected_statuses)) &
-        (grouped['Age'].between(age_range[0], age_range[1]))
-    ]
+filtered = grouped[
+    (grouped['Current_Job_Level'].isin(selected_levels)) &
+    (grouped['Entrepreneurship'].isin(selected_statuses)) &
+    (grouped['Age'].between(age_range[0], age_range[1]))
+]
 
-    color_map = {'Yes': '#FFD700', 'No': '#004080'}
-    level_order = ['Entry', 'Executive', 'Mid', 'Senior']
-    visible_levels = [lvl for lvl in level_order if lvl in selected_levels]
+color_map = {'Yes': '#FFD700', 'No': '#004080'}
+level_order = ['Entry', 'Executive', 'Mid', 'Senior']
+visible_levels = [lvl for lvl in level_order if lvl in selected_levels]
 
-    for level in visible_levels:
-        data = filtered[filtered['Current_Job_Level'] == level]
-        if data.empty:
-            st.write(f"### {level} – No data available")
-            continue
+for level in visible_levels:
+    data = filtered[filtered['Current_Job_Level'] == level]
+    if data.empty:
+        st.write(f"### {level} – No data available")
+        continue
 
-        ages = sorted(data['Age'].unique())
-        font_size = {1: 20, 2: 18, 3: 16, 4: 14, 5: 12}.get(len(ages), 10)
-        chart_width = max(400, min(1200, 50 * len(ages) + 100))
+    ages = sorted(data['Age'].unique())
+    font_size = {1: 20, 2: 18, 3: 16, 4: 14, 5: 12}.get(len(ages), 10)
+    chart_width = max(400, min(1200, 50 * len(ages) + 100))
 
-        fig_bar = px.bar(
-            data, x='Age', y='Percentage', color='Entrepreneurship', barmode='stack',
-            color_discrete_map=color_map, height=400, width=chart_width,
-            title=f"{level} Level – Entrepreneurship by Age (%)"
-        )
-        fig_bar.update_layout(margin=dict(t=40, l=40, r=40, b=40), xaxis_tickangle=90, bargap=0.1)
-        fig_bar.update_yaxes(tickformat=".0%")
-
-
-        fig_area = px.area(
-            data, x='Age', y='Count', color='Entrepreneurship', markers=True,
-            color_discrete_map=color_map, height=400, width=chart_width,
-            title=f"{level} Level – Entrepreneurship by Age (Count)"
-        )
-
-        fig_area.update_layout(
-    hovermode='x',
-    spikedistance=-1,
-    xaxis=dict(
-        showspikes=True,
-        spikemode='toaxis',      
-        spikesnap='cursor',       
-        showline=True,
-        spikethickness=1,
-        spikecolor="gray",
-        spikedash="dot"
-    ),
-    yaxis=dict(
-        showspikes=False  
+    fig_bar = px.bar(
+        data, x='Age', y='Percentage', color='Entrepreneurship', barmode='stack',
+        color_discrete_map=color_map, height=400, width=chart_width,
+        title=f"{level} Level – Entrepreneurship by Age (%)"
     )
+    fig_bar.update_layout(margin=dict(t=40, l=40, r=40, b=40), xaxis_tickangle=90, bargap=0.1)
+    fig_bar.update_yaxes(tickformat=".0%")
+
+
+    fig_area = px.area(
+        data, x='Age', y='Count', color='Entrepreneurship', markers=True,
+        color_discrete_map=color_map, height=400, width=chart_width,
+        title=f"{level} Level – Entrepreneurship by Age (Count)"
+    )
+
+    fig_area.update_layout(
+hovermode='x',
+spikedistance=-1,
+xaxis=dict(
+    showspikes=True,
+    spikemode='toaxis',      
+    spikesnap='cursor',       
+    showline=True,
+    spikethickness=1,
+    spikecolor="gray",
+    spikedash="dot"
+),
+yaxis=dict(
+    showspikes=False  
+)
 )
 
-        col1, col2 = st.columns(2)
-        with col1:
-            st.plotly_chart(fig_bar, use_container_width=True)
-        with col2:
-            st.plotly_chart(fig_area, use_container_width=True)
-
+    col1, col2 = st.columns(2)
+    with col1:
+        st.plotly_chart(fig_bar, use_container_width=True)
+    with col2:
+        st.plotly_chart(fig_area, use_container_width=True)
 
 # === SECTION 3: GPA vs. Salary Scatter Plot ===
-with st.expander("🎓 GPA vs. Starting Salary", expanded=True):
-    df["GPA_Group"] = pd.cut(df["University_GPA"], bins=[2.0, 2.5, 3.0, 3.5, 4.0],
-                             labels=["2.0–2.5", "2.5–3.0", "3.0–3.5", "3.5–4.0"], include_lowest=True)
+st.subheader("🎓 GPA vs. Starting Salary")
+df["GPA_Group"] = pd.cut(df["University_GPA"], bins=[2.0, 2.5, 3.0, 3.5, 4.0],
+                         labels=["2.0–2.5", "2.5–3.0", "3.0–3.5", "3.5–4.0"], include_lowest=True)
 
-    selected_gpa = st.selectbox("Select GPA Group", ["All"] + df["GPA_Group"].cat.categories.tolist())
-    salary_min, salary_max = int(df["Starting_Salary"].min()), int(df["Starting_Salary"].max())
-    salary_range = st.slider("Select Starting Salary Range", salary_min, salary_max, (salary_min, salary_max), 1000)
+selected_gpa = st.selectbox("Select GPA Group", ["All"] + df["GPA_Group"].cat.categories.tolist())
+salary_min, salary_max = int(df["Starting_Salary"].min()), int(df["Starting_Salary"].max())
+salary_range = st.slider("Select Starting Salary Range", salary_min, salary_max, (salary_min, salary_max), 1000)
 
-    mask = df["Starting_Salary"].between(*salary_range)
-    if selected_gpa != "All":
-        mask &= (df["GPA_Group"] == selected_gpa)
-    filtered_df = df[mask]
+mask = df["Starting_Salary"].between(*salary_range)
+if selected_gpa != "All":
+    mask &= (df["GPA_Group"] == selected_gpa)
+filtered_df = df[mask]
 
-    fig3 = px.scatter(
-    filtered_df, x="University_GPA", y="Starting_Salary",
-    opacity=0.7,
-    title="GPA vs. Starting Salary"
+fig3 = px.scatter(
+filtered_df, x="University_GPA", y="Starting_Salary",
+opacity=0.7,
+title="GPA vs. Starting Salary"
 )
-    fig3.data[0].marker.color = '#00BFFF'
-    fig3.update_layout(height=700)
-    st.plotly_chart(fig3, use_container_width=True)
+fig3.data[0].marker.color = '#00BFFF'
+fig3.update_layout(height=700)
+st.plotly_chart(fig3, use_container_width=True)
 
 # === SECTION 4: Work-Life Balance Line Chart ===
-with st.expander("⚖️ Work-Life Balance by Promotion Time", expanded=True):
-    avg_balance = df.groupby(['Current_Job_Level', 'Years_to_Promotion'])['Work_Life_Balance'].mean().reset_index()
-    job_levels_order = ['Entry', 'Mid', 'Senior', 'Executive']
-    avg_balance['Current_Job_Level'] = pd.Categorical(avg_balance['Current_Job_Level'],
-                                                      categories=job_levels_order, ordered=True)
+st.subheader("⚖️ Work-Life Balance by Promotion Time")
+avg_balance = df.groupby(['Current_Job_Level', 'Years_to_Promotion'])['Work_Life_Balance'].mean().reset_index()
+job_levels_order = ['Entry', 'Mid', 'Senior', 'Executive']
+avg_balance['Current_Job_Level'] = pd.Categorical(avg_balance['Current_Job_Level'],
+                                                  categories=job_levels_order, ordered=True)
 # === SECTION 4: Work-Life Balance Line Chart ===
 with st.expander("⚖️ Work-Life Balance by Promotion Time", expanded=True):
     avg_balance = (
