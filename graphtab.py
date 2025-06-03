@@ -16,16 +16,15 @@ df = load_data()
 # === SECTION 1: Career Path Sunburst ===
 st.subheader("🌞 Career Path Sunburst")
 sunburst_df = df.copy()
-
-    def categorize_salary(salary):
-        if salary < 30000:
-            return '<30K'
-        elif salary < 50000:
-            return '30K–50K'
-        elif salary < 70000:
-            return '50K–70K'
+def categorize_salary(salary):
+    if salary < 30000:
+        return '<30K'
+    elif salary < 50000:
+        return '30K–50K'
+    elif salary < 70000:
+        return '50K–70K'
         else:
-            return '70K+'
+        return '70K+'
 
     sunburst_df['Salary_Group'] = sunburst_df['Starting_Salary'].apply(categorize_salary)
 
