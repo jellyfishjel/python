@@ -207,79 +207,58 @@ st.plotly_chart(fig3, use_container_width=True)
 
 # === SECTION 4: Work-Life Balance Line Chart ===
 st.subheader("⚖️ Work-Life Balance by Promotion Time")
-avg_balance = df.groupby(['Current_Job_Level', 'Years_to_Promotion'])['Work_Life_Balance'].mean().reset_index()
 job_levels_order = ['Entry', 'Mid', 'Senior', 'Executive']
-avg_balance['Current_Job_Level'] = pd.Categorical(avg_balance['Current_Job_Level'],
-                                                  categories=job_levels_order, ordered=True)
-# === SECTION 4: Work-Life Balance Line Chart ===
-with st.expander("⚖️ Work-Life Balance by Promotion Time", expanded=True):
-    avg_balance = (
-        df.groupby(['Current_Job_Level', 'Years_to_Promotion'])['Work_Life_Balance']
-        .mean()
-        .reset_index()
-    )
+colors = {
+    "Entry": "#1f77b4",      # blue
+    "Mid": "#ff7f0e",        # orange
+    "Senior": "#2ca02c",     # green
+    "Executive": "#d62728"   # red
+}
 
-    job_levels_order = ['Entry', 'Mid', 'Senior', 'Executive']
-    avg_balance['Current_Job_Level'] = pd.Categorical(
-        avg_balance['Current_Job_Level'], categories=job_levels_order, ordered=True
-    )
+avg_balance = (
+    df.groupby(['Current_Job_Level', 'Years_to_Promotion'])['Work_Life_Balance']
+    .mean()
+    .reset_index()
+)
+avg_balance['Current_Job_Level'] = pd.Categorical(
+    avg_balance['Current_Job_Level'], categories=job_levels_order, ordered=True
+)
 
-    selected_levels = st.sidebar.multiselect(
-        "Select Job Levels to Display (Work-Life Balance)",
-        options=job_levels_order + ["All"],
-        default=["All"]
-    )
+selected_levels = st.sidebar.multiselect(
+    "Select Job Levels to Display (Work-Life Balance)",
+    options=["All"] + job_levels_order,
+    default=["All"]
+)
 
-    if "All" in selected_levels or not selected_levels:
-        filtered_data = avg_balance
-    else:
-        filtered_data = avg_balance[avg_balance["Current_Job_Level"].isin(selected_levels)]
+filtered_data = avg_balance if "All" in selected_levels or not selected_levels \
+    else avg_balance[avg_balance["Current_Job_Level"].isin(selected_levels)]
 
-    fig = go.Figure()
-    colors = {
-        "Entry": "#1f77b4",      # blue
-        "Mid": "#ff7f0e",        # orange
-        "Senior": "#2ca02c",     # green
-        "Executive": "#d62728"   # red
-    }
+fig = go.Figure()
+for level in job_levels_order:
+    if "All" in selected_levels or level in selected_levels:
+        data_level = filtered_data[filtered_data["Current_Job_Level"] == level]
+        fig.add_trace(go.Scatter(
+            x=data_level["Years_to_Promotion"],
+            y=data_level["Work_Life_Balance"],
+            mode="lines+markers",
+            name=level,
+            line=dict(color=colors[level]),
+            hovertemplate="%{y:.2f}"
+        ))
 
-    for level in job_levels_order:
-        if "All" in selected_levels or level in selected_levels:
-            data_level = filtered_data[filtered_data["Current_Job_Level"] == level]
-            fig.add_trace(go.Scatter(
-                x=data_level["Years_to_Promotion"],
-                y=data_level["Work_Life_Balance"],
-                mode="lines+markers",
-                name=level,
-                line=dict(color=colors[level]),
-                hovertemplate="%{y:.2f}"
-            ))
-
-    fig.update_layout(
-        title="Average Work-Life Balance by Years to Promotion",
-        xaxis_title="Years to Promotion",
-        yaxis_title="Average Work-Life Balance",
-        height=600,
-        width=900,
-        title_x=0.5,
-        legend_title_text="Job Level",
-        hovermode="x unified",
-        xaxis=dict(
-            showspikes=True,
-            spikemode="across",
-            spikesnap="cursor",
-            spikedash="dot",
-            spikethickness=1,
-            spikecolor="gray"
-        ),
-        yaxis=dict(
-            showspikes=True,
-            spikemode="across",
-            spikesnap="cursor",
-            spikedash="dot",
-            spikethickness=1,
-            spikecolor="gray"
-        )
-    )
+fig.update_layout(
+    title="Average Work-Life Balance by Years to Promotion",
+    xaxis_title="Years to Promotion",
+    yaxis_title="Average Work-Life Balance",
+    height=600,
+    width=900,
+    title_x=0.5,
+    legend_title_text="Job Level",
+    hovermode="x unified",
+    xaxis=dict(showspikes=True, spikemode="across", spikesnap="cursor",
+               spikedash="dot", spikethickness=1, spikecolor="gray"),
+    yaxis=dict(showspikes=True, spikemode="across", spikesnap="cursor",
+               spikedash="dot", spikethickness=1, spikecolor="gray")
+)
 
     st.plotly_chart(fig, use_container_width=True)
