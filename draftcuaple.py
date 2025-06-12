@@ -14,37 +14,24 @@ def load_data():
 
 df = load_data()
 
-# ========== SIDEBAR FILTER ========== #
-with st.sidebar:
-    st.header("🔍 Filters")
-    
-    # Job level filter
-    job_levels = sorted(df['Current_Job_Level'].dropna().unique())
-    selected_levels = st.multiselect("Select Job Levels", job_levels, default=job_levels)
-
-    # Entrepreneurship status filter
-    status_options = ['Yes', 'No']
-    selected_statuses = st.multiselect("Select Entrepreneurship Status", status_options, default=status_options)
-
-    # Tab 2 specific filter - optional level selection
-    level_options = sorted(df[df['Entrepreneurship'].isin(selected_statuses)]['Current_Job_Level'].dropna().unique())
-    selected_level_tab2 = st.selectbox("Select Job Level (Tab 2)", level_options)
-
-    # Age range filter (used in Tab 2)
-    df_age = df[df['Entrepreneurship'].isin(selected_statuses)]
-    min_age, max_age = int(df_age['Age'].min()), int(df_age['Age'].max())
-    age_range = st.slider("Select Age Range (Tab 2)", min_value=min_age, max_value=max_age, value=(min_age, max_age))
-
 # ========== MAIN TABS ========== #
 tab1, tab2, tab3 = st.tabs(["🌞 Sunburst Career Path", "📊 Job Level vs Age", "⚖️ Work-Life Balance"])
 
 # ======= TAB 1: SUNBURST ======= #
 with tab1:
+    with st.sidebar:
+        st.header("🔍 Filters – Tab 1")
+        job_levels_1 = sorted(df['Current_Job_Level'].dropna().unique())
+        selected_levels_1 = st.multiselect("Select Job Levels", job_levels_1, default=job_levels_1, key="tab1_levels")
+
+        status_options_1 = ['Yes', 'No']
+        selected_statuses_1 = st.multiselect("Select Entrepreneurship Status", status_options_1, default=status_options_1, key="tab1_statuses")
+
     st.subheader("Career Path Sunburst")
 
     df_sun = df[
-        (df['Current_Job_Level'].isin(selected_levels)) &
-        (df['Entrepreneurship'].isin(selected_statuses))
+        (df['Current_Job_Level'].isin(selected_levels_1)) &
+        (df['Entrepreneurship'].isin(selected_statuses_1))
     ]
 
     def categorize_salary(salary):
@@ -97,15 +84,25 @@ with tab1:
 
 # ======= TAB 2: JOB LEVEL VS AGE ======= #
 with tab2:
+    with st.sidebar:
+        st.header("🔍 Filters – Tab 2")
+        status_options_2 = ['Yes', 'No']
+        selected_statuses_2 = st.multiselect("Select Entrepreneurship Status", status_options_2, default=status_options_2, key="tab2_statuses")
+
     st.subheader("Job Level vs. Age by Entrepreneurship")
 
-    df2 = df[
-        (df['Current_Job_Level'] == selected_level_tab2) &
-        (df['Entrepreneurship'].isin(selected_statuses))
-    ]
+    df2 = df[df['Entrepreneurship'].isin(selected_statuses_2)]
 
-    df_grouped = df2.groupby(['Age', 'Entrepreneurship']).size().reset_index(name='Count')
+    level_options = df2['Current_Job_Level'].dropna().unique().tolist()
+    selected_level_tab2 = st.selectbox("Select Job Level", sorted(level_options), key="tab2_level")
+
+    df_filtered = df2[df2['Current_Job_Level'] == selected_level_tab2]
+
+    df_grouped = df_filtered.groupby(['Age', 'Entrepreneurship']).size().reset_index(name='Count')
     df_grouped['Percentage'] = df_grouped.groupby('Age')['Count'].transform(lambda x: x / x.sum())
+
+    min_age, max_age = int(df_grouped['Age'].min()), int(df_grouped['Age'].max())
+    age_range = st.slider("Select Age Range", min_value=min_age, max_value=max_age, value=(min_age, max_age), key="tab2_age")
 
     filtered = df_grouped[df_grouped['Age'].between(age_range[0], age_range[1])]
 
@@ -155,11 +152,19 @@ with tab2:
 
 # ======= TAB 3: WORK-LIFE BALANCE ======= #
 with tab3:
+    with st.sidebar:
+        st.header("🔍 Filters – Tab 3")
+        job_levels_3 = sorted(df['Current_Job_Level'].dropna().unique())
+        selected_levels_3 = st.multiselect("Select Job Levels", job_levels_3, default=job_levels_3, key="tab3_levels")
+
+        status_options_3 = ['Yes', 'No']
+        selected_statuses_3 = st.multiselect("Select Entrepreneurship Status", status_options_3, default=status_options_3, key="tab3_statuses")
+
     st.subheader("Work-Life Balance by Years to Promotion")
 
     df_balance = df[
-        (df['Current_Job_Level'].isin(selected_levels)) &
-        (df['Entrepreneurship'].isin(selected_statuses))
+        (df['Current_Job_Level'].isin(selected_levels_3)) &
+        (df['Entrepreneurship'].isin(selected_statuses_3))
     ]
 
     avg_balance = (
@@ -182,7 +187,7 @@ with tab3:
 
     fig3 = go.Figure()
     for level in job_levels_order:
-        if level in selected_levels:
+        if level in selected_levels_3:
             data_level = avg_balance[avg_balance["Current_Job_Level"] == level]
             fig3.add_trace(go.Scatter(
                 x=data_level["Years_to_Promotion"],
