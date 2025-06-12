@@ -1,111 +1,56 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-import plotly.graph_objects as go
 
-st.set_page_config(page_title="Education & Career Dashboard", layout="wide")
+st.set_page_config(
+    page_title="Career Insights by Job Level",
+    layout="wide",
+    page_icon="🍩"
+)
 
+st.title("🍩 Career Insights by Job Level")
+
+# Load data
 @st.cache_data
 def load_data():
-    return pd.read_excel("education_career_success.xlsx", sheet_name=0)
+    return pd.read_excel("education_career_success.xlsx", sheet_name='education_career_success')
 
 df = load_data()
 
-# Categorize salary
-def categorize_salary(salary):
-    if salary < 30000:
-        return '<30K'
-    elif salary < 50000:
-        return '30K–50K'
-    elif salary < 70000:
-        return '50K–70K'
-    else:
-        return '70K+'
+# Sidebar: Job Level Selection (single choice)
+st.sidebar.header("🎯 Filter by Job Level")
+job_levels = sorted(df['Current_Job_Level'].dropna().unique().tolist())
+selected_level = st.sidebar.selectbox("Select one Job Level:", job_levels)
 
-df['Salary_Group'] = df['Starting_Salary'].apply(categorize_salary)
+# Filter data based on selection
+filtered_df = df[df['Current_Job_Level'] == selected_level]
 
-# Sidebar filters
-st.sidebar.title("🔍 Filters")
-
-job_levels = sorted(df['Current_Job_Level'].dropna().unique())
-selected_level = st.sidebar.selectbox("Select Job Level", job_levels)
-
-min_age, max_age = int(df['Age'].min()), int(df['Age'].max())
-age_range = st.sidebar.slider("Select Age Range", min_value=min_age, max_value=max_age, value=(min_age, max_age))
-
-df_filtered = df[
-    (df['Current_Job_Level'] == selected_level) &
-    (df['Age'].between(age_range[0], age_range[1]))
-]
-
-st.title("🚀 Education & Career Success Dashboard")
-st.subheader(f"Job Level: {selected_level}")
-
-# Donut charts
-cols = st.columns(3)
-
-for i, col in enumerate(['Gender', 'Field_of_Study', 'Salary_Group']):
-    group_data = df_filtered[col].value_counts().reset_index()
-    group_data.columns = [col, 'Count']
+# Function to generate donut chart without legend
+def plot_donut(data, column, title):
+    count_data = data[column].value_counts().reset_index()
+    count_data.columns = [column, 'Count']
     fig = px.pie(
-        group_data,
-        names=col,
+        count_data,
+        names=column,
         values='Count',
         hole=0.5,
-        title=col,
+        title=title
     )
-    fig.update_layout(showlegend=False, height=400, margin=dict(t=40, l=40, r=40, b=40))
-    cols[i].plotly_chart(fig, use_container_width=True)
+    fig.update_traces(textinfo='percent+label', showlegend=False)
+    fig.update_layout(margin=dict(t=40, b=0, l=0, r=0))
+    return fig
 
-# Group data for bar/area charts
-grouped = df_filtered.groupby(['Age', 'Salary_Group']).size().reset_index(name='Count')
-grouped['Percentage'] = grouped.groupby('Age')['Count'].transform(lambda x: x / x.sum())
+# Layout: 3 donut charts
+col1, col2, col3 = st.columns(3)
 
-# Define color mapping
-color_map = {
-    '<30K': '#d73027',
-    '30K–50K': '#fc8d59',
-    '50K–70K': '#91bfdb',
-    '70K+': '#4575b4'
-}
+with col1:
+    st.plotly_chart(plot_donut(filtered_df, 'Gender', 'Gender Distribution'), use_container_width=True)
 
-ages = sorted(grouped['Age'].unique())
+with col2:
+    st.plotly_chart(plot_donut(filtered_df, 'Entrepreneurship', 'Entrepreneurship Status'), use_container_width=True)
 
-# Stacked Bar Chart (Percentage)
-fig_bar = px.bar(
-    grouped,
-    x='Age',
-    y='Percentage',
-    color='Salary_Group',
-    barmode='stack',
-    color_discrete_map=color_map,
-    category_orders={'Age': ages, 'Salary_Group': list(color_map.keys())},
-    labels={'Percentage': 'Percentage'},
-    height=400,
-    title=f"{selected_level} Level – Salary Group by Age (%)"
-)
+with col3:
+    st.plotly_chart(plot_donut(filtered_df, 'Field_of_Study', 'Field of Study'), use_container_width=True)
 
-fig_bar.update_layout(margin=dict(t=40, l=40, r=40, b=40))
-fig_bar.update_yaxes(tickformat=".0%", title="Percentage")
-
-# Area Chart (Count)
-fig_area = px.area(
-    grouped,
-    x='Age',
-    y='Count',
-    color='Salary_Group',
-    markers=True,
-    color_discrete_map=color_map,
-    category_orders={'Age': ages, 'Salary_Group': list(color_map.keys())},
-    labels={'Count': 'Count'},
-    height=400,
-    title=f"{selected_level} Level – Salary Group by Age (Count)"
-)
-fig_area.update_traces(line=dict(width=2), marker=dict(size=8))
-fig_area.update_layout(margin=dict(t=40, l=40, r=40, b=40))
-fig_area.update_yaxes(title="Count")
-
-# Display both charts side-by-side
-col1, col2 = st.columns(2)
-col1.plotly_chart(fig_bar, use_container_width=True)
-col2.plotly_chart(fig_area, use_container_width=True)
+# Display number of records
+st.markdown(f"### 👥 Total Records for '{selected_level}': {len(filtered_df)}")
