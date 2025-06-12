@@ -23,7 +23,7 @@ st.sidebar.title("🎯 Filter Options")
 
 # Gender filter
 genders = sorted(df['Gender'].dropna().unique())
-selected_genders = st.sidebar.multiselect("Select Gender", genders, default=genders)
+selected_genders = st.sidebar.selectbox("Select Gender", genders, default=genders)
 
 # Job level filter
 job_levels = sorted(df['Current_Job_Level'].dropna().unique())
@@ -77,11 +77,6 @@ df_grouped = (
 )
 df_grouped['Percentage'] = df_grouped.groupby('Age')['Count'].transform(lambda x: x / x.sum())
 
-# Apply additional filters for age and entrepreneurship
-filtered = df_grouped[
-    (df_grouped['Entrepreneurship'].isin(selected_statuses)) &
-    (df_grouped['Age'].between(age_range[0], age_range[1]))
-]
 
 # Font size utility
 def font_size_by_count(n):
