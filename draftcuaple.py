@@ -87,13 +87,15 @@ with tab1:
 with tab2:
     st.subheader("Job Level vs. Age by Entrepreneurship")
 
-    df2 = df[
-        (df['Current_Job_Level'].isin(selected_levels)) &
-        (df['Entrepreneurship'].isin(selected_statuses))
-    ]
+    df2 = df[df['Entrepreneurship'].isin(selected_statuses)]
 
-    df_grouped = df2.groupby(['Current_Job_Level', 'Age', 'Entrepreneurship']).size().reset_index(name='Count')
-    df_grouped['Percentage'] = df_grouped.groupby(['Current_Job_Level', 'Age'])['Count'].transform(lambda x: x / x.sum())
+    level_options = df2['Current_Job_Level'].dropna().unique().tolist()
+    selected_level_tab2 = st.selectbox("Select Job Level", sorted(level_options), key="level_dropdown")
+
+    df_filtered = df2[df2['Current_Job_Level'] == selected_level_tab2]
+
+    df_grouped = df_filtered.groupby(['Age', 'Entrepreneurship']).size().reset_index(name='Count')
+    df_grouped['Percentage'] = df_grouped.groupby('Age')['Count'].transform(lambda x: x / x.sum())
 
     min_age, max_age = int(df_grouped['Age'].min()), int(df_grouped['Age'].max())
     age_range = st.slider("Select Age Range", min_value=min_age, max_value=max_age, value=(min_age, max_age), key="age_slider")
@@ -101,56 +103,48 @@ with tab2:
     filtered = df_grouped[df_grouped['Age'].between(age_range[0], age_range[1])]
 
     color_map2 = {'Yes': '#FFD700', 'No': '#004080'}
-    level_order = ['Entry', 'Executive', 'Mid', 'Senior']
-    visible_levels = [lvl for lvl in level_order if lvl in selected_levels]
 
-    for level in visible_levels:
-        data = filtered[filtered['Current_Job_Level'] == level]
-        if data.empty:
-            st.write(f"### {level} – No data available")
-            continue
+    fig_bar = px.bar(
+        filtered,
+        x='Age',
+        y='Percentage',
+        color='Entrepreneurship',
+        barmode='stack',
+        color_discrete_map=color_map2,
+        height=400,
+        width=500,
+        title=f"{selected_level_tab2} Level – Entrepreneurship by Age (%)"
+    )
+    fig_bar.update_layout(margin=dict(t=30, l=30, r=30, b=30), legend_title_text='Entrepreneurship', xaxis_tickangle=90)
+    fig_bar.update_yaxes(tickformat=".0%", title="Percentage")
 
-        fig_bar = px.bar(
-            data,
-            x='Age',
-            y='Percentage',
-            color='Entrepreneurship',
-            barmode='stack',
-            color_discrete_map=color_map2,
-            height=400,
-            width=500,
-            title=f"{level} Level – Entrepreneurship by Age (%)"
-        )
-        fig_bar.update_layout(margin=dict(t=30, l=30, r=30, b=30), legend_title_text='Entrepreneurship', xaxis_tickangle=90)
-        fig_bar.update_yaxes(tickformat=".0%", title="Percentage")
+    fig_area = px.area(
+        filtered,
+        x='Age',
+        y='Count',
+        color='Entrepreneurship',
+        markers=True,
+        color_discrete_map=color_map2,
+        height=400,
+        width=500,
+        title=f"{selected_level_tab2} Level – Entrepreneurship by Age (Count)"
+    )
+    for status in ['Yes', 'No']:
+        avg_age = filtered[filtered['Entrepreneurship'] == status]['Age'].mean()
+        fig_area.add_vline(x=avg_age, line_dash="dot", line_color=color_map2[status], line_width=1.2)
+        fig_area.add_trace(go.Scatter(
+            x=[None], y=[None], mode='markers',
+            marker=dict(symbol='circle', size=10, color=color_map2[status]),
+            name=f"{status} Avg Age: {avg_age:.1f}"
+        ))
+    fig_area.update_traces(line=dict(width=2), marker=dict(size=8))
+    fig_area.update_layout(margin=dict(t=30, l=30, r=30, b=30), legend_title_text='Entrepreneurship')
 
-        fig_area = px.area(
-            data,
-            x='Age',
-            y='Count',
-            color='Entrepreneurship',
-            markers=True,
-            color_discrete_map=color_map2,
-            height=400,
-            width=500,
-            title=f"{level} Level – Entrepreneurship by Age (Count)"
-        )
-        for status in ['Yes', 'No']:
-            avg_age = data[data['Entrepreneurship'] == status]['Age'].mean()
-            fig_area.add_vline(x=avg_age, line_dash="dot", line_color=color_map2[status], line_width=1.2)
-            fig_area.add_trace(go.Scatter(
-                x=[None], y=[None], mode='markers',
-                marker=dict(symbol='circle', size=10, color=color_map2[status]),
-                name=f"{status} Avg Age: {avg_age:.1f}"
-            ))
-        fig_area.update_traces(line=dict(width=2), marker=dict(size=8))
-        fig_area.update_layout(margin=dict(t=30, l=30, r=30, b=30), legend_title_text='Entrepreneurship')
-
-        col1, col2 = st.columns(2)
-        with col1:
-            st.plotly_chart(fig_bar, use_container_width=True)
-        with col2:
-            st.plotly_chart(fig_area, use_container_width=True)
+    col1, col2 = st.columns(2)
+    with col1:
+        st.plotly_chart(fig_bar, use_container_width=True)
+    with col2:
+        st.plotly_chart(fig_area, use_container_width=True)
 
 # ======= TAB 3: WORK-LIFE BALANCE =======
 with tab3:
