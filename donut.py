@@ -43,7 +43,7 @@ chart_option = st.selectbox("Select Variable for Visualization", ['Gender', 'Fie
 if filtered_df.empty:
     st.write("Not enough data to display charts.")
 else:
-    col1, col2 = st.columns([3, 1]) 
+    col1, col2 = st.columns([1, 1]) 
 
     # ----- DENSITY CHART (Area) -----
     with col1:
