@@ -3,17 +3,20 @@ import pandas as pd
 import plotly.express as px
 
 st.set_page_config(page_title="Entrepreneurship by Age & Gender", layout="wide")
-
+# Load and preprocess data
+# LOAD DATA
 @st.cache_data
 def load_data():
     return pd.read_excel("education_career_success.xlsx")
 
 df = load_data()
 
+
 # Sidebar filters
 
 st.title("📊 Entrepreneurship Trends by Age and Gender")
 st.markdown("Explore how entrepreneurship varies across age groups and job levels.")
+
 st.sidebar.title("Filters")
 
 # Gender filter
@@ -78,27 +81,31 @@ else:
     fig_bar.update_yaxes(tickformat=".0%", title="Percentage")
 
     # Area chart: Count
-    fig_line = px.line(
-        df,
-        x="Years_to_Promotion",
-        y="Entrepreneurship",
-        color="Current_Job_Level",  # hoặc "Gender"
+    fig_area = px.area(
+        filtered,
+        x='Age',
+        y='Count',
+        color='Entrepreneurship',
         markers=True,
-        title="Entrepreneurship by Years to Promotion and Job Level"
+        color_discrete_map=color_map,
+        category_orders={'Entrepreneurship': ['No', 'Yes'], 'Age': ages},
+        labels={'Age': 'Age', 'Count': 'Count'},
+        height=400,
+        title=f"{selected_level} – Entrepreneurship by Age (Count)"
     )
+    fig_area.update_traces(line=dict(width=2), marker=dict(size=6))
+    fig_area.update_layout(
+        margin=dict(t=40, l=40, r=40, b=40),
+        legend_title_text='Entrepreneurship',
+        xaxis_tickangle=90
+    )
+    fig_area.update_yaxes(title="Count")
 
-    fig_line.update_layout(
-        xaxis_title="Age",
-        yaxis_title="Entrepreneurship (%)",
-        hovermode="x unified",
-        title_x=0.5
-    )
-    
     col1, col2 = st.columns(2)
     with col1:
         st.plotly_chart(fig_bar, use_container_width=True)
     with col2:
-        st.plotly_chart(fig_line, use_container_width=True)
+        st.plotly_chart(fig_area, use_container_width=True)
 
 
 
