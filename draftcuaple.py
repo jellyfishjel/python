@@ -20,8 +20,17 @@ with st.sidebar:
     job_levels = sorted(df['Current_Job_Level'].dropna().unique())
     selected_levels = st.multiselect("Select Job Levels", job_levels, default=job_levels, key="level_selector")
 
+    status_options = ['Yes', 'No']
+    selected_statuses = st.multiselect("Select Entrepreneurship Status", status_options, default=status_options, key="status_selector")
+
 # ======= GRAPH 1: SUNBURST =======
 st.subheader("Career Path Sunburst")
+
+# Apply filters to sunburst data
+df_sun = df[
+    (df['Current_Job_Level'].isin(selected_levels)) &
+    (df['Entrepreneurship'].isin(selected_statuses))
+]
 
 def categorize_salary(salary):
     if salary < 30000:
@@ -33,8 +42,8 @@ def categorize_salary(salary):
     else:
         return '70K+'
 
-df['Salary_Group'] = df['Starting_Salary'].apply(categorize_salary)
-sunburst_data = df.groupby(['Entrepreneurship', 'Field_of_Study', 'Salary_Group']).size().reset_index(name='Count')
+df_sun['Salary_Group'] = df_sun['Starting_Salary'].apply(categorize_salary)
+sunburst_data = df_sun.groupby(['Entrepreneurship', 'Field_of_Study', 'Salary_Group']).size().reset_index(name='Count')
 total_count = sunburst_data['Count'].sum()
 sunburst_data['Percentage'] = (sunburst_data['Count'] / total_count * 100).round(2)
 
@@ -85,19 +94,18 @@ with col_sun_txt:
 # ======= GRAPH 2: JOB LEVEL BY AGE & ENTREPRENEURSHIP =======
 st.subheader("Job Level vs. Age by Entrepreneurship")
 
-df2 = df[df['Entrepreneurship'].isin(['Yes', 'No'])]
+df2 = df[
+    (df['Current_Job_Level'].isin(selected_levels)) &
+    (df['Entrepreneurship'].isin(selected_statuses))
+]
+
 df_grouped = df2.groupby(['Current_Job_Level', 'Age', 'Entrepreneurship']).size().reset_index(name='Count')
 df_grouped['Percentage'] = df_grouped.groupby(['Current_Job_Level', 'Age'])['Count'].transform(lambda x: x / x.sum())
 
 min_age, max_age = int(df_grouped['Age'].min()), int(df_grouped['Age'].max())
 age_range = st.slider("Select Age Range", min_value=min_age, max_value=max_age, value=(min_age, max_age), key="age_slider")
-selected_statuses = st.multiselect("Select Entrepreneurship Status", ['Yes', 'No'], default=['Yes', 'No'], key="status_selector")
 
-filtered = df_grouped[
-    (df_grouped['Current_Job_Level'].isin(selected_levels)) &
-    (df_grouped['Entrepreneurship'].isin(selected_statuses)) &
-    (df_grouped['Age'].between(age_range[0], age_range[1]))
-]
+filtered = df_grouped[df_grouped['Age'].between(age_range[0], age_range[1])]
 
 color_map2 = {'Yes': '#FFD700', 'No': '#004080'}
 level_order = ['Entry', 'Executive', 'Mid', 'Senior']
@@ -154,8 +162,13 @@ for level in visible_levels:
 # ======= GRAPH 3: WORK-LIFE BALANCE =======
 st.subheader("Work-Life Balance by Years to Promotion")
 
+df_balance = df[
+    (df['Current_Job_Level'].isin(selected_levels)) &
+    (df['Entrepreneurship'].isin(selected_statuses))
+]
+
 avg_balance = (
-    df.groupby(['Current_Job_Level', 'Years_to_Promotion'])['Work_Life_Balance']
+    df_balance.groupby(['Current_Job_Level', 'Years_to_Promotion'])['Work_Life_Balance']
     .mean()
     .reset_index()
 )
@@ -164,9 +177,6 @@ job_levels_order = ['Entry', 'Mid', 'Senior', 'Executive']
 avg_balance['Current_Job_Level'] = pd.Categorical(
     avg_balance['Current_Job_Level'], categories=job_levels_order, ordered=True
 )
-
-# Apply global sidebar filter
-filtered_balance = avg_balance[avg_balance["Current_Job_Level"].isin(selected_levels)]
 
 colors = {
     "Entry": "#1f77b4",
@@ -178,7 +188,7 @@ colors = {
 fig3 = go.Figure()
 for level in job_levels_order:
     if level in selected_levels:
-        data_level = filtered_balance[filtered_balance["Current_Job_Level"] == level]
+        data_level = avg_balance[avg_balance["Current_Job_Level"] == level]
         fig3.add_trace(go.Scatter(
             x=data_level["Years_to_Promotion"],
             y=data_level["Work_Life_Balance"],
@@ -202,4 +212,3 @@ fig3.update_layout(
     yaxis=dict(showspikes=True, spikemode="across", spikecolor="gray")
 )
 st.plotly_chart(fig3, use_container_width=True)
-
