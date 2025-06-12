@@ -87,7 +87,7 @@ else:
         title="Entrepreneurship by Years to Promotion and Job Level"
     )
 
-    fig.update_layout(
+    fig_line.update_layout(
         xaxis_title="Age",
         yaxis_title="Entrepreneurship (%)",
         hovermode="x unified",
