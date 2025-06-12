@@ -84,7 +84,7 @@ else:
     
         fig_gender.update_layout(
             title="Gender Distribution (Donut Chart)",
-            height=400,
+            height=200,
             margin=dict(t=40, l=40, r=40, b=40),
             showlegend=True
         )
@@ -101,7 +101,7 @@ else:
 
         fig_field.update_layout(
             title="Field of Study Distribution (Donut Chart)",
-            height=400,
+            height=200,
             margin=dict(t=40, l=40, r=40, b=40),
             showlegend=True
         )
