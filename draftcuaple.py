@@ -14,19 +14,31 @@ def load_data():
 
 df = load_data()
 
-# ========== SIDEBAR FILTER ==========
+# ========== SIDEBAR FILTER ========== #
 with st.sidebar:
     st.header("🔍 Filters")
+    
+    # Job level filter
     job_levels = sorted(df['Current_Job_Level'].dropna().unique())
-    selected_levels = st.multiselect("Select Job Levels", job_levels, default=job_levels, key="level_selector")
+    selected_levels = st.multiselect("Select Job Levels", job_levels, default=job_levels)
 
+    # Entrepreneurship status filter
     status_options = ['Yes', 'No']
-    selected_statuses = st.multiselect("Select Entrepreneurship Status", status_options, default=status_options, key="status_selector")
+    selected_statuses = st.multiselect("Select Entrepreneurship Status", status_options, default=status_options)
 
-# ========== MAIN TABS ==========
+    # Tab 2 specific filter - optional level selection
+    level_options = sorted(df[df['Entrepreneurship'].isin(selected_statuses)]['Current_Job_Level'].dropna().unique())
+    selected_level_tab2 = st.selectbox("Select Job Level (Tab 2)", level_options)
+
+    # Age range filter (used in Tab 2)
+    df_age = df[df['Entrepreneurship'].isin(selected_statuses)]
+    min_age, max_age = int(df_age['Age'].min()), int(df_age['Age'].max())
+    age_range = st.slider("Select Age Range (Tab 2)", min_value=min_age, max_value=max_age, value=(min_age, max_age))
+
+# ========== MAIN TABS ========== #
 tab1, tab2, tab3 = st.tabs(["🌞 Sunburst Career Path", "📊 Job Level vs Age", "⚖️ Work-Life Balance"])
 
-# ======= TAB 1: SUNBURST =======
+# ======= TAB 1: SUNBURST ======= #
 with tab1:
     st.subheader("Career Path Sunburst")
 
@@ -83,22 +95,17 @@ with tab1:
 
     st.plotly_chart(fig1, use_container_width=True)
 
-# ======= TAB 2: JOB LEVEL VS AGE =======
+# ======= TAB 2: JOB LEVEL VS AGE ======= #
 with tab2:
     st.subheader("Job Level vs. Age by Entrepreneurship")
 
-    df2 = df[df['Entrepreneurship'].isin(selected_statuses)]
+    df2 = df[
+        (df['Current_Job_Level'] == selected_level_tab2) &
+        (df['Entrepreneurship'].isin(selected_statuses))
+    ]
 
-    level_options = df2['Current_Job_Level'].dropna().unique().tolist()
-    selected_level_tab2 = st.selectbox("Select Job Level", sorted(level_options), key="level_dropdown")
-
-    df_filtered = df2[df2['Current_Job_Level'] == selected_level_tab2]
-
-    df_grouped = df_filtered.groupby(['Age', 'Entrepreneurship']).size().reset_index(name='Count')
+    df_grouped = df2.groupby(['Age', 'Entrepreneurship']).size().reset_index(name='Count')
     df_grouped['Percentage'] = df_grouped.groupby('Age')['Count'].transform(lambda x: x / x.sum())
-
-    min_age, max_age = int(df_grouped['Age'].min()), int(df_grouped['Age'].max())
-    age_range = st.slider("Select Age Range", min_value=min_age, max_value=max_age, value=(min_age, max_age), key="age_slider")
 
     filtered = df_grouped[df_grouped['Age'].between(age_range[0], age_range[1])]
 
@@ -146,7 +153,7 @@ with tab2:
     with col2:
         st.plotly_chart(fig_area, use_container_width=True)
 
-# ======= TAB 3: WORK-LIFE BALANCE =======
+# ======= TAB 3: WORK-LIFE BALANCE ======= #
 with tab3:
     st.subheader("Work-Life Balance by Years to Promotion")
 
