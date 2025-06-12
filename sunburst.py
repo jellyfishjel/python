@@ -47,7 +47,7 @@ with col1:
     st.plotly_chart(plot_donut(filtered_df, 'Gender', 'Gender Distribution'), use_container_width=True)
 
 with col2:
-    st.plotly_chart(plot_donut(filtered_df, 'Entrepreneurship', 'Entrepreneurship Status'), use_container_width=True)
+    st.plotly_chart(plot_donut(filtered_df, 'Years_to_Promotion', 'Years to Promotion'), use_container_width=True)
 
 with col3:
     st.plotly_chart(plot_donut(filtered_df, 'Field_of_Study', 'Field of Study'), use_container_width=True)
