@@ -87,6 +87,21 @@ else:
             showlegend=True
         )
         st.plotly_chart(fig_donut, use_container_width=True)
+    with col2:
+    field_counts = filtered_df['Field_of_Study'].value_counts().reset_index()
+    field_counts.columns = ['Field', 'Count']
+    fig_field = go.Figure(data=[go.Pie(
+        labels=field_counts['Field'],
+        values=field_counts['Count'],
+        hole=0.5
+    )])
+
+    fig_field.update_layout(
+        title="Field of Study Distribution (Donut Chart)",
+        height=500,
+        margin=dict(t=40, l=40, r=40, b=40)
+    )
+    st.plotly_chart(fig_field, use_container_width=True)
 
 
 
