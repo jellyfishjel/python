@@ -78,7 +78,7 @@ else:
     fig_bar.update_yaxes(tickformat=".0%", title="Percentage")
 
     # Area chart: Count
-    fig = px.line(
+    fig_line = px.line(= px.line(
         df,
         x="Years_to_Promotion",
         y="Entrepreneurship",
