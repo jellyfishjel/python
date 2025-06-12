@@ -17,22 +17,21 @@ def load_data():
 
 df = load_data()
 
-# Sidebar Filters
-st.sidebar.title("🎯 Filter Options")
+# Sidebar: Job Level Selection
+st.sidebar.header("🎯 Filter Options")
 
-# Gender filter (multi)
-genders = sorted(df['Gender'].dropna().unique())
-selected_genders = st.sidebar.multiselect("Select Gender", genders, default=genders)
+# Filter by Job Level
+job_levels = sorted(df['Current_Job_Level'].dropna().unique().tolist())
+selected_level = st.sidebar.selectbox("Select Job Level:", job_levels)
 
-# Job level filter (single)
-job_levels = sorted(df['Current_Job_Level'].dropna().unique())
-selected_level = st.sidebar.selectbox("Select Job Level", job_levels)
+# Filter by Gender (below Job Level)
+gender_options = df['Gender'].dropna().unique().tolist()
+selected_gender = st.sidebar.selectbox("Select Gender:", ["All"] + gender_options)
 
-# Apply filters to base dataframe
-df_filtered = df[
-    (df['Gender'].isin(selected_genders)) &
-    (df['Current_Job_Level'] == selected_level)
-]
+# Apply filters
+filtered_df = df[df['Current_Job_Level'] == selected_level]
+if selected_gender != "All":
+    filtered_df = filtered_df[filtered_df['Gender'] == selected_gender]
 
 # Function to generate donut chart without legend
 def plot_donut(data, column, title):
