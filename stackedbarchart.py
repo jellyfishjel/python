@@ -82,13 +82,6 @@ if selected_status != 'All':
     df_line = df_line[df_line['Entrepreneurship'] == selected_status]
 
 # Compute mean Job Offers
-df_avg_offers = (
-    df_line.groupby(['Age', 'Entrepreneurship'])['Job_Offers']
-    .mean()
-    .reset_index()
-)
-
-# Create line chart
 fig_line = px.line(
     df_avg_offers,
     x='Age',
@@ -99,9 +92,15 @@ fig_line = px.line(
     category_orders={'Entrepreneurship': ['No', 'Yes'], 'Age': sorted(df_avg_offers['Age'].unique())},
     labels={'Age': 'Age', 'Job_Offers': 'Average Job Offers'},
     height=400,
-    title=f"Average Job Offers by Age – {selected_level} Level" + ("" if selected_status == 'All' else f" ({selected_status})")
+    title=f"Average Job Offers by Age – {selected_level} Level" + ("" if selected_status == 'All' else f" ({selected_status})"),
+    line_shape='spline',  # 👈 Làm mượt đường nối
+    hover_data=['Job_Offers']  # 👈 Chỉ hiện Average Job Offers
 )
-fig_line.update_traces(line=dict(width=2), marker=dict(size=6))
+fig_line.update_traces(
+    line=dict(width=2),
+    marker=dict(size=6),
+    hovertemplate='Average Job Offers=%{y:.2f}<extra></extra>'  # 👈 Hiện đúng format tooltip
+)
 fig_line.update_layout(
     margin=dict(t=40, l=40, r=40, b=40),
     legend_title_text='Entrepreneurship Status',
