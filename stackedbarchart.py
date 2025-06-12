@@ -80,42 +80,57 @@ else:
     )
     fig_bar.update_yaxes(tickformat=".0%", title="Percentage")
 
-         # Line chart: Years to Promotion
-    df_avg_promotion = (
-        df[(df['Current_Job_Level'] == selected_level) &
-           (df['Entrepreneurship'].isin(selected_statuses)) &
-           (df['Age'].between(age_range[0], age_range[1]))]
-        .groupby(['Age', 'Entrepreneurship'])['Job_Offers']
-        .mean()
-        .reset_index()
-    )
+  df_line = (
+    df[
+        (df['Entrepreneurship'].isin(selected_statuses)) &
+        (df['Age'].between(age_range[0], age_range[1])) &
+        (df['Gender'].isin(selected_genders))
+    ]
+    .groupby(['Current_Job_Level', 'Age', 'Entrepreneurship'])['Job_Offers']
+    .mean()
+    .reset_index()
+)
 
-    fig_line = px.line(
-        df_avg_promotion,
-        x='Age',
-        y='Job_Offers',
-        color='Entrepreneurship',
-        markers=True,
-        color_discrete_map=color_map,
-        category_orders={'Entrepreneurship': ['No', 'Yes'], 'Age': ages},
-        labels={'Age': 'Age', 'Job_Offers': 'Job Offers'},
-        height=400,
-        title=f"{selected_level} – Avg Years to Promotion by Age"
-    )
-    fig_line.update_traces(line=dict(width=2), marker=dict(size=6))
-    fig_line.update_layout(
-        margin=dict(t=40, l=40, r=40, b=40),
-        legend_title_text='Entrepreneurship',
-        xaxis_tickangle=90,
-        hovermode="x unified"
-    )
-    fig_line.update_yaxes(title="Avg Years to Promotion")
-    
-    col1, col2 = st.columns(2)
-    with col1:
+# Xác định thứ tự Job Level
+job_levels_order = ['Entry', 'Mid', 'Senior', 'Executive']
+df_line['Current_Job_Level'] = pd.Categorical(
+    df_line['Current_Job_Level'],
+    categories=job_levels_order,
+    ordered=True
+)
+df_line = df_line.sort_values(['Current_Job_Level', 'Age'])
+
+# Tạo biểu đồ line
+fig_line = px.line(
+    df_line,
+    x='Age',
+    y='Job_Offers',
+    color='Entrepreneurship',
+    facet_col='Current_Job_Level',
+    facet_col_wrap=2,
+    markers=True,
+    color_discrete_map=color_map,
+    category_orders={
+        'Current_Job_Level': job_levels_order,
+        'Entrepreneurship': ['No', 'Yes']
+    },
+    labels={'Age': 'Age', 'Job_Offers': 'Avg Job Offers'},
+    height=600,
+    title="Avg Job Offers by Age, Entrepreneurship & Job Level"
+)
+
+fig_line.update_traces(line=dict(width=2), marker=dict(size=6))
+fig_line.update_layout(
+    margin=dict(t=40, l=40, r=40, b=40),
+    legend_title_text='Entrepreneurship',
+    xaxis_tickangle=90,
+    hovermode="x unified"
+)
+fig_line.update_yaxes(title="Avg Job Offers")
+
+col1, col2 = st.columns(2)
+with col1:
         st.plotly_chart(fig_bar, use_container_width=True)
-    with col2:
+with col2:
         st.plotly_chart(fig_line, use_container_width=True)
-
-
 
