@@ -102,7 +102,7 @@ fig_line = px.line(
 fig_line.update_traces(
     line=dict(width=2),
     marker=dict(size=6),
-    hovertemplate='Average Job Offers=%{y:.2f}<extra></extra>'  
+    hovertemplate='{y:.2f}<extra></extra>'  
 )
 fig_line.update_layout(
     margin=dict(t=40, l=40, r=40, b=40),
@@ -115,7 +115,6 @@ fig_line.update_layout(
         spikesnap='cursor',
         spikethickness=1.2,
         spikedash='dot',
-        spikecolor='#999999'
     ),
      yaxis=dict(
         showspikes=True,
@@ -123,7 +122,6 @@ fig_line.update_layout(
         spikesnap='cursor',
         spikethickness=1.2,
         spikedash='dot',
-        spikecolor='#999999'
     )
 )
 fig_line.update_yaxes(title="Average Job Offers")
