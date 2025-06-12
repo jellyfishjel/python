@@ -37,15 +37,15 @@ if selected_status != 'All':
     filtered_df = filtered_df[filtered_df['Entrepreneurship'] == selected_status]
 
 # Select variable to visualize
-chart_option = st.selectbox("Select Variable for Visualization", 
-                            ['Gender', 'Field of Study'])
+chart_option = st.selectbox("Select Variable for Visualization", ['Gender', 'Field of Study'])
+
 # Check if enough data exists
 if filtered_df.empty:
     st.write("Not enough data to display charts.")
 else:
     col1, col2 = st.columns(2)
 
-    # ----- DENSITY CHART -----
+    # ----- DENSITY CHART (Area) -----
     with col1:
         fig_density = go.Figure()
 
@@ -58,6 +58,22 @@ else:
             categories = filtered_df['Field_of_Study'].value_counts().nlargest(6).index  # Top 6 fields
             title = "Age Distribution by Field of Study (Top 6)"
             group_col = 'Field_of_Study'
+
+        for cat in categories:
+            age_data = filtered_df[filtered_df[group_col] == cat]['Age']
+
+            if len(age_data) > 1:
+                kde = gaussian_kde(age_data)
+                x_vals = np.linspace(age_range[0], age_range[1], 100)
+                y_vals = kde(x_vals)
+
+                fig_density.add_trace(go.Scatter(
+                    x=x_vals,
+                    y=y_vals,
+                    mode='lines',
+                    name=str(cat),
+                    fill='tozeroy'
+                ))
 
         fig_density.update_layout(
             title=title,
