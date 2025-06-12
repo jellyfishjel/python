@@ -85,14 +85,14 @@ else:
     # Donut chart: chia theo gender
     fig_combined.add_trace(
     go.Pie(
-        labels=gender_counts['Gender'],
-        values=gender_counts['Count'],
-        hole=0.5,
-        marker=dict(colors=[gender_colors.get(g, 'gray') for g in gender_counts['Gender']]),
-        legendgroup="",  # Không cần legendgroup ở pie này vì đã có ở area
-        showlegend=False  # Legend đã hiển thị ở area chart
-        ),
-        row=1, col=2
+            labels=gender_counts['Gender'],
+            values=gender_counts['Count'],
+            hole=0.5,
+            marker=dict(colors=[gender_colors.get(g, 'gray') for g in gender_counts['Gender']]),
+            legendgroup="",  # Không cần legendgroup ở pie này vì đã có ở area
+            showlegend=False  # Legend đã hiển thị ở area chart
+            ),
+            row=1, col=2
     )
 
     # Layout
