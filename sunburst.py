@@ -22,8 +22,16 @@ st.sidebar.header("🎯 Filter by Job Level")
 job_levels = sorted(df['Current_Job_Level'].dropna().unique().tolist())
 selected_level = st.sidebar.selectbox("Select one Job Level:", job_levels)
 
-# Filter data based on selection
+# Main page: Gender Filter
+gender_options = df['Gender'].dropna().unique().tolist()
+selected_gender = st.selectbox("🔍 Filter by Gender:", ["All"] + gender_options)
+
+# Filter data based on Job Level
 filtered_df = df[df['Current_Job_Level'] == selected_level]
+
+# Further filter by Gender
+if selected_gender != "All":
+    filtered_df = filtered_df[filtered_df['Gender'] == selected_gender]
 
 # Function to generate donut chart without legend
 def plot_donut(data, column, title):
@@ -53,6 +61,4 @@ with col3:
     st.plotly_chart(plot_donut(filtered_df, 'Field_of_Study', 'Field of Study'), use_container_width=True)
 
 # Display number of records
-st.markdown(f"### 👥 Total Records for '{selected_level}': {len(filtered_df)}")
-
-
+st.markdown(f"### 👥 Total Records for '{selected_level}'{' and Gender: ' + selected_gender if selected_gender != 'All' else ''}: {len(filtered_df)}")
