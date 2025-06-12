@@ -15,12 +15,12 @@ st.markdown("This dashboard explores the relationship between entrepreneurship, 
 
 st.sidebar.title("Filter Options")
 
-# Gender filter
-genders = sorted(df['Gender'].dropna().unique())
-selected_genders = st.sidebar.selectbox("Select Gender", genders)
+# Gender filter (select one + 'All')
+gender_options = ['All'] + sorted(df['Gender'].dropna().unique())
+selected_gender = st.sidebar.selectbox("Select Gender", gender_options)
 
-# Filter by gender first
-df = df[df['Gender'].isin(selected_genders)]
+if selected_gender != 'All':
+    df = df[df['Gender'] == selected_gender]
 
 # Job level filter
 job_levels = sorted(df['Current_Job_Level'].dropna().unique())
@@ -30,8 +30,10 @@ selected_level = st.sidebar.selectbox("Select Job Level", job_levels)
 min_age, max_age = int(df['Age'].min()), int(df['Age'].max())
 age_range = st.sidebar.slider("Select Age Range", min_value=min_age, max_value=max_age, value=(min_age, max_age))
 
-# Entrepreneurship filter (select one only)
-selected_status = st.sidebar.selectbox("Select Entrepreneurship Status", ['Yes', 'No','All'])
+# Entrepreneurship filter (select one + 'All')
+entrepreneur_options = ['All', 'Yes', 'No']
+selected_status = st.sidebar.selectbox("Select Entrepreneurship Status", entrepreneur_options)
+
 
 # Filtered for grouped percentage chart
 df_grouped = (
