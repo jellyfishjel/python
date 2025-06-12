@@ -108,6 +108,7 @@ fig_line.update_layout(
     margin=dict(t=40, l=40, r=40, b=40),
     legend_title_text='Entrepreneurship',
     xaxis_tickangle=90,
+    overmode="x unified"
     xaxis=dict(
         showspikes=True,
         spikemode='across',
