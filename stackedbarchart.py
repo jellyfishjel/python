@@ -119,10 +119,10 @@ fig_line.update_layout(
     )
 )
 # Biểu đồ bar nằm phía trên – cao hơn chút
-fig_bar.update_layout(height=400)
+fig_bar.update_layout(height=450)
 
 # Biểu đồ line nằm phía dưới – thấp hơn
-fig_line.update_layout(height=270)
+fig_line.update_layout(height=300)
 
 fig_line.update_yaxes(title="Average Job Offers")
 
