@@ -17,15 +17,15 @@ def load_data():
 
 df = load_data()
 
-# Sidebar: Job Level Filter
+# Sidebar: Job Level Selection (single choice)
 st.sidebar.header("🎯 Filter by Job Level")
-job_levels = df['Current_Job_Level'].dropna().unique().tolist()
-selected_levels = st.sidebar.multiselect("Select Job Levels:", job_levels, default=job_levels)
+job_levels = sorted(df['Current_Job_Level'].dropna().unique().tolist())
+selected_level = st.sidebar.selectbox("Select one Job Level:", job_levels)
 
-# Filter data
-filtered_df = df[df['Current_Job_Level'].isin(selected_levels)]
+# Filter data based on selection
+filtered_df = df[df['Current_Job_Level'] == selected_level]
 
-# Function to generate donut chart
+# Function to generate donut chart without legend
 def plot_donut(data, column, title):
     count_data = data[column].value_counts().reset_index()
     count_data.columns = [column, 'Count']
@@ -36,11 +36,11 @@ def plot_donut(data, column, title):
         hole=0.5,
         title=title
     )
-    fig.update_traces(textinfo='percent+label')
+    fig.update_traces(textinfo='percent+label', showlegend=False)
     fig.update_layout(margin=dict(t=40, b=0, l=0, r=0))
     return fig
 
-# Layout: 3 columns for 3 donut charts
+# Layout: 3 donut charts
 col1, col2, col3 = st.columns(3)
 
 with col1:
@@ -52,5 +52,5 @@ with col2:
 with col3:
     st.plotly_chart(plot_donut(filtered_df, 'Field_of_Study', 'Field of Study'), use_container_width=True)
 
-# Optional: record total
-st.markdown(f"### 👥 Total Records Displayed: {len(filtered_df)}")
+# Display number of records
+st.markdown(f"### 👥 Total Records for '{selected_level}': {len(filtered_df)}")
