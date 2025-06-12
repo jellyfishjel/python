@@ -121,8 +121,5 @@ fig_line.update_layout(
 fig_line.update_yaxes(title="Average Job Offers")
 
 # Display charts
-col1, col2 = st.columns(2)
-with col1:
-    st.plotly_chart(fig_bar, use_container_width=True)
-with col2:
-    st.plotly_chart(fig_line, use_container_width=True)
+st.plotly_chart(fig_line, use_container_width=True)
+st.plotly_chart(fig_bar, use_container_width=True)
