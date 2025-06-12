@@ -55,7 +55,7 @@ else:
             group_col = 'Gender'
 
         elif chart_option == 'Field of Study':
-            categories = filtered_df['Field_of_Study'].value_counts()
+            categories = filtered_df['Field_of_Study'].dropna().unique()
             title = "Age Distribution by Field of Study"
             group_col = 'Field_of_Study'
 
