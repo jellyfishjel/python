@@ -114,7 +114,7 @@ fig_line.update_layout(
         spikethickness=1.2,
         spikedash='dot',
         spikecolor='#999999'
-    )
+    ),
      yaxis=dict(
         showspikes=True,
         spikemode='across',
