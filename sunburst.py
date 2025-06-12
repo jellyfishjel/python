@@ -50,7 +50,7 @@ with col2:
     st.plotly_chart(plot_donut(filtered_df, 'Years_to_Promotion', 'Years to Promotion'), use_container_width=True)
 
 with col3:
-    st.plotly_chart(plot_donut(filtered_df, 'Age', 'Age'), use_container_width=True)
+    st.plotly_chart(plot_donut(filtered_df, 'Field_of_Study', 'Field of Study'), use_container_width=True)
 
 # Display number of records
 st.markdown(f"### 👥 Total Records for '{selected_level}': {len(filtered_df)}")
@@ -87,9 +87,9 @@ fig_promo = px.bar(
     promotion_grouped,
     x='Age',
     y='Percentage',
-    color='Years_to_Promotion',
+    color='Entrepreneurship',
     barmode='stack',
-    category_orders={'Years_to_Promotion': promotion_order, 'Age': ages_promo},
+    category_orders={'Entrepreneurship': promotion_order, 'Age': ages_promo},
     labels={'Age': 'Age', 'Percentage': 'Percentage'},
     height=400,
     width=chart_width_promo,
