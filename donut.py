@@ -71,37 +71,42 @@ else:
         st.plotly_chart(fig_density, use_container_width=True)
 
     # Donut Chart
+    # Donut Charts in col2
     with col2:
+    # Gender Donut Chart
         gender_counts = filtered_df['Gender'].value_counts().reset_index()
         gender_counts.columns = ['Gender', 'Count']
-        fig_donut = go.Figure(data=[go.Pie(
+        fig_gender = go.Figure(data=[go.Pie(
             labels=gender_counts['Gender'],
             values=gender_counts['Count'],
-            hole=0.5  # Donut style
+            hole=0.5
         )])
-
-        fig_donut.update_layout(
+    
+        fig_gender.update_layout(
             title="Gender Distribution (Donut Chart)",
-            height=500,
+            height=400,
             margin=dict(t=40, l=40, r=40, b=40),
             showlegend=True
         )
-        st.plotly_chart(fig_donut, use_container_width=True)
-    with col2:
-    field_counts = filtered_df['Field_of_Study'].value_counts().reset_index()
-    field_counts.columns = ['Field', 'Count']
-    fig_field = go.Figure(data=[go.Pie(
-        labels=field_counts['Field'],
-        values=field_counts['Count'],
-        hole=0.5
-    )])
+        st.plotly_chart(fig_gender, use_container_width=True)
 
-    fig_field.update_layout(
-        title="Field of Study Distribution (Donut Chart)",
-        height=500,
-        margin=dict(t=40, l=40, r=40, b=40)
-    )
-    st.plotly_chart(fig_field, use_container_width=True)
+    # Field of Study Donut Chart
+        field_counts = filtered_df['Field_of_Study'].value_counts().reset_index()
+        field_counts.columns = ['Field of Study', 'Count']
+        fig_field = go.Figure(data=[go.Pie(
+            labels=field_counts['Field of Study'],
+            values=field_counts['Count'],
+            hole=0.5
+        )])
+
+        fig_field.update_layout(
+            title="Field of Study Distribution (Donut Chart)",
+            height=400,
+            margin=dict(t=40, l=40, r=40, b=40),
+            showlegend=True
+        )
+        st.plotly_chart(fig_field, use_container_width=True)
+
 
 
 
