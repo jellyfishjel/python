@@ -5,7 +5,11 @@ from scipy.stats import gaussian_kde
 import numpy as np
 
 # Load and preprocess data
-df = pd.read_csv("education_career_success.csv")
+@st.cache_data
+def load_data():
+    return pd.read_excel("education_career_success.xlsx", sheet_name=0)
+
+df = load_data()
 df = df[df['Entrepreneurship'].isin(['Yes', 'No'])]
 
 # Sidebar filters
