@@ -3,12 +3,12 @@ import pandas as pd
 import plotly.express as px
 
 st.set_page_config(
-    page_title="Career Insights by Job Level",
+    page_title="Career Insights Dashboard",
     layout="wide",
     page_icon="🍩"
 )
 
-st.title("🍩 Career Insights by Job Level")
+st.title("🍩 Career Insights Dashboard")
 
 # Load data
 @st.cache_data
@@ -16,22 +16,31 @@ def load_data():
     return pd.read_excel("education_career_success.xlsx", sheet_name='education_career_success')
 
 df = load_data()
+df = df[df['Entrepreneurship'].isin(['Yes', 'No'])]  # Ensure clean binary values
 
-# Sidebar: Job Level Selection
-st.sidebar.header("🎯 Filter Options")
+# Sidebar filters
+st.sidebar.title("🎯 Filter Options")
 
-# Filter by Job Level
-job_levels = sorted(df['Current_Job_Level'].dropna().unique().tolist())
-selected_level = st.sidebar.selectbox("Select Job Level:", job_levels)
+# Gender filter
+genders = sorted(df['Gender'].dropna().unique())
+selected_genders = st.sidebar.multiselect("Select Gender", genders, default=genders)
 
-# Filter by Gender (below Job Level)
-gender_options = df['Gender'].dropna().unique().tolist()
-selected_gender = st.sidebar.selectbox("Select Gender:", ["All"] + gender_options)
+# Job level filter
+job_levels = sorted(df['Current_Job_Level'].dropna().unique())
+selected_level = st.sidebar.selectbox("Select Job Level", job_levels)
 
-# Apply filters
-filtered_df = df[df['Current_Job_Level'] == selected_level]
-if selected_gender != "All":
-    filtered_df = filtered_df[filtered_df['Gender'] == selected_gender]
+# Filtered base dataframe
+df_filtered = df[
+    (df['Gender'].isin(selected_genders)) &
+    (df['Current_Job_Level'] == selected_level)
+]
+
+# Age filter (based on filtered data)
+min_age, max_age = int(df_filtered['Age'].min()), int(df_filtered['Age'].max())
+age_range = st.sidebar.slider("Select Age Range", min_value=min_age, max_value=max_age, value=(min_age, max_age))
+
+# Entrepreneurship filter
+selected_statuses = st.sidebar.multiselect("Select Entrepreneurship Status", ['Yes', 'No'], default=['Yes', 'No'])
 
 # Function to generate donut chart without legend
 def plot_donut(data, column, title):
@@ -48,29 +57,19 @@ def plot_donut(data, column, title):
     fig.update_layout(margin=dict(t=40, b=0, l=0, r=0))
     return fig
 
-# Layout: 3 donut charts
+# Display 3 donut charts
+st.subheader("📊 Donut Charts Overview")
 col1, col2, col3 = st.columns(3)
-
 with col1:
-    st.plotly_chart(plot_donut(filtered_df, 'Entrepreneurship', 'Entrepreneurship'), use_container_width=True)
-
+    st.plotly_chart(plot_donut(df_filtered, 'Entrepreneurship', 'Entrepreneurship'), use_container_width=True)
 with col2:
-    st.plotly_chart(plot_donut(filtered_df, 'Years_to_Promotion', 'Years to Promotion'), use_container_width=True)
-
+    st.plotly_chart(plot_donut(df_filtered, 'Years_to_Promotion', 'Years to Promotion'), use_container_width=True)
 with col3:
-    st.plotly_chart(plot_donut(filtered_df, 'Field_of_Study', 'Field of Study'), use_container_width=True)
+    st.plotly_chart(plot_donut(df_filtered, 'Field_of_Study', 'Field of Study'), use_container_width=True)
 
-# Display number of records
-st.markdown(f"### 👥 Total Records for '{selected_level}'{' and Gender: ' + selected_gender if selected_gender != 'All' else ''}: {len(filtered_df)}")
+st.markdown(f"### 👥 Total Records for '{selected_level}' and selected gender(s): {len(df_filtered)}")
 
-# Age filter (chỉ lấy từ df_filtered)
-min_age, max_age = int(df_filtered['Age'].min()), int(df_filtered['Age'].max())
-age_range = st.sidebar.slider("Select Age Range", min_value=min_age, max_value=max_age, value=(min_age, max_age))
-
-# Entrepreneurship filter
-selected_statuses = st.sidebar.multiselect("Select Entrepreneurship Status", ['Yes', 'No'], default=['Yes', 'No'])
-
-# Nhóm lại dữ liệu theo các tiêu chí
+# Bar + Area Chart Section
 df_grouped = (
     df_filtered.groupby(['Age', 'Entrepreneurship'])
       .size()
@@ -78,8 +77,89 @@ df_grouped = (
 )
 df_grouped['Percentage'] = df_grouped.groupby('Age')['Count'].transform(lambda x: x / x.sum())
 
-# Áp dụng filter tuổi và status
+# Apply additional filters for age and entrepreneurship
 filtered = df_grouped[
     (df_grouped['Entrepreneurship'].isin(selected_statuses)) &
     (df_grouped['Age'].between(age_range[0], age_range[1]))
 ]
+
+# Font size utility
+def font_size_by_count(n):
+    return {1: 20, 2: 18, 3: 16, 4: 14, 5: 12, 6: 11, 7: 10, 8: 9, 9: 8, 10: 7}.get(n, 6)
+
+color_map = {'Yes': '#FFD700', 'No': '#004080'}
+
+# Display charts if data is available
+if filtered.empty:
+    st.write(f"### ⚠️ No data available for selected filters.")
+else:
+    st.subheader("📈 Entrepreneurship by Age – Detailed Charts")
+    ages = sorted(filtered['Age'].unique())
+    font_size = font_size_by_count(len(ages))
+    chart_width = max(400, min(1200, 50 * len(ages) + 100))
+
+    # Bar Chart
+    fig_bar = px.bar(
+        filtered,
+        x='Age',
+        y='Percentage',
+        color='Entrepreneurship',
+        barmode='stack',
+        color_discrete_map=color_map,
+        category_orders={'Entrepreneurship': ['No', 'Yes'], 'Age': ages},
+        labels={'Age': 'Age', 'Percentage': 'Percentage'},
+        height=400,
+        width=chart_width,
+        title=f"{selected_level} Level – Entrepreneurship by Age (%)"
+    )
+
+    for status in ['No', 'Yes']:
+        for _, row in filtered[filtered['Entrepreneurship'] == status].iterrows():
+            if row['Percentage'] > 0:
+                y_pos = 0.2 if status == 'No' else 0.9
+                fig_bar.add_annotation(
+                    x=row['Age'],
+                    y=y_pos,
+                    text=f"{row['Percentage']:.0%}",
+                    showarrow=False,
+                    font=dict(color="white", size=font_size),
+                    xanchor="center",
+                    yanchor="middle"
+                )
+
+    fig_bar.update_layout(
+        margin=dict(t=40, l=40, r=40, b=40),
+        legend_title_text='Entrepreneurship',
+        xaxis_tickangle=90,
+        bargap=0.1
+    )
+    fig_bar.update_yaxes(tickformat=".0%", title="Percentage")
+
+    # Area Chart
+    fig_area = px.area(
+        filtered,
+        x='Age',
+        y='Count',
+        color='Entrepreneurship',
+        markers=True,
+        color_discrete_map=color_map,
+        category_orders={'Entrepreneurship': ['No', 'Yes'], 'Age': ages},
+        labels={'Age': 'Age', 'Count': 'Count'},
+        height=400,
+        width=chart_width,
+        title=f"{selected_level} Level – Entrepreneurship by Age (Count)"
+    )
+    fig_area.update_traces(line=dict(width=2), marker=dict(size=8))
+    fig_area.update_layout(
+        margin=dict(t=40, l=40, r=40, b=40),
+        legend_title_text='Entrepreneurship',
+        xaxis_tickangle=90
+    )
+    fig_area.update_yaxes(title="Count")
+
+    # Display side by side
+    col1, col2 = st.columns(2)
+    with col1:
+        st.plotly_chart(fig_bar, use_container_width=True)
+    with col2:
+        st.plotly_ch_
