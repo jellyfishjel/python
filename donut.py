@@ -55,8 +55,8 @@ else:
             group_col = 'Gender'
 
         elif chart_option == 'Field of Study':
-            categories = filtered_df['Field_of_Study'].value_counts().nlargest(6).index  # Top 6 fields
-            title = "Age Distribution by Field of Study (Top 6)"
+            categories = filtered_df['Field_of_Study'].value_counts()
+            title = "Age Distribution by Field of Study"
             group_col = 'Field_of_Study'
 
         for cat in categories:
