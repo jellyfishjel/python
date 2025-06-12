@@ -73,18 +73,29 @@ promotion_grouped['Years_to_Promotion'] = pd.Categorical(promotion_grouped['Year
 promotion_grouped = promotion_grouped.sort_values(['Age', 'Years_to_Promotion'])
 
 # Biểu đồ stacked bar
+# Tạo biến tuổi và chiều rộng riêng cho biểu đồ promotion
+ages_promo = sorted(promotion_grouped['Age'].unique())
+chart_width_promo = max(400, min(1200, 50 * len(ages_promo) + 100))
+
+# Biểu đồ stacked bar
+# Tạo biến tuổi và chiều rộng riêng cho biểu đồ promotion
+ages_promo = sorted(promotion_grouped['Age'].unique())
+chart_width_promo = max(400, min(1200, 50 * len(ages_promo) + 100))
+
+# Biểu đồ stacked bar
 fig_promo = px.bar(
     promotion_grouped,
     x='Age',
     y='Percentage',
     color='Years_to_Promotion',
     barmode='stack',
-    category_orders={'Years_to_Promotion': promotion_order},
+    category_orders={'Years_to_Promotion': promotion_order, 'Age': ages_promo},
     labels={'Age': 'Age', 'Percentage': 'Percentage'},
     height=400,
-    width=chart_width,
+    width=chart_width_promo,
     title="📈 Years to Promotion Distribution by Age (%)"
 )
+
 
 fig_promo.update_layout(
     margin=dict(t=40, l=40, r=40, b=40),
