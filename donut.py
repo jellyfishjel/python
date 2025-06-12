@@ -1,16 +1,13 @@
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 from scipy.stats import gaussian_kde
 import numpy as np
-
-st.set_page_config(layout="wide")
 
 # Load and preprocess data
 @st.cache_data
 def load_data():
-    return pd.read_excel("education_career_success.xlsx", sheet_name=0)
+    return pd.read_excel("education_career_success.xlsx")
 
 df = load_data()
 df = df[df['Entrepreneurship'].isin(['Yes', 'No'])]
@@ -41,67 +38,54 @@ if selected_status != 'All':
 if filtered_df.empty or filtered_df['Gender'].nunique() < 2:
     st.write("Not enough data to display charts.")
 else:
-    # Prepare data
-    genders = filtered_df['Gender'].unique()
-    gender_counts = filtered_df['Gender'].value_counts().reset_index()
-    gender_counts.columns = ['Gender', 'Count']
+    col1, col2 = st.columns(2)
 
-    # Màu cố định để cả hai biểu đồ dùng chung
-    gender_colors = {
-        'Male': 'blue',
-        'Female': 'skyblue',
-        'Other': 'red'
-    }
+    # Area Chart (was density curve)
+    with col1:
+        fig_density = go.Figure()
+        genders = filtered_df['Gender'].unique()
 
-    # Tạo subplot
-    fig_combined = make_subplots(
-        rows=1, cols=2,
-        specs=[[{"type": "xy"}, {"type": "domain"}]],
-        subplot_titles=("Age Distribution by Gender", "Gender Distribution")
-    )
+        for gender in genders:
+            gender_ages = filtered_df[filtered_df['Gender'] == gender]['Age']
+            if len(gender_ages) > 1:
+                kde = gaussian_kde(gender_ages)
+                x_vals = np.linspace(age_range[0], age_range[1], 100)
+                y_vals = kde(x_vals)
 
-    # Area chart
-    for gender in genders:
-        gender_ages = filtered_df[filtered_df['Gender'] == gender]['Age']
-        if len(gender_ages) > 1:
-            kde = gaussian_kde(gender_ages)
-            x_vals = np.linspace(age_range[0], age_range[1], 100)
-            y_vals = kde(x_vals)
-
-            fig_combined.add_trace(
-                go.Scatter(
+                fig_density.add_trace(go.Scatter(
                     x=x_vals,
                     y=y_vals,
                     mode='lines',
                     name=gender,
-                    fill='tozeroy',
-                    line=dict(color=gender_colors.get(gender, None)),
-                    legendgroup=gender,
-                    showlegend=True  # Chỉ hiện legend 1 lần cho nhóm
-                ),
-                row=1, col=1
-            )
+                    fill='tozeroy'  # Tạo area chart
+                ))
 
-    # Donut chart: chia theo gender
-    fig_combined.add_trace(
-    go.Pie(
+        fig_density.update_layout(
+            title="Age Distribution by Gender (Area Chart)",
+            xaxis_title="Age",
+            yaxis_title="Density",
+            height=500,
+            margin=dict(t=40, l=40, r=40, b=40)
+        )
+        st.plotly_chart(fig_density, use_container_width=True)
+
+    # Donut Chart
+    with col2:
+        gender_counts = filtered_df['Gender'].value_counts().reset_index()
+        gender_counts.columns = ['Gender', 'Count']
+        fig_donut = go.Figure(data=[go.Pie(
             labels=gender_counts['Gender'],
             values=gender_counts['Count'],
-            hole=0.5,
-            marker=dict(colors=[gender_colors.get(g, 'gray') for g in gender_counts['Gender']]),
-            legendgroup="",  # Không cần legendgroup ở pie này vì đã có ở area
-            showlegend=False  # Legend đã hiển thị ở area chart
-            ),
-            row=1, col=2
-    )
+            hole=0.5  # Donut style
+        )])
 
-    # Layout
-    fig_combined.update_layout(
-        title_text="Combined View: Age & Gender Distribution",
-        height=500,
-        showlegend=True,
-        legend=dict(orientation="h", y=-0.2),
-        margin=dict(t=60, l=40, r=40, b=60)
-    )
+        fig_donut.update_layout(
+            title="Gender Distribution (Donut Chart)",
+            height=500,
+            margin=dict(t=40, l=40, r=40, b=40),
+            showlegend=True
+        )
+        st.plotly_chart(fig_donut, use_container_width=True)
 
-    st.plotly_chart(fig_combined, use_container_width=True)
+
+
