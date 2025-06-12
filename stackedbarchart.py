@@ -115,6 +115,14 @@ fig_line.update_layout(
         spikedash='dot',
         spikecolor='#999999'
     )
+     yaxis=dict(
+        showspikes=True,
+        spikemode='across',
+        spikesnap='cursor',
+        spikethickness=1.2,
+        spikedash='dot',
+        spikecolor='#999999'
+    )
 )
 fig_line.update_yaxes(title="Average Job Offers")
 
