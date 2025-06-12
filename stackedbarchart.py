@@ -80,45 +80,28 @@ else:
     )
     fig_bar.update_yaxes(tickformat=".0%", title="Percentage")
 
-  df_line = (
-    df[
-        (df['Entrepreneurship'].isin(selected_statuses)) &
-        (df['Age'].between(age_range[0], age_range[1])) &
-        (df['Gender'].isin(selected_genders))
-    ]
-    .groupby(['Current_Job_Level', 'Age', 'Entrepreneurship'])['Job_Offers']
+  # Line chart: Avg Job Offers by Age
+df_avg_offers = (
+    df[(df['Current_Job_Level'] == selected_level) &
+       (df['Entrepreneurship'].isin(selected_statuses)) &
+       (df['Age'].between(age_range[0], age_range[1]))]
+    .groupby(['Age', 'Entrepreneurship'])['Job_Offers']
     .mean()
     .reset_index()
 )
 
-# Xác định thứ tự Job Level
-job_levels_order = ['Entry', 'Mid', 'Senior', 'Executive']
-df_line['Current_Job_Level'] = pd.Categorical(
-    df_line['Current_Job_Level'],
-    categories=job_levels_order,
-    ordered=True
-)
-df_line = df_line.sort_values(['Current_Job_Level', 'Age'])
-
-# Tạo biểu đồ line
 fig_line = px.line(
-    df_line,
+    df_avg_offers,
     x='Age',
     y='Job_Offers',
     color='Entrepreneurship',
-    facet_col='Current_Job_Level',
-    facet_col_wrap=2,
     markers=True,
     color_discrete_map=color_map,
-    category_orders={
-        'Current_Job_Level': job_levels_order,
-        'Entrepreneurship': ['No', 'Yes']
-    },
+    category_orders={'Entrepreneurship': ['No', 'Yes'], 'Age': ages},
     labels={'Age': 'Age', 'Job_Offers': 'Avg Job Offers'},
-    height=600,
-    title="Avg Job Offers by Age, Entrepreneurship & Job Level"
+    height=400,
+    title=f"{selected_level} – Avg Job Offers by Age"
 )
-
 fig_line.update_traces(line=dict(width=2), marker=dict(size=6))
 fig_line.update_layout(
     margin=dict(t=40, l=40, r=40, b=40),
@@ -127,6 +110,7 @@ fig_line.update_layout(
     hovermode="x unified"
 )
 fig_line.update_yaxes(title="Avg Job Offers")
+
 
 col1, col2 = st.columns(2)
 with col1:
