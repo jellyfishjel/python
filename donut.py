@@ -108,7 +108,7 @@ else:
 
         fig_donut.update_layout(
             height=500,
-            width=300
+            width=300,
             margin=dict(t=40, l=40, r=40, b=40),
             showlegend=True
         )
