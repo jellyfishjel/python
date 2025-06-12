@@ -53,60 +53,45 @@ if selected_status != 'All':
     df_bar = df_bar[df_bar['Entrepreneurship'] == selected_status]
 
 # Create bar chart
-fig_bar = px.bar(
-    df_bar,
-    x='Age',
-    y='Percentage',
-    color='Entrepreneurship',
-    barmode='stack',
-    color_discrete_map=color_map,
-    category_orders={'Entrepreneurship': ['No', 'Yes'], 'Age': sorted(df_bar['Age'].unique())},
-    labels={'Age': 'Age', 'Percentage': 'Entrepreneurship Rate'},
-    height=400,
-    title=f"Entrepreneurship Rate by Age – {selected_level} Level"
+# Tạo lại df_avg_offers trước khi tạo biểu đồ line
+df_avg_offers = (
+    df[(df['Current_Job_Level'] == selected_level) &
+       (df['Entrepreneurship'].isin(selected_statuses)) &
+       (df['Age'].between(age_range[0], age_range[1]))]
+    .groupby(['Age', 'Entrepreneurship'])['Job_Offers']
+    .mean()
+    .reset_index()
 )
-fig_bar.update_layout(
-    margin=dict(t=40, l=40, r=40, b=40),
-    legend_title_text='Entrepreneurship Status',
-    xaxis_tickangle=90,
-    bargap=0.1
-)
-fig_bar.update_yaxes(tickformat=".0%", title="Entrepreneurship Rate")
 
-# Prepare data for line chart
-df_line = df[
-    (df['Current_Job_Level'] == selected_level) &
-    (df['Age'].between(age_range[0], age_range[1]))
-]
-if selected_status != 'All':
-    df_line = df_line[df_line['Entrepreneurship'] == selected_status]
-
-# Compute mean Job Offers
+# Biểu đồ line: Average Job Offers
 fig_line = px.line(
     df_avg_offers,
     x='Age',
     y='Job_Offers',
-    color='Entrepreneurship' if selected_status == 'All' else None,
+    color='Entrepreneurship' if selected_statuses == ['Yes', 'No'] else None,
     markers=True,
     color_discrete_map=color_map,
     category_orders={'Entrepreneurship': ['No', 'Yes'], 'Age': sorted(df_avg_offers['Age'].unique())},
     labels={'Age': 'Age', 'Job_Offers': 'Average Job Offers'},
     height=400,
-    title=f"Average Job Offers by Age – {selected_level} Level" + ("" if selected_status == 'All' else f" ({selected_status})"),
-    line_shape='spline',  # 👈 Làm mượt đường nối
-    hover_data=['Job_Offers']  # 👈 Chỉ hiện Average Job Offers
+    title=f"Average Job Offers by Age – {selected_level} Level",
+    line_shape='spline',
+    hover_data=['Job_Offers']  # 👈 Hiện đúng tooltip
 )
+
 fig_line.update_traces(
     line=dict(width=2),
     marker=dict(size=6),
-    hovertemplate='Average Job Offers=%{y:.2f}<extra></extra>'  # 👈 Hiện đúng format tooltip
+    hovertemplate='Average Job Offers=%{y:.2f}<extra></extra>'
 )
+
 fig_line.update_layout(
     margin=dict(t=40, l=40, r=40, b=40),
-    legend_title_text='Entrepreneurship Status',
+    legend_title_text='Entrepreneurship',
     xaxis_tickangle=90,
     hovermode="x unified"
 )
+
 fig_line.update_yaxes(title="Average Job Offers")
 
 # Display charts
