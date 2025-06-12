@@ -34,8 +34,7 @@ age_range = st.sidebar.slider("Select Age Range", min_value=min_age, max_value=m
 entrepreneur_options = ['All', 'Yes', 'No']
 selected_status = st.sidebar.selectbox("Select Entrepreneurship Status", entrepreneur_options)
 
-
-# Filtered for grouped percentage chart
+# Group data for percentage chart
 df_grouped = (
     df.groupby(['Current_Job_Level', 'Age', 'Entrepreneurship'])
     .size()
@@ -43,16 +42,19 @@ df_grouped = (
 )
 df_grouped['Percentage'] = df_grouped.groupby(['Current_Job_Level', 'Age'])['Count'].transform(lambda x: x / x.sum())
 
+# Filter for percentage chart
 filtered = df_grouped[
     (df_grouped['Current_Job_Level'] == selected_level) &
-    (df_grouped['Entrepreneurship'] == selected_status) &
     (df_grouped['Age'].between(age_range[0], age_range[1]))
 ]
+
+if selected_status != 'All':
+    filtered = filtered[filtered['Entrepreneurship'] == selected_status]
 
 color_map = {'Yes': '#FFD700', 'No': '#004080'}
 
 if filtered.empty:
-    st.warning(f"No data available for Job Level '{selected_level}' and Entrepreneurship = '{selected_status}'.")
+    st.warning(f"No data available for Job Level '{selected_level}' and selected filters.")
 else:
     ages = sorted(filtered['Age'].unique())
 
@@ -78,11 +80,15 @@ else:
     fig_bar.update_yaxes(tickformat=".0%", title="Entrepreneurship Rate")
 
     # Line chart: Avg Job Offers by Age
+    df_line = df[
+        (df['Current_Job_Level'] == selected_level) &
+        (df['Age'].between(age_range[0], age_range[1]))
+    ]
+    if selected_status != 'All':
+        df_line = df_line[df_line['Entrepreneurship'] == selected_status]
+
     df_avg_offers = (
-        df[(df['Current_Job_Level'] == selected_level) &
-           (df['Entrepreneurship'] == selected_status) &
-           (df['Age'].between(age_range[0], age_range[1]))]
-        .groupby(['Age'])['Job_Offers']
+        df_line.groupby(['Age'])['Job_Offers']
         .mean()
         .reset_index()
     )
@@ -95,7 +101,7 @@ else:
         color_discrete_sequence=['#228B22'],
         labels={'Age': 'Age', 'Job_Offers': 'Average Number of Job Offers'},
         height=400,
-        title=f"Average Job Offers by Age – {selected_level} Level (Entrepreneurship: {selected_status})"
+        title=f"Average Job Offers by Age – {selected_level} Level" + (f" (Entrepreneurship: {selected_status})" if selected_status != 'All' else "")
     )
     fig_line.update_traces(line=dict(width=2), marker=dict(size=6))
     fig_line.update_layout(
