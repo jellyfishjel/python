@@ -17,21 +17,22 @@ def load_data():
 
 df = load_data()
 
-# Sidebar: Job Level Selection
-st.sidebar.header("🎯 Filter Options")
+# Sidebar Filters
+st.sidebar.title("🎯 Filter Options")
 
-# Filter by Job Level
-job_levels = sorted(df['Current_Job_Level'].dropna().unique().tolist())
-selected_level = st.sidebar.selectbox("Select Job Level:", job_levels)
+# Gender filter (multi)
+genders = sorted(df['Gender'].dropna().unique())
+selected_genders = st.sidebar.multiselect("Select Gender", genders, default=genders)
 
-# Filter by Gender (below Job Level)
-gender_options = df['Gender'].dropna().unique().tolist()
-selected_gender = st.sidebar.selectbox("Select Gender:", ["All"] + gender_options)
+# Job level filter (single)
+job_levels = sorted(df['Current_Job_Level'].dropna().unique())
+selected_level = st.sidebar.selectbox("Select Job Level", job_levels)
 
-# Apply filters
-filtered_df = df[df['Current_Job_Level'] == selected_level]
-if selected_gender != "All":
-    filtered_df = filtered_df[filtered_df['Gender'] == selected_gender]
+# Apply filters to base dataframe
+df_filtered = df[
+    (df['Gender'].isin(selected_genders)) &
+    (df['Current_Job_Level'] == selected_level)
+]
 
 # Function to generate donut chart without legend
 def plot_donut(data, column, title):
@@ -62,3 +63,24 @@ with col3:
 
 # Display number of records
 st.markdown(f"### 👥 Total Records for '{selected_level}'{' and Gender: ' + selected_gender if selected_gender != 'All' else ''}: {len(filtered_df)}")
+
+# Age filter (chỉ lấy từ df_filtered)
+min_age, max_age = int(df_filtered['Age'].min()), int(df_filtered['Age'].max())
+age_range = st.sidebar.slider("Select Age Range", min_value=min_age, max_value=max_age, value=(min_age, max_age))
+
+# Entrepreneurship filter
+selected_statuses = st.sidebar.multiselect("Select Entrepreneurship Status", ['Yes', 'No'], default=['Yes', 'No'])
+
+# Nhóm lại dữ liệu theo các tiêu chí
+df_grouped = (
+    df_filtered.groupby(['Age', 'Entrepreneurship'])
+      .size()
+      .reset_index(name='Count')
+)
+df_grouped['Percentage'] = df_grouped.groupby('Age')['Count'].transform(lambda x: x / x.sum())
+
+# Áp dụng filter tuổi và status
+filtered = df_grouped[
+    (df_grouped['Entrepreneurship'].isin(selected_statuses)) &
+    (df_grouped['Age'].between(age_range[0], age_range[1]))
+]
