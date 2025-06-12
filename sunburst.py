@@ -79,4 +79,33 @@ fig_bar = px.bar(
     color='Salary_Group',
     barmode='stack',
     color_discrete_map=color_map,
-    c
+    category_orders={'Age': ages, 'Salary_Group': list(color_map.keys())},
+    labels={'Percentage': 'Percentage'},
+    height=400,
+    title=f"{selected_level} Level – Salary Group by Age (%)"
+)
+
+fig_bar.update_layout(margin=dict(t=40, l=40, r=40, b=40))
+fig_bar.update_yaxes(tickformat=".0%", title="Percentage")
+
+# Area Chart (Count)
+fig_area = px.area(
+    grouped,
+    x='Age',
+    y='Count',
+    color='Salary_Group',
+    markers=True,
+    color_discrete_map=color_map,
+    category_orders={'Age': ages, 'Salary_Group': list(color_map.keys())},
+    labels={'Count': 'Count'},
+    height=400,
+    title=f"{selected_level} Level – Salary Group by Age (Count)"
+)
+fig_area.update_traces(line=dict(width=2), marker=dict(size=8))
+fig_area.update_layout(margin=dict(t=40, l=40, r=40, b=40))
+fig_area.update_yaxes(title="Count")
+
+# Display both charts side-by-side
+col1, col2 = st.columns(2)
+col1.plotly_chart(fig_bar, use_container_width=True)
+col2.plotly_chart(fig_area, use_container_width=True)
