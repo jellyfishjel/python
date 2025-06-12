@@ -24,6 +24,7 @@ selected_level = st.sidebar.selectbox("Select one Job Level:", job_levels)
 
 # Filter data based on selection
 filtered_df = df[df['Current_Job_Level'] == selected_level]
+filtered_df = df[df['Gender'] == selected_level]
 
 # Function to generate donut chart without legend
 def plot_donut(data, column, title):
@@ -44,7 +45,7 @@ def plot_donut(data, column, title):
 col1, col2, col3 = st.columns(3)
 
 with col1:
-    st.plotly_chart(plot_donut(filtered_df, 'Gender', 'Gender Distribution'), use_container_width=True)
+    st.plotly_chart(plot_donut(filtered_df, 'Entrepreneurship', 'Entrepreneurship'), use_container_width=True)
 
 with col2:
     st.plotly_chart(plot_donut(filtered_df, 'Years_to_Promotion', 'Years to Promotion'), use_container_width=True)
