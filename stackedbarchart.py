@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
 
 st.set_page_config(page_title="Entrepreneurship Analysis", layout="wide")
 
@@ -85,19 +86,21 @@ df_avg_offers = (
     .reset_index()
 )
 
-fig_line = px.line(
-    df_avg_offers,
-    x='Age',
-    y='Job_Offers',
-    color='Entrepreneurship' if selected_status == 'All' else None,
-    markers=True,
-    color_discrete_map=color_map,
-    category_orders={'Entrepreneurship': ['No', 'Yes'], 'Age': sorted(df_avg_offers['Age'].unique())},
-    labels={'Age': 'Age', 'Job_Offers': 'Average Job Offers'},
-    height=400,
-    title=f"Average Job Offers by Age – {selected_level} Level",
-    hover_data=['Job_Offers']
-)
+fig_line = go.Figure()
+
+for status in selected_statuses:
+    df_line = df_avg_offers[df_avg_offers['Entrepreneurship'] == status]
+    fig_line.add_trace(go.Scatter(
+        x=df_line['Age'],
+        y=df_line['Job_Offers'],
+        mode='lines+markers',
+        name=status,
+        marker=dict(size=6),
+        line=dict(width=2),
+        hovertemplate='Age: %{x}<br>Avg Job Offers: %{y:.2f}<extra></extra>',
+        hoverinfo='x+y',
+        line_color=color_map[status]
+    ))
 
 fig_line.update_traces(
     line=dict(width=2),
