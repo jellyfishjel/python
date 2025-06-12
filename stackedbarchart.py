@@ -17,7 +17,7 @@ st.sidebar.title("Filter Options")
 
 # Gender filter
 genders = sorted(df['Gender'].dropna().unique())
-selected_genders = st.sidebar.multiselect("Select Gender", genders, default=genders)
+selected_genders = st.sidebar.selectbox("Select Gender", genders)
 
 # Filter by gender first
 df = df[df['Gender'].isin(selected_genders)]
@@ -31,7 +31,7 @@ min_age, max_age = int(df['Age'].min()), int(df['Age'].max())
 age_range = st.sidebar.slider("Select Age Range", min_value=min_age, max_value=max_age, value=(min_age, max_age))
 
 # Entrepreneurship filter (select one only)
-selected_status = st.sidebar.selectbox("Select Entrepreneurship Status", ['Yes', 'No'])
+selected_status = st.sidebar.selectbox("Select Entrepreneurship Status", ['Yes', 'No','All'])
 
 # Filtered for grouped percentage chart
 df_grouped = (
