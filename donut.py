@@ -43,7 +43,7 @@ chart_option = st.selectbox("Select Variable for Visualization", ['Gender', 'Fie
 if filtered_df.empty:
     st.write("Not enough data to display charts.")
 else:
-    col1, col2 = st.columns(2)
+    col1, col2 = st.columns([3, 1]) 
 
     # ----- DENSITY CHART (Area) -----
     with col1:
@@ -114,9 +114,3 @@ else:
         )
         st.plotly_chart(fig_donut, use_container_width=True)
         
-col1, col2 = st.columns([3, 1])
-with col1:
-    st.plotly_chart(fig_density, use_container_width=True)
-
-with col2:
-    st.plotly_chart(fig_donut, use_container_width=True)
