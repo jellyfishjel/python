@@ -61,4 +61,4 @@ with col3:
     st.plotly_chart(plot_donut(filtered_df, 'Field_of_Study', 'Field of Study'), use_container_width=True)
 
 # Display number of records
-st.markdown(f"### 👥 Total Records for '{selected_level}'{' and Gender: ' + selected_gender if selected
+st.markdown(f"### 👥 Total Records for '{selected_level}'{' and Gender: ' + selected_gender if selected_gender != 'All' else ''}: {len(filtered_df)}")
