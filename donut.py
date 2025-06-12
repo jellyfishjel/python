@@ -48,53 +48,65 @@ else:
 
     # ----- DENSITY CHART -----
     with col1:
-        fig_density = go.Figure()
+    fig_hist = go.Figure()
 
-        if chart_option == 'Gender':
-            categories = filtered_df['Gender'].unique()
-            title = "Age Distribution by Gender (Area Chart)"
-            group_col = 'Gender'
+    if chart_option == 'Gender':
+        categories = filtered_df['Gender'].unique()
+        title = "Age Histogram by Gender with KDE Curve"
+        group_col = 'Gender'
 
-        elif chart_option == 'Field of Study':
-            categories = filtered_df['Field_of_Study'].value_counts().nlargest(6).index  # Top 6 fields
-            title = "Age Distribution by Field of Study (Top 6)"
-            group_col = 'Field_of_Study'
+    elif chart_option == 'Field of Study':
+        categories = filtered_df['Field_of_Study'].value_counts().nlargest(6).index
+        title = "Age Histogram by Field of Study (Top 6)"
+        group_col = 'Field_of_Study'
 
-        elif chart_option == 'Years to Promotion':
-            promo_bins = pd.cut(filtered_df['Years_to_Promotion'], bins=[-1, 1, 3, 5, np.inf],
-                                labels=['0-1 yrs', '2-3 yrs', '4-5 yrs', '6+ yrs'])
-            filtered_df['Promo_Group'] = promo_bins
-            categories = filtered_df['Promo_Group'].dropna().unique()
-            title = "Age Distribution by Years to Promotion Group"
-            group_col = 'Promo_Group'
+    elif chart_option == 'Years to Promotion':
+        promo_bins = pd.cut(filtered_df['Years_to_Promotion'], bins=[-1, 1, 3, 5, np.inf],
+                            labels=['0-1 yrs', '2-3 yrs', '4-5 yrs', '6+ yrs'])
+        filtered_df['Promo_Group'] = promo_bins
+        categories = filtered_df['Promo_Group'].dropna().unique()
+        title = "Age Histogram by Years to Promotion Group"
+        group_col = 'Promo_Group'
 
-        for cat in categories:
-            if chart_option == 'Years to Promotion':
-                age_data = filtered_df[filtered_df['Promo_Group'] == cat]['Age']
-            else:
-                age_data = filtered_df[filtered_df[group_col] == cat]['Age']
+    # Add histogram and KDE curve per group
+    for cat in categories:
+        if chart_option == 'Years to Promotion':
+            age_data = filtered_df[filtered_df['Promo_Group'] == cat]['Age']
+        else:
+            age_data = filtered_df[filtered_df[group_col] == cat]['Age']
 
-            if len(age_data) > 1:
-                kde = gaussian_kde(age_data)
-                x_vals = np.linspace(age_range[0], age_range[1], 100)
-                y_vals = kde(x_vals)
+        if len(age_data) > 1:
+            # Histogram
+            fig_hist.add_trace(go.Histogram(
+                x=age_data,
+                name=str(cat),
+                opacity=0.5,
+                histnorm='probability density',
+            ))
 
-                fig_density.add_trace(go.Scatter(
-                    x=x_vals,
-                    y=y_vals,
-                    mode='lines',
-                    name=str(cat),
-                    fill='tozeroy'
-                ))
+            # KDE Curve
+            kde = gaussian_kde(age_data)
+            x_vals = np.linspace(age_range[0], age_range[1], 200)
+            y_vals = kde(x_vals)
 
-        fig_density.update_layout(
-            title=title,
-            xaxis_title="Age",
-            yaxis_title="Density",
-            height=500,
-            margin=dict(t=40, l=40, r=40, b=40)
-        )
-        st.plotly_chart(fig_density, use_container_width=True)
+            fig_hist.add_trace(go.Scatter(
+                x=x_vals,
+                y=y_vals,
+                mode='lines',
+                name=f"{cat} (KDE)",
+                line=dict(width=2)
+            ))
+
+    fig_hist.update_layout(
+        barmode='overlay',
+        title=title,
+        xaxis_title="Age",
+        yaxis_title="Density",
+        height=500,
+        margin=dict(t=40, l=40, r=40, b=40)
+    )
+    st.plotly_chart(fig_hist, use_container_width=True)
+
 
     # ----- DONUT CHART -----
     with col2:
