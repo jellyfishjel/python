@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import plotly.express as px
+import plotly.graph_objects as go
 
 st.set_page_config(page_title="Entrepreneurship Analysis", layout="wide")
 
@@ -85,43 +85,44 @@ df_avg_offers = (
     .reset_index()
 )
 
-fig_line = px.line(
-    df_avg_offers,
-    x='Age',
-    y='Job_Offers',
-    color='Entrepreneurship' if selected_status == 'All' else None,
-    markers=True,
-    color_discrete_map=color_map,
-    category_orders={'Entrepreneurship': ['No', 'Yes'], 'Age': sorted(df_avg_offers['Age'].unique())},
-    labels={'Age': 'Age', 'Job_Offers': 'Average Job Offers'},
-    height=400,
-    title=f"Average Job Offers by Age – {selected_level} Level",
-    hover_data=['Job_Offers']
-)
+fig_line = go.Figure()
 
-fig_line.update_traces(
-    line=dict(width=2),
-    marker=dict(size=6),
-    hovertemplate='%{y:.2f}<extra></extra>'  # 👈 Hiện đúng format tooltip
-)
+for status in selected_statuses:  # ['Yes', 'No'] hoặc ['Yes'] hoặc ['No']
+    data_status = df_avg_offers[df_avg_offers["Entrepreneurship"] == status]
+    fig_line.add_trace(go.Scatter(
+        x=data_status["Age"],
+        y=data_status["Job_Offers"],
+        mode="lines+markers",
+        name=status,
+        line=dict(color=color_map[status], width=2),
+        marker=dict(size=6),
+        hovertemplate="%{y:.2f}"  # chỉ hiện giá trị, tên và màu line sẽ auto hiện
+    ))
+
 fig_line.update_layout(
+    title=f"Average Job Offers by Age – {selected_level} Level",
+    xaxis_title="Age",
+    yaxis_title="Average Job Offers",
+    height=400,
     margin=dict(t=40, l=40, r=40, b=40),
     legend_title_text='Entrepreneurship',
     xaxis_tickangle=90,
-    hovermode="x unified",
+    hovermode="x",  # 👈 để vẫn hiện cả 2 điểm cùng lúc
     xaxis=dict(
         showspikes=True,
         spikemode='across',
         spikesnap='cursor',
         spikethickness=1.2,
         spikedash='dot',
+        spikecolor='gray'
     ),
-     yaxis=dict(
+    yaxis=dict(
         showspikes=True,
         spikemode='across',
         spikesnap='cursor',
         spikethickness=1.2,
         spikedash='dot',
+        spikecolor='gray'
     )
 )
 fig_line.update_yaxes(title="Average Job Offers")
