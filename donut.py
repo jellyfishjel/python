@@ -46,14 +46,21 @@ else:
     gender_counts = filtered_df['Gender'].value_counts().reset_index()
     gender_counts.columns = ['Gender', 'Count']
 
-    # Create combined figure
+    # Màu cố định để cả hai biểu đồ dùng chung
+    gender_colors = {
+        'Male': 'blue',
+        'Female': 'skyblue',
+        'Other': 'red'
+    }
+
+    # Tạo subplot
     fig_combined = make_subplots(
         rows=1, cols=2,
         specs=[[{"type": "xy"}, {"type": "domain"}]],
         subplot_titles=("Age Distribution by Gender", "Gender Distribution")
     )
 
-    # Density chart (area)
+    # Area chart
     for gender in genders:
         gender_ages = filtered_df[filtered_df['Gender'] == gender]['Age']
         if len(gender_ages) > 1:
@@ -67,31 +74,37 @@ else:
                     y=y_vals,
                     mode='lines',
                     name=gender,
-                    fill='tozeroy'
+                    fill='tozeroy',
+                    line=dict(color=gender_colors.get(gender, None)),
+                    legendgroup=gender,
+                    showlegend=True  # Chỉ hiện legend 1 lần cho nhóm
                 ),
                 row=1, col=1
             )
 
-    # Donut chart
-    fig_combined.add_trace(
-        go.Pie(
-            labels=gender_counts['Gender'],
-            values=gender_counts['Count'],
-            hole=0.5,
-            name="Gender",
-            showlegend=True  # shared legend
-        ),
-        row=1, col=2
-    )
+    # Donut chart: chia theo gender
+    for gender in genders:
+        count = gender_counts.loc[gender_counts['Gender'] == gender, 'Count'].values[0]
+        fig_combined.add_trace(
+            go.Pie(
+                labels=[gender],
+                values=[count],
+                hole=0.5,
+                name=gender,
+                marker_colors=[gender_colors.get(gender, None)],
+                legendgroup=gender,
+                showlegend=False  # Ẩn legend phần donut, đã có ở phần line
+            ),
+            row=1, col=2
+        )
 
-    # Layout settings
+    # Layout
     fig_combined.update_layout(
         title_text="Combined View: Age & Gender Distribution",
         height=500,
         showlegend=True,
-        legend=dict(orientation="h", y=-0.2),  # Adjust legend position
+        legend=dict(orientation="h", y=-0.2),
         margin=dict(t=60, l=40, r=40, b=60)
     )
 
-    # Show chart
     st.plotly_chart(fig_combined, use_container_width=True)
