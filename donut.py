@@ -48,4 +48,50 @@ else:
 
     # Create combined figure
     fig_combined = make_subplots(
-        rows=1, col
+        rows=1, cols=2,
+        specs=[[{"type": "xy"}, {"type": "domain"}]],
+        subplot_titles=("Age Distribution by Gender", "Gender Distribution")
+    )
+
+    # Density chart (area)
+    for gender in genders:
+        gender_ages = filtered_df[filtered_df['Gender'] == gender]['Age']
+        if len(gender_ages) > 1:
+            kde = gaussian_kde(gender_ages)
+            x_vals = np.linspace(age_range[0], age_range[1], 100)
+            y_vals = kde(x_vals)
+
+            fig_combined.add_trace(
+                go.Scatter(
+                    x=x_vals,
+                    y=y_vals,
+                    mode='lines',
+                    name=gender,
+                    fill='tozeroy'
+                ),
+                row=1, col=1
+            )
+
+    # Donut chart
+    fig_combined.add_trace(
+        go.Pie(
+            labels=gender_counts['Gender'],
+            values=gender_counts['Count'],
+            hole=0.5,
+            name="Gender",
+            showlegend=True  # shared legend
+        ),
+        row=1, col=2
+    )
+
+    # Layout settings
+    fig_combined.update_layout(
+        title_text="Combined View: Age & Gender Distribution",
+        height=500,
+        showlegend=True,
+        legend=dict(orientation="h", y=-0.2),  # Adjust legend position
+        margin=dict(t=60, l=40, r=40, b=60)
+    )
+
+    # Show chart
+    st.plotly_chart(fig_combined, use_container_width=True)
