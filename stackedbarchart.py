@@ -96,7 +96,6 @@ fig_line = px.line(
     labels={'Age': 'Age', 'Job_Offers': 'Average Job Offers'},
     height=400,
     title=f"Average Job Offers by Age – {selected_level} Level",
-    line_shape='spline',
     hover_data=['Job_Offers']
 )
 
