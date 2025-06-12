@@ -118,8 +118,29 @@ fig_line.update_layout(
         spikecolor='gray'
     )
 )
+
+fig_line.update_layout(
+    legend=dict(
+        orientation="h",
+        yanchor="bottom",
+        y=1.02,
+        xanchor="center",
+        x=0.5
+    )
+)
+
+fig_bar.update_layout(
+    legend=dict(
+        orientation="v",
+        yanchor="top",
+        y=0.98,
+        xanchor="left",
+        x=1.02
+    )
+)
+
 fig_line.update_yaxes(title="Average Job Offers")
 
 # Display charts
-st.plotly_chart(fig_line, use_container_width=True)
 st.plotly_chart(fig_bar, use_container_width=True)
+st.plotly_chart(fig_line, use_container_width=True)
