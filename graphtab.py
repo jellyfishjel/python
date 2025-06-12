@@ -211,3 +211,46 @@ fig3.update_layout(
     yaxis=dict(showspikes=True, spikemode="across", spikecolor="gray")
 )
 st.plotly_chart(fig3, use_container_width=True)
+
+# === Stacked Bar Chart for Years to Promotion by Age ===
+
+# Nhóm dữ liệu theo Age và Years_to_Promotion
+promotion_grouped = filtered_df.groupby(['Age', 'Years_to_Promotion']).size().reset_index(name='Count')
+promotion_grouped['Percentage'] = promotion_grouped.groupby('Age')['Count'].transform(lambda x: x / x.sum())
+
+# Chuyển giá trị sang chuỗi để biểu diễn rõ hơn
+promotion_grouped['Years_to_Promotion'] = promotion_grouped['Years_to_Promotion'].astype(str)
+
+# Đảm bảo thứ tự hợp lý cho Years_to_Promotion
+promotion_order = sorted(
+    promotion_grouped['Years_to_Promotion'].unique(),
+    key=lambda x: float(x) if x.replace('.', '', 1).isdigit() else 999
+)
+promotion_grouped['Years_to_Promotion'] = pd.Categorical(promotion_grouped['Years_to_Promotion'], categories=promotion_order, ordered=True)
+promotion_grouped = promotion_grouped.sort_values(['Age', 'Years_to_Promotion'])
+
+# Biểu đồ stacked bar
+fig_promo = px.bar(
+    promotion_grouped,
+    x='Age',
+    y='Percentage',
+    color='Years_to_Promotion',
+    barmode='stack',
+    category_orders={'Years_to_Promotion': promotion_order},
+    labels={'Age': 'Age', 'Percentage': 'Percentage'},
+    height=400,
+    width=chart_width,
+    title="📈 Years to Promotion Distribution by Age (%)"
+)
+
+fig_promo.update_layout(
+    margin=dict(t=40, l=40, r=40, b=40),
+    legend_title_text='Years to Promotion',
+    xaxis_tickangle=90,
+    bargap=0.1
+)
+fig_promo.update_yaxes(tickformat=".0%", title="Percentage")
+
+# Hiển thị stacked bar
+st.plotly_chart(fig_promo, use_container_width=True)
+
