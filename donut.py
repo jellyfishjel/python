@@ -36,7 +36,9 @@ filtered_df = filtered_df[filtered_df['Age'].between(age_range[0], age_range[1])
 if selected_status != 'All':
     filtered_df = filtered_df[filtered_df['Entrepreneurship'] == selected_status]
 
-
+# Select variable to visualize
+chart_option = st.selectbox("Select Variable for Visualization", 
+                            ['Gender', 'Field of Study'])
 # Check if enough data exists
 if filtered_df.empty:
     st.write("Not enough data to display charts.")
