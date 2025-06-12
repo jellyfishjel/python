@@ -85,7 +85,7 @@ else:
         df[(df['Current_Job_Level'] == selected_level) &
            (df['Entrepreneurship'].isin(selected_statuses)) &
            (df['Age'].between(age_range[0], age_range[1]))]
-        .groupby(['Age', 'Entrepreneurship'])['Years_to_Promotion']
+        .groupby(['Age', 'Entrepreneurship'])['Job_Offers']
         .mean()
         .reset_index()
     )
@@ -93,12 +93,12 @@ else:
     fig_line = px.line(
         df_avg_promotion,
         x='Age',
-        y='Years_to_Promotion',
+        y='Job_Offers',
         color='Entrepreneurship',
         markers=True,
         color_discrete_map=color_map,
         category_orders={'Entrepreneurship': ['No', 'Yes'], 'Age': ages},
-        labels={'Age': 'Age', 'Years_to_Promotion': 'Avg Years to Promotion'},
+        labels={'Age': 'Age', 'Job_Offers': 'Job Offers'},
         height=400,
         title=f"{selected_level} – Avg Years to Promotion by Age"
     )
