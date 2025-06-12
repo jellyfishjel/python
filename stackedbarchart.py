@@ -80,27 +80,37 @@ else:
     )
     fig_bar.update_yaxes(tickformat=".0%", title="Percentage")
 
-       # Line chart: Count
+         # Line chart: Years to Promotion
+    df_avg_promotion = (
+        df[(df['Current_Job_Level'] == selected_level) &
+           (df['Entrepreneurship'].isin(selected_statuses)) &
+           (df['Age'].between(age_range[0], age_range[1]))]
+        .groupby(['Age', 'Entrepreneurship'])['Years_to_Promotion']
+        .mean()
+        .reset_index()
+    )
+
     fig_line = px.line(
-        filtered,
+        df_avg_promotion,
         x='Age',
-        y='Count',
+        y='Years_to_Promotion',
         color='Entrepreneurship',
         markers=True,
         color_discrete_map=color_map,
         category_orders={'Entrepreneurship': ['No', 'Yes'], 'Age': ages},
-        labels={'Age': 'Age', 'Count': 'Count'},
+        labels={'Age': 'Age', 'Years_to_Promotion': 'Avg Years to Promotion'},
         height=400,
-        title=f"{selected_level} – Entrepreneurship by Age (Count)"
+        title=f"{selected_level} – Avg Years to Promotion by Age"
     )
     fig_line.update_traces(line=dict(width=2), marker=dict(size=6))
     fig_line.update_layout(
         margin=dict(t=40, l=40, r=40, b=40),
         legend_title_text='Entrepreneurship',
-        xaxis_tickangle=90
+        xaxis_tickangle=90,
+        hovermode="x unified"
     )
-    fig_line.update_yaxes(title="Count")
-
+    fig_line.update_yaxes(title="Avg Years to Promotion")
+    
     col1, col2 = st.columns(2)
     with col1:
         st.plotly_chart(fig_bar, use_container_width=True)
