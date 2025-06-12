@@ -24,7 +24,6 @@ selected_level = st.sidebar.selectbox("Select one Job Level:", job_levels)
 
 # Filter data based on selection
 filtered_df = df[df['Current_Job_Level'] == selected_level]
-filtered_df = df[df['Gender'] == selected_level]
 
 # Function to generate donut chart without legend
 def plot_donut(data, column, title):
