@@ -101,7 +101,8 @@ fig_line = px.line(
 
 fig_line.update_traces(
     line=dict(width=2),
-    marker=dict(size=6)
+    marker=dict(size=6),
+    hovertemplate='Average Job Offers=%{y:.2f}<extra></extra>'  
 )
 fig_line.update_layout(
     margin=dict(t=40, l=40, r=40, b=40),
