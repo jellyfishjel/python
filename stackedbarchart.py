@@ -33,6 +33,9 @@ age_range = st.sidebar.slider("Select Age Range", min_value=min_age, max_value=m
 entrepreneur_options = ['All', 'Yes', 'No']
 selected_status = st.sidebar.selectbox("Select Entrepreneurship Status", entrepreneur_options)
 
+# Convert to list for filtering
+selected_statuses = ['Yes', 'No'] if selected_status == 'All' else [selected_status]
+
 # Color mapping
 color_map = {'Yes': '#FFD700', 'No': '#004080'}
 
@@ -44,7 +47,6 @@ df_grouped = (
 )
 df_grouped['Percentage'] = df_grouped.groupby(['Current_Job_Level', 'Age'])['Count'].transform(lambda x: x / x.sum())
 
-# Apply filters to grouped data
 df_bar = df_grouped[
     (df_grouped['Current_Job_Level'] == selected_level) &
     (df_grouped['Age'].between(age_range[0], age_range[1]))
@@ -52,8 +54,28 @@ df_bar = df_grouped[
 if selected_status != 'All':
     df_bar = df_bar[df_bar['Entrepreneurship'] == selected_status]
 
-# Create bar chart
-# Tạo lại df_avg_offers trước khi tạo biểu đồ line
+# Bar chart
+fig_bar = px.bar(
+    df_bar,
+    x='Age',
+    y='Percentage',
+    color='Entrepreneurship',
+    barmode='stack',
+    color_discrete_map=color_map,
+    category_orders={'Entrepreneurship': ['No', 'Yes'], 'Age': sorted(df_bar['Age'].unique())},
+    labels={'Age': 'Age', 'Percentage': 'Percentage'},
+    height=400,
+    title=f"Entrepreneurship Distribution by Age – {selected_level} Level"
+)
+fig_bar.update_layout(
+    margin=dict(t=40, l=40, r=40, b=40),
+    legend_title_text='Entrepreneurship',
+    xaxis_tickangle=90,
+    bargap=0.1
+)
+fig_bar.update_yaxes(tickformat=".0%", title="Percentage")
+
+# Line chart: Average Job Offers
 df_avg_offers = (
     df[(df['Current_Job_Level'] == selected_level) &
        (df['Entrepreneurship'].isin(selected_statuses)) &
@@ -63,12 +85,11 @@ df_avg_offers = (
     .reset_index()
 )
 
-# Biểu đồ line: Average Job Offers
 fig_line = px.line(
     df_avg_offers,
     x='Age',
     y='Job_Offers',
-    color='Entrepreneurship' if selected_statuses == ['Yes', 'No'] else None,
+    color='Entrepreneurship' if selected_status == 'All' else None,
     markers=True,
     color_discrete_map=color_map,
     category_orders={'Entrepreneurship': ['No', 'Yes'], 'Age': sorted(df_avg_offers['Age'].unique())},
@@ -76,7 +97,7 @@ fig_line = px.line(
     height=400,
     title=f"Average Job Offers by Age – {selected_level} Level",
     line_shape='spline',
-    hover_data=['Job_Offers']  # 👈 Hiện đúng tooltip
+    hover_data=['Job_Offers']
 )
 
 fig_line.update_traces(
@@ -84,14 +105,12 @@ fig_line.update_traces(
     marker=dict(size=6),
     hovertemplate='Average Job Offers=%{y:.2f}<extra></extra>'
 )
-
 fig_line.update_layout(
     margin=dict(t=40, l=40, r=40, b=40),
     legend_title_text='Entrepreneurship',
     xaxis_tickangle=90,
     hovermode="x unified"
 )
-
 fig_line.update_yaxes(title="Average Job Offers")
 
 # Display charts
