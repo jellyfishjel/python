@@ -3,129 +3,54 @@ import pandas as pd
 import plotly.express as px
 
 st.set_page_config(
-    page_title="Career Path Sunburst",
+    page_title="Career Insights by Job Level",
     layout="wide",
-    page_icon="🌞"
+    page_icon="🍩"
 )
-st.title("🌞 Career Path Sunburst")
 
+st.title("🍩 Career Insights by Job Level")
+
+# Load data
 @st.cache_data
 def load_data():
-    return pd.read_excel("education_career_success.xlsx", sheet_name=0)
+    return pd.read_excel("education_career_success.xlsx", sheet_name='education_career_success')
 
 df = load_data()
 
-def categorize_salary(salary):
-    if salary < 30000:
-        return '<30K'
-    elif salary < 50000:
-        return '30K–50K'
-    elif salary < 70000:
-        return '50K–70K'
-    else:
-        return '70K+'
+# Sidebar: Job Level Filter
+st.sidebar.header("🎯 Filter by Job Level")
+job_levels = df['Current_Job_Level'].dropna().unique().tolist()
+selected_levels = st.sidebar.multiselect("Select Job Levels:", job_levels, default=job_levels)
 
-df['Salary_Group'] = df['Starting_Salary'].apply(categorize_salary)
+# Filter data
+filtered_df = df[df['Current_Job_Level'].isin(selected_levels)]
 
-sunburst_data = df.groupby(['Entrepreneurship', 'Field_of_Study', 'Salary_Group']).size().reset_index(name='Count')
-total_count = sunburst_data['Count'].sum()
-sunburst_data['Percentage'] = (sunburst_data['Count'] / total_count * 100).round(2)
-
-ent_totals = sunburst_data.groupby('Entrepreneurship')['Count'].sum()
-sunburst_data['Ent_Label'] = sunburst_data['Entrepreneurship'].map(
-    lambda x: f"{x}<br>{round(ent_totals[x] / total_count * 100, 2)}%"
-)
-
-field_totals = sunburst_data.groupby(['Entrepreneurship', 'Field_of_Study'])['Count'].sum()
-sunburst_data['Field_Label'] = sunburst_data.apply(
-    lambda row: f"{row['Field_of_Study']}<br>{round(field_totals[(row['Entrepreneurship'], row['Field_of_Study'])] / total_count * 100, 2)}%",
-    axis=1
-)
-
-sunburst_data['Salary_Label'] = sunburst_data['Salary_Group'] + '<br>' + sunburst_data['Percentage'].astype(str) + '%'
-sunburst_data['Ent_Field'] = sunburst_data['Entrepreneurship'] + " - " + sunburst_data['Field_of_Study']
-
-# Color mapping
-yes_colors = {
-    'Engineering': '#aedea7',
-    'Business': '#dbf1d5',
-    'Arts': '#0c7734',
-    'Computer Science': '#73c375',
-    'Medicine': '#00441b',
-    'Law': '#f7fcf5',
-    'Mathematics': '#37a055'
-}
-no_colors = {
-    'Engineering': '#005b96',
-    'Business': '#03396c',
-    'Arts': '#009ac7',
-    'Computer Science': '#8ed2ed',
-    'Medicine': '#b3cde0',
-    'Law': '#5dc4e1',
-    'Mathematics': '#0a70a9'
-}
-color_map = {}
-for field, color in yes_colors.items():
-    color_map[f"Yes - {field}"] = color
-for field, color in no_colors.items():
-    color_map[f"No - {field}"] = color
-
-color_map['Yes'] = '#ffd16a'
-color_map['No'] = '#ffd16a'
-
-# Sidebar filters
-st.sidebar.header("🧩 Sunburst Filters")
-show_entre = st.sidebar.checkbox("Show Entrepreneurship", value=True)
-show_field = st.sidebar.checkbox("Show Field of Study", value=True)
-show_salary = st.sidebar.checkbox("Show Salary Group", value=True)
-
-# Determine the path based on user selections
-sunburst_path = []
-if show_entre:
-    sunburst_path.append('Ent_Label')
-if show_field:
-    sunburst_path.append('Field_Label')
-if show_salary:
-    sunburst_path.append('Salary_Label')
-
-if not sunburst_path:
-    st.warning("Please select at least one level to display the sunburst chart.")
-else:
-    fig = px.sunburst(
-        sunburst_data,
-        path=sunburst_path,
+# Function to generate donut chart
+def plot_donut(data, column, title):
+    count_data = data[column].value_counts().reset_index()
+    count_data.columns = [column, 'Count']
+    fig = px.pie(
+        count_data,
+        names=column,
         values='Count',
-        color='Ent_Field',
-        color_discrete_map=color_map,
-        custom_data=['Percentage'],
-        title='Career Path Insights: Education, Salary & Entrepreneurship'
+        hole=0.5,
+        title=title
     )
+    fig.update_traces(textinfo='percent+label')
+    fig.update_layout(margin=dict(t=40, b=0, l=0, r=0))
+    return fig
 
-    fig.update_traces(
-        insidetextorientation='radial',
-        maxdepth=2,
-        branchvalues="total",
-        textinfo='label+text',
-        hovertemplate="<b>%{label}</b><br>Value: %{value}<br>"
-    )
+# Layout: 3 columns for 3 donut charts
+col1, col2, col3 = st.columns(3)
 
-    fig.update_layout(
-        width=500,
-        height=500,
-        margin=dict(t=50, l=0, r=0, b=0)
-    )
+with col1:
+    st.plotly_chart(plot_donut(filtered_df, 'Gender', 'Gender Distribution'), use_container_width=True)
 
-    col1, col2 = st.columns([3, 1])
-    with col1:
-        st.plotly_chart(fig, use_container_width=True)
+with col2:
+    st.plotly_chart(plot_donut(filtered_df, 'Entrepreneurship', 'Entrepreneurship Status'), use_container_width=True)
 
-    with col2:
-        st.markdown("### 💡 How to use")
-        st.markdown(
-            """
-- The chart displays selected levels:  
-    - *Entrepreneurship*, *Field of Study*, and/or *Salary Group*  
-- Labels show percentage share (e.g., _Engineering (20.1%)_)  
-- Click a segment to zoom in and explore.
-            """
-        )
+with col3:
+    st.plotly_chart(plot_donut(filtered_df, 'Field_of_Study', 'Field of Study'), use_container_width=True)
+
+# Optional: record total
+st.markdown(f"### 👥 Total Records Displayed: {len(filtered_df)}")
