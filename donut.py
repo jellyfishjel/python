@@ -4,6 +4,8 @@ import plotly.graph_objects as go
 from scipy.stats import gaussian_kde
 import numpy as np
 
+st.set_page_config(layout="wide")
+
 # Load and preprocess data
 @st.cache_data
 def load_data():
