@@ -78,31 +78,27 @@ else:
     fig_bar.update_yaxes(tickformat=".0%", title="Percentage")
 
     # Area chart: Count
-    fig_area = px.area(
-        filtered,
-        x='Age',
-        y='Count',
-        color='Entrepreneurship',
+    fig = px.line(
+        df,
+        x="Years_to_Promotion",
+        y="Entrepreneurship",
+        color="Current_Job_Level",  # hoặc "Gender"
         markers=True,
-        color_discrete_map=color_map,
-        category_orders={'Entrepreneurship': ['No', 'Yes'], 'Age': ages},
-        labels={'Age': 'Age', 'Count': 'Count'},
-        height=400,
-        title=f"{selected_level} – Entrepreneurship by Age (Count)"
+        title="Entrepreneurship by Years to Promotion and Job Level"
     )
-    fig_area.update_traces(line=dict(width=2), marker=dict(size=6))
-    fig_area.update_layout(
-        margin=dict(t=40, l=40, r=40, b=40),
-        legend_title_text='Entrepreneurship',
-        xaxis_tickangle=90
-    )
-    fig_area.update_yaxes(title="Count")
 
+    fig.update_layout(
+        xaxis_title="Age",
+        yaxis_title="Entrepreneurship (%)",
+        hovermode="x unified",
+        title_x=0.5
+    )
+    
     col1, col2 = st.columns(2)
     with col1:
         st.plotly_chart(fig_bar, use_container_width=True)
     with col2:
-        st.plotly_chart(fig_area, use_container_width=True)
+        st.plotly_chart(fig_line, use_container_width=True)
 
 
 
