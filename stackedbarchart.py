@@ -2,6 +2,8 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
+st.set_page_config(page_title="Entrepreneurship by Age & Gender", layout="wide")
+
 @st.cache_data
 def load_data():
     return pd.read_excel("education_career_success.xlsx")
@@ -9,10 +11,9 @@ def load_data():
 df = load_data()
 
 # Sidebar filters
-st.set_page_config(page_title="Entrepreneurship by Age & Gender", layout="wide")
+
 st.title("📊 Entrepreneurship Trends by Age and Gender")
 st.markdown("Explore how entrepreneurship varies across age groups and job levels.")
-
 st.sidebar.title("Filters")
 
 # Gender filter
