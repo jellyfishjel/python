@@ -118,26 +118,11 @@ fig_line.update_layout(
         spikecolor='gray'
     )
 )
+# Biểu đồ bar nằm phía trên – cao hơn chút
+fig_bar.update_layout(height=500)
 
-fig_line.update_layout(
-    legend=dict(
-        orientation="h",
-        yanchor="bottom",
-        y=1.02,
-        xanchor="center",
-        x=0.5
-    )
-)
-
-fig_bar.update_layout(
-    legend=dict(
-        orientation="v",
-        yanchor="top",
-        y=0.98,
-        xanchor="left",
-        x=1.02
-    )
-)
+# Biểu đồ line nằm phía dưới – thấp hơn
+fig_line.update_layout(height=350)
 
 fig_line.update_yaxes(title="Average Job Offers")
 
