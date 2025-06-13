@@ -1,215 +1,186 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
+from scipy.stats import gaussian_kde
 
 # PAGE CONFIG
-st.set_page_config(page_title="Career Success Dashboard", layout="wide", page_icon="📊")
-st.title("Education Career Success Analysis")
+st.set_page_config(page_title="Education & Career Insights", layout="wide", page_icon="📊")
 
-# LOAD DATA
+# Load data
 @st.cache_data
 def load_data():
     return pd.read_excel("education_career_success.xlsx")
 
 df = load_data()
 
-# ======= GRAPH 1: SUNBURST =======
-st.subheader("Career Path Sunburst")
+# SIDEBAR FILTERS
+st.sidebar.title("Filters")
 
-def categorize_salary(salary):
-    if salary < 30000:
-        return '<30K'
-    elif salary < 50000:
-        return '30K–50K'
-    elif salary < 70000:
-        return '50K–70K'
-    else:
-        return '70K+'
+# Gender filter
+gender_options = ['All'] + sorted(df['Gender'].dropna().unique())
+selected_gender = st.sidebar.selectbox("Select Gender", gender_options)
+if selected_gender != 'All':
+    df = df[df['Gender'] == selected_gender]
 
-df['Salary_Group'] = df['Starting_Salary'].apply(categorize_salary)
-sunburst_data = df.groupby(['Entrepreneurship', 'Field_of_Study', 'Salary_Group']).size().reset_index(name='Count')
-total_count = sunburst_data['Count'].sum()
-sunburst_data['Percentage'] = (sunburst_data['Count'] / total_count * 100).round(2)
+# Job Level
+job_levels = sorted(df['Current_Job_Level'].dropna().unique())
+selected_level = st.sidebar.selectbox("Select Job Level", job_levels)
+df = df[df['Current_Job_Level'] == selected_level]
 
-ent_totals = sunburst_data.groupby('Entrepreneurship')['Count'].sum()
-sunburst_data['Ent_Label'] = sunburst_data['Entrepreneurship'].map(
-    lambda x: f"{x}<br>{round(ent_totals[x] / total_count * 100, 2)}%"
-)
+# Age Range
+min_age, max_age = int(df['Age'].min()), int(df['Age'].max())
+age_range = st.sidebar.slider("Select Age Range", min_value=min_age, max_value=max_age, value=(min_age, max_age))
+df = df[df['Age'].between(age_range[0], age_range[1])]
 
-field_totals = sunburst_data.groupby(['Entrepreneurship', 'Field_of_Study'])['Count'].sum()
-sunburst_data['Field_Label'] = sunburst_data.apply(
-    lambda row: f"{row['Field_of_Study']}<br>{round(field_totals[(row['Entrepreneurship'], row['Field_of_Study'])] / total_count * 100, 2)}%",
-    axis=1
-)
-sunburst_data['Salary_Label'] = sunburst_data['Salary_Group'] + '<br>' + sunburst_data['Percentage'].astype(str) + '%'
-sunburst_data['Ent_Field'] = sunburst_data['Entrepreneurship'] + " - " + sunburst_data['Field_of_Study']
+# Entrepreneurship
+entrepreneur_options = ['All', 'Yes', 'No']
+selected_status = st.sidebar.selectbox("Select Entrepreneurship Status", entrepreneur_options)
+selected_statuses = ['Yes', 'No'] if selected_status == 'All' else [selected_status]
+df = df[df['Entrepreneurship'].isin(selected_statuses)]
 
-yes_colors = {'Engineering': '#aedea7', 'Business': '#dbf1d5', 'Arts': '#0c7734',
-              'Computer Science': '#73c375', 'Medicine': '#00441b', 'Law': '#f7fcf5', 'Mathematics': '#37a055'}
-no_colors = {'Engineering': '#005b96', 'Business': '#03396c', 'Arts': '#009ac7',
-             'Computer Science': '#8ed2ed', 'Medicine': '#b3cde0', 'Law': '#5dc4e1', 'Mathematics': '#0a70a9'}
-color_map = {f"Yes - {k}": v for k, v in yes_colors.items()} | {f"No - {k}": v for k, v in no_colors.items()}
-color_map.update({'Yes': '#ffd16a', 'No': '#ffd16a'})
+# MAIN PAGE
+st.title("📊 Career and Education Insights")
+st.markdown("Analyze the relationship between demographics, entrepreneurship, and job offers.")
 
-fig1 = px.sunburst(
-    sunburst_data,
-    path=['Ent_Label', 'Field_Label', 'Salary_Label'],
-    values='Count',
-    color='Ent_Field',
-    color_discrete_map=color_map,
-    title='Career Path Insights: Education, Salary & Entrepreneurship'
-)
-fig1.update_traces(insidetextorientation='radial', maxdepth=2, branchvalues="total", textinfo='label+text')
-fig1.update_layout(width=500, height=500, margin=dict(t=40, l=0, r=0, b=0))
+tab1, tab2 = st.tabs(["Entrepreneurship & Job Offers", "Demographics Visualization"])
 
-col_sun, col_sun_txt = st.columns([3, 1])
-with col_sun:
-    st.plotly_chart(fig1, use_container_width=True)
-with col_sun_txt:
-    st.markdown("### 💡 How to use")
-    st.markdown("""
-- Inner ring: *Entrepreneurship*  
-- Middle ring: *Field of Study*  
-- Outer ring: *Salary Group*  
-- Percentages show segment distribution  
-- Click to zoom in on specific segments.
-""")
+# -------- TAB 1 -------- #
+with tab1:
+    st.subheader("Entrepreneurship and Job Offers by Age")
 
+    # Grouped data for bar chart
+    df_grouped = (
+        df.groupby(['Current_Job_Level', 'Age', 'Entrepreneurship'])
+        .size()
+        .reset_index(name='Count')
+    )
+    df_grouped['Percentage'] = df_grouped.groupby(['Current_Job_Level', 'Age'])['Count'].transform(lambda x: x / x.sum())
+    df_bar = df_grouped
 
-# ======= GRAPH 2: JOB LEVEL BY AGE & ENTREPRENEURSHIP =======
-st.subheader("Job Level vs. Age by Entrepreneurship")
-
-df2 = df[df['Entrepreneurship'].isin(['Yes', 'No'])]
-df_grouped = df2.groupby(['Current_Job_Level', 'Age', 'Entrepreneurship']).size().reset_index(name='Count')
-df_grouped['Percentage'] = df_grouped.groupby(['Current_Job_Level', 'Age'])['Count'].transform(lambda x: x / x.sum())
-
-job_levels = sorted(df_grouped['Current_Job_Level'].unique())
-selected_levels = st.multiselect("Select Job Levels", job_levels, default=job_levels, key="level_selector")
-min_age, max_age = int(df_grouped['Age'].min()), int(df_grouped['Age'].max())
-age_range = st.slider("Select Age Range", min_value=min_age, max_value=max_age, value=(min_age, max_age), key="age_slider")
-selected_statuses = st.multiselect("Select Entrepreneurship Status", ['Yes', 'No'], default=['Yes', 'No'], key="status_selector")
-
-filtered = df_grouped[
-    (df_grouped['Current_Job_Level'].isin(selected_levels)) &
-    (df_grouped['Entrepreneurship'].isin(selected_statuses)) &
-    (df_grouped['Age'].between(age_range[0], age_range[1]))
-]
-
-color_map2 = {'Yes': '#FFD700', 'No': '#004080'}
-level_order = ['Entry', 'Executive', 'Mid', 'Senior']
-visible_levels = [lvl for lvl in level_order if lvl in selected_levels]
-
-for level in visible_levels:
-    data = filtered[filtered['Current_Job_Level'] == level]
-    if data.empty:
-        st.write(f"### {level} – No data available")
-        continue
-
-    ages = sorted(data['Age'].unique())
-
+    even_ages = sorted(df_bar['Age'].unique())
+    even_ages = [age for age in even_ages if age % 2 == 0]
+    color_map = {'Yes': '#FFD700', 'No': '#004080'}
 
     fig_bar = px.bar(
-        data,
+        df_bar,
         x='Age',
         y='Percentage',
         color='Entrepreneurship',
         barmode='stack',
-        color_discrete_map=color_map2,
-        height=400,
-        width=500,
-        title=f"{level} Level – Entrepreneurship by Age (%)"
+        color_discrete_map=color_map,
+        category_orders={'Entrepreneurship': ['No', 'Yes']},
+        labels={'Age': 'Age', 'Percentage': 'Percentage'},
+        height=450,
+        width=1250,
+        title=f"Entrepreneurship Distribution by Age – {selected_level} Level"
     )
-    fig_bar.update_layout(margin=dict(t=30, l=30, r=30, b=30), legend_title_text='Entrepreneurship', xaxis_tickangle=90)
-    fig_bar.update_yaxes(tickformat=".0%", title="Percentage")
-
-    fig_area = px.area(
-        data,
-        x='Age',
-        y='Count',
-        color='Entrepreneurship',
-        markers=True,
-        color_discrete_map=color_map2,
-        height=400,
-        width=500,
-        title=f"{level} Level – Entrepreneurship by Age (Count)"
+    fig_bar.update_traces(
+        hovertemplate="Entrepreneurship=%{customdata[0]}<br>Age=%{x}<br>Percentage=%{y:.0%}<extra></extra>",
+        customdata=df_bar[['Entrepreneurship']].values
     )
-    for status in ['Yes', 'No']:
-        avg_age = data[data['Entrepreneurship'] == status]['Age'].mean()
-        fig_area.add_vline(x=avg_age, line_dash="dot", line_color=color_map2[status], line_width=1.2)
-        fig_area.add_trace(go.Scatter(
-            x=[None], y=[None], mode='markers',
-            marker=dict(symbol='circle', size=10, color=color_map2[status]),
-            name=f"{status} Avg Age: {avg_age:.1f}"
-        ))
-    fig_area.update_traces(line=dict(width=2), marker=dict(size=8))
-    fig_area.update_layout(margin=dict(t=30, l=30, r=30, b=30), legend_title_text='Entrepreneurship')
+    fig_bar.update_layout(
+        margin=dict(t=40, l=40, r=40, b=40),
+        xaxis=dict(tickvals=even_ages),
+        yaxis=dict(title="Percentage", range=[0, 1], tickformat=".0%"),
+        legend=dict(orientation='h', yanchor='bottom', y=-0.3, xanchor='center', x=0.5)
+    )
 
-    col_a, col_b = st.columns(2)
-    with col_a:
-        st.plotly_chart(fig_bar, use_container_width=True)
-    with col_b:
-        st.plotly_chart(fig_area, use_container_width=True)
+    # Line chart: Average Job Offers
+    df_avg = df.groupby(['Age', 'Entrepreneurship'])['Job_Offers'].mean().reset_index()
 
-
-# ======= GRAPH 3: WORK-LIFE BALANCE =======
-st.subheader("Work-Life Balance by Years to Promotion")
-
-avg_balance = (
-    df.groupby(['Current_Job_Level', 'Years_to_Promotion'])['Work_Life_Balance']
-    .mean()
-    .reset_index()
-)
-
-job_levels_order = ['Entry', 'Mid', 'Senior', 'Executive']
-avg_balance['Current_Job_Level'] = pd.Categorical(
-    avg_balance['Current_Job_Level'], categories=job_levels_order, ordered=True
-)
-
-selected_balance_levels = st.multiselect(
-    "Select Job Levels to Display (Work-Life Balance)",
-    options=job_levels_order + ["All"],
-    default=["All"]
-)
-
-if "All" in selected_balance_levels or not selected_balance_levels:
-    filtered_balance = avg_balance
-else:
-    filtered_balance = avg_balance[avg_balance["Current_Job_Level"].isin(selected_balance_levels)]
-
-colors = {
-    "Entry": "#1f77b4",
-    "Mid": "#ff7f0e",
-    "Senior": "#2ca02c",
-    "Executive": "#d62728"
-}
-
-fig3 = go.Figure()
-for level in job_levels_order:
-    if "All" in selected_balance_levels or level in selected_balance_levels:
-        data_level = filtered_balance[filtered_balance["Current_Job_Level"] == level]
-        fig3.add_trace(go.Scatter(
-            x=data_level["Years_to_Promotion"],
-            y=data_level["Work_Life_Balance"],
+    fig_line = go.Figure()
+    for status in selected_statuses:
+        temp = df_avg[df_avg['Entrepreneurship'] == status]
+        fig_line.add_trace(go.Scatter(
+            x=temp['Age'],
+            y=temp['Job_Offers'],
             mode="lines+markers",
-            name=level,
-            line=dict(color=colors[level]),
-            hovertemplate=f"%{{y:.2f}}"
+            name=status,
+            line=dict(color=color_map[status], width=2),
+            marker=dict(size=6),
+            hovertemplate="%{y:.2f}"
         ))
+    fig_line.update_layout(
+        margin=dict(t=40, l=40, r=40, b=40),
+        hovermode="x unified",
+        width=1250,
+        xaxis=dict(tickvals=even_ages, title="Age"),
+        yaxis=dict(title="Average Job Offers"),
+        legend=dict(orientation='h', yanchor='bottom', y=-0.3, xanchor='center', x=0.5)
+    )
 
-fig3.update_layout(
-    title="Average Work-Life Balance by Years to Promotion",
-    xaxis_title="Years to Promotion",
-    yaxis_title="Average Work-Life Balance",
-    height=400,
-    width=700,
-    title_x=0.5,
-    legend_title_text="Job Level",
-    legend=dict (font=dict(size=14)),
-    hovermode="x unified",
-    xaxis=dict(showspikes=True, spikemode="across", spikecolor="gray"),
-    yaxis=dict(showspikes=True, spikemode="across", spikecolor="gray")
-)
-st.plotly_chart(fig3, use_container_width=True)
+    col1, col2 = st.columns(2)
+    with col1:
+        st.plotly_chart(fig_bar, use_container_width=True)
+    with col2:
+        st.plotly_chart(fig_line, use_container_width=True)
 
+# -------- TAB 2 -------- #
+with tab2:
+    st.subheader("Age Distribution & Category Proportions")
 
+    chart_option = st.selectbox("Select Variable for Visualization", ['Gender', 'Field of Study'])
+
+    col1, col2 = st.columns(2)
+
+    # ----- AREA CHART -----
+    with col1:
+        fig_density = go.Figure()
+        if chart_option == 'Gender':
+            categories = df['Gender'].dropna().unique()
+            group_col = 'Gender'
+            title = "Age Distribution by Gender"
+        else:
+            categories = df['Field_of_Study'].dropna().unique()
+            group_col = 'Field_of_Study'
+            title = "Age Distribution by Field of Study"
+
+        for cat in categories:
+            age_data = df[df[group_col] == cat]['Age']
+            if len(age_data) > 1:
+                kde = gaussian_kde(age_data)
+                x_vals = np.linspace(age_range[0], age_range[1], 100)
+                y_vals = kde(x_vals)
+                fig_density.add_trace(go.Scatter(
+                    x=x_vals,
+                    y=y_vals,
+                    mode='lines',
+                    name=str(cat),
+                    fill='tozeroy'
+                ))
+
+        fig_density.update_layout(
+            title=title,
+            xaxis_title="Age",
+            yaxis_title="Density",
+            height=500,
+            margin=dict(t=40, l=40, r=40, b=80),
+            legend=dict(orientation='h', yanchor='bottom', y=-0.3, xanchor='center', x=0.5)
+        )
+        st.plotly_chart(fig_density, use_container_width=True)
+
+    # ----- DONUT CHART -----
+    with col2:
+        if chart_option == 'Gender':
+            counts = df['Gender'].value_counts().reset_index()
+            counts.columns = ['Gender', 'Count']
+            labels = counts['Gender']
+            values = counts['Count']
+            title = "Gender Distribution"
+        else:
+            counts = df['Field_of_Study'].value_counts().reset_index()
+            counts.columns = ['Field of Study', 'Count']
+            labels = counts['Field of Study']
+            values = counts['Count']
+            title = "Field of Study Distribution"
+
+        fig_donut = go.Figure(data=[go.Pie(labels=labels, values=values, hole=0.5)])
+        fig_donut.update_layout(
+            title=title,
+            height=350,
+            margin=dict(t=40, l=40, r=40, b=40),
+            legend=dict(orientation='h', yanchor='bottom', y=-0.3, xanchor='center', x=0.5)
+        )
+        st.plotly_chart(fig_donut, use_container_width=True)
