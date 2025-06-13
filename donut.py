@@ -79,17 +79,19 @@ else:
             title=title,
             xaxis_title="Age",
             yaxis_title="Density",
-            height=500,
-            margin=dict(t=40, l=40, r=40, b=80),  # tăng b để chừa chỗ cho legend bên dưới
+            height=600,
+            margin=dict(t=40, l=40, r=40, b=120),
             legend=dict(
-            orientation="h",         # horizontal
-            yanchor="bottom",
-            y=-0.3,                  # khoảng cách dưới biểu đồ
-            xanchor="center",
-            x=0.5
-            )
+                orientation="h",
+                yanchor="bottom",
+                y=0,
+                xanchor="center",
+                x=0.5,
+            font=dict(size=12)
+          )
         )
-        st.plotly_chart(fig_density, use_container_width=True)
+        st.plotly_chart(fig_density)  # không dùng use_container_width
+
 
     # ----- DONUT CHART -----
     with col2:
