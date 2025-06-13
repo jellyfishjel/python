@@ -84,7 +84,7 @@ else:
             legend=dict(
                 orientation="h",         # horizontal
                 yanchor="bottom",
-                y= 0.5,                  # khoảng cách dưới biểu đồ
+                y= -0.5,                  # khoảng cách dưới biểu đồ
                 xanchor="center",
                 x=0.5
             )
