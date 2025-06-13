@@ -86,7 +86,7 @@ else:
                 yanchor="bottom",
                 y= -0.5,                  # khoảng cách dưới biểu đồ
                 xanchor="center",
-                x=0.7
+                x=0.5
             )
         )
         st.plotly_chart(fig_density, use_container_width=True)
