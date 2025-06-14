@@ -17,29 +17,41 @@ df = load_data()
 # Sidebar Filters
 st.sidebar.title("Global Filters")
 
-# Gender filter with separate "Select All" button
-all_genders = sorted(df['Gender'].dropna().unique())
+# Gender Filter - Multiselect with auto-deselect logic
+gender_options = ['All'] + sorted(df['Gender'].dropna().unique())
 
-# Initialize session state
-if "selected_genders" not in st.session_state:
-    st.session_state.selected_genders = all_genders.copy()
+# Khởi tạo session state nếu chưa có
+if "gender_filter" not in st.session_state:
+    st.session_state.gender_filter = ['All']
 
-# Multiselect for genders
-selected_genders = st.sidebar.multiselect("Select Gender(s)", all_genders, default=st.session_state.selected_genders)
+# Xử lý cập nhật lựa chọn
+def update_gender_selection():
+    current_selection = st.session_state.gender_filter
 
-# Use columns to align buttons neatly under the multiselect
-col1, col2 = st.sidebar.columns([1, 1.5])  # Điều chỉnh tỉ lệ nếu muốn
-with col1:
-    if st.button("Select All"):
-        st.session_state.selected_genders = all_genders.copy()
-        selected_genders = st.session_state.selected_genders
-with col2:
-    if st.button("Clear All"):
-        st.session_state.selected_genders = []
-        selected_genders = []
+    if 'All' in current_selection and len(current_selection) > 1:
+        # Nếu chọn All + giới tính khác → bỏ All
+        current_selection.remove('All')
+    elif 'All' in current_selection and len(current_selection) == 1:
+        # Chỉ chọn All thì giữ nguyên
+        pass
+    elif len(current_selection) == 0:
+        # Không chọn gì → gán lại All
+        current_selection.append('All')
 
-# Apply filter
-if selected_genders:
+    st.session_state.gender_filter = current_selection
+
+# Gọi multiselect với callback
+st.sidebar.multiselect(
+    "Select Gender(s)",
+    gender_options,
+    default=st.session_state.gender_filter,
+    key="gender_filter",
+    on_change=update_gender_selection
+)
+
+# Lấy dữ liệu lọc
+selected_genders = st.session_state.gender_filter
+if 'All' not in selected_genders:
     df = df[df['Gender'].isin(selected_genders)]
 
 # Job Level Filter
