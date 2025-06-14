@@ -17,40 +17,36 @@ df = load_data()
 # Sidebar Filters
 st.sidebar.title("Global Filters")
 
-# Gender Filter - Multiselect with auto-deselect logic
+# Gender Filter - Multiselect with auto-correction logic
 gender_options = ['All'] + sorted(df['Gender'].dropna().unique())
 
 # Khởi tạo session state nếu chưa có
 if "gender_filter" not in st.session_state:
     st.session_state.gender_filter = ['All']
 
-# Hàm xử lý thay đổi lựa chọn
-def update_gender_selection():
-    current_selection = st.session_state.gender_filter.copy()
-
-    if 'All' in current_selection:
-        # Nếu chọn All cùng lúc với giới tính khác → chỉ giữ All
-        st.session_state.gender_filter = ['All']
-    elif len(current_selection) == 0:
-        # Không chọn gì → mặc định chọn All
-        st.session_state.gender_filter = ['All']
-    else:
-        # Chọn riêng từng gender → giữ nguyên (và bỏ All nếu có)
-        st.session_state.gender_filter = [g for g in current_selection if g != 'All']
-
-# Multiselect với callback
-st.sidebar.multiselect(
+# Multiselect hiển thị cho người dùng chọn
+selected_genders = st.sidebar.multiselect(
     "Select Gender(s)",
     gender_options,
     default=st.session_state.gender_filter,
-    key="gender_filter",
-    on_change=update_gender_selection
+    key="gender_filter_input"
 )
 
-# Lọc dữ liệu
-selected_genders = st.session_state.gender_filter
+# Xử lý logic lựa chọn sau khi chọn
+if 'All' in selected_genders and len(selected_genders) > 1:
+    # Nếu chọn All và thêm giới tính khác → chỉ giữ All
+    selected_genders = ['All']
+elif 'All' not in selected_genders and len(selected_genders) == 0:
+    # Nếu không chọn gì → gán lại All
+    selected_genders = ['All']
+
+# Cập nhật session state
+st.session_state.gender_filter = selected_genders
+
+# Áp dụng filter
 if 'All' not in selected_genders:
     df = df[df['Gender'].isin(selected_genders)]
+
 
 # Job Level Filter
 job_levels = sorted(df['Current_Job_Level'].dropna().unique())
