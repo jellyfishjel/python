@@ -24,23 +24,21 @@ gender_options = ['All'] + sorted(df['Gender'].dropna().unique())
 if "gender_filter" not in st.session_state:
     st.session_state.gender_filter = ['All']
 
-# Xử lý cập nhật lựa chọn
+# Hàm xử lý thay đổi lựa chọn
 def update_gender_selection():
-    current_selection = st.session_state.gender_filter
+    current_selection = st.session_state.gender_filter.copy()
 
-    if 'All' in current_selection and len(current_selection) > 1:
-        # Nếu chọn All + giới tính khác → bỏ All
-        current_selection.remove('All')
-    elif 'All' in current_selection and len(current_selection) == 1:
-        # Chỉ chọn All thì giữ nguyên
-        pass
+    if 'All' in current_selection:
+        # Nếu chọn All cùng lúc với giới tính khác → chỉ giữ All
+        st.session_state.gender_filter = ['All']
     elif len(current_selection) == 0:
-        # Không chọn gì → gán lại All
-        current_selection.append('All')
+        # Không chọn gì → mặc định chọn All
+        st.session_state.gender_filter = ['All']
+    else:
+        # Chọn riêng từng gender → giữ nguyên (và bỏ All nếu có)
+        st.session_state.gender_filter = [g for g in current_selection if g != 'All']
 
-    st.session_state.gender_filter = current_selection
-
-# Gọi multiselect với callback
+# Multiselect với callback
 st.sidebar.multiselect(
     "Select Gender(s)",
     gender_options,
@@ -49,7 +47,7 @@ st.sidebar.multiselect(
     on_change=update_gender_selection
 )
 
-# Lấy dữ liệu lọc
+# Lọc dữ liệu
 selected_genders = st.session_state.gender_filter
 if 'All' not in selected_genders:
     df = df[df['Gender'].isin(selected_genders)]
