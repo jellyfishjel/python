@@ -27,15 +27,20 @@ if "selected_genders" not in st.session_state:
 # Multiselect for genders
 selected_genders = st.sidebar.multiselect("Select Gender(s)", all_genders, default=st.session_state.selected_genders)
 
-# Separate "Select All" button
-if st.sidebar.button("Select All Genders"):
-    st.session_state.selected_genders = all_genders.copy()
-    selected_genders = st.session_state.selected_genders
+# Use columns to align buttons neatly under the multiselect
+col1, col2 = st.sidebar.columns([1, 1.5])  # Điều chỉnh tỉ lệ nếu muốn
+with col1:
+    if st.button("Select All"):
+        st.session_state.selected_genders = all_genders.copy()
+        selected_genders = st.session_state.selected_genders
+with col2:
+    if st.button("Clear All"):
+        st.session_state.selected_genders = []
+        selected_genders = []
 
-# Filter the dataframe
+# Apply filter
 if selected_genders:
     df = df[df['Gender'].isin(selected_genders)]
-
 
 # Job Level Filter
 job_levels = sorted(df['Current_Job_Level'].dropna().unique())
