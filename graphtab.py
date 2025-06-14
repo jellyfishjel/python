@@ -45,8 +45,7 @@ if show_no:
 # Nếu không chọn gì, mặc định chọn cả 2 để tránh lỗi dữ liệu rỗng
 if not selected_statuses:
     selected_statuses = ['Yes', 'No']
-
-
+    
 # Color mapping
 color_map = {'Yes': '#FFD700', 'No': '#004080'}
 
