@@ -17,36 +17,13 @@ df = load_data()
 # Sidebar Filters
 st.sidebar.title("Global Filters")
 
-# Gender Filter - Multiselect with auto-correction logic
+# Gender Filter - Multiselect đơn giản
 gender_options = ['All'] + sorted(df['Gender'].dropna().unique())
+selected_genders = st.sidebar.multiselect("Select Gender(s)", gender_options, default=['All'])
 
-# Khởi tạo session state nếu chưa có
-if "gender_filter" not in st.session_state:
-    st.session_state.gender_filter = ['All']
-
-# Multiselect hiển thị cho người dùng chọn
-selected_genders = st.sidebar.multiselect(
-    "Select Gender(s)",
-    gender_options,
-    default=st.session_state.gender_filter,
-    key="gender_filter_input"
-)
-
-# Xử lý logic lựa chọn sau khi chọn
-if 'All' in selected_genders and len(selected_genders) > 1:
-    # Nếu chọn All và thêm giới tính khác → chỉ giữ All
-    selected_genders = ['All']
-elif 'All' not in selected_genders and len(selected_genders) == 0:
-    # Nếu không chọn gì → gán lại All
-    selected_genders = ['All']
-
-# Cập nhật session state
-st.session_state.gender_filter = selected_genders
-
-# Áp dụng filter
+# Áp dụng filter nếu không chọn "All"
 if 'All' not in selected_genders:
     df = df[df['Gender'].isin(selected_genders)]
-
 
 # Job Level Filter
 job_levels = sorted(df['Current_Job_Level'].dropna().unique())
