@@ -17,32 +17,23 @@ df = load_data()
 # Sidebar Filters
 st.sidebar.title("Global Filters")
 
-# Gender Filter - Multiselect with auto-deselect logic
-gender_options = ['All'] + sorted(df['Gender'].dropna().unique())
+# Gender filter with separate "Select All" button
+all_genders = sorted(df['Gender'].dropna().unique())
 
-# Session state to keep track of selection
+# Initialize session state
 if "selected_genders" not in st.session_state:
-    st.session_state.selected_genders = ['All']
+    st.session_state.selected_genders = all_genders.copy()
 
-selected_genders = st.sidebar.multiselect(
-    "Select Gender(s)", 
-    gender_options, 
-    default=st.session_state.selected_genders
-)
+# Multiselect for genders
+selected_genders = st.sidebar.multiselect("Select Gender(s)", all_genders, default=st.session_state.selected_genders)
 
-# Logic to auto-deselect "All" or others
-if 'All' in selected_genders and len(selected_genders) > 1:
-    selected_genders = [g for g in selected_genders if g != 'All']
-elif 'All' in selected_genders and selected_genders != st.session_state.selected_genders:
-    selected_genders = ['All']
-elif not selected_genders:
-    selected_genders = ['All']
+# Separate "Select All" button
+if st.sidebar.button("Select All Genders"):
+    st.session_state.selected_genders = all_genders.copy()
+    selected_genders = st.session_state.selected_genders
 
-# Update session state
-st.session_state.selected_genders = selected_genders
-
-# Apply gender filter
-if 'All' not in selected_genders:
+# Filter the dataframe
+if selected_genders:
     df = df[df['Gender'].isin(selected_genders)]
 
 
