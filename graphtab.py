@@ -31,9 +31,21 @@ selected_level = st.sidebar.selectbox("Select Job Level", job_levels)
 min_age, max_age = int(df['Age'].min()), int(df['Age'].max())
 age_range = st.sidebar.slider("Select Age Range", min_value=min_age, max_value=max_age, value=(min_age, max_age))
 
-# Entrepreneurship Status Filter - Checkbox
-entrepreneur_options = ['Yes', 'No']
-selected_statuses = st.sidebar.multiselect("Select Entrepreneurship Status", entrepreneur_options, default=entrepreneur_options)
+# Entrepreneurship Status Filter - Individual Checkboxes
+st.sidebar.markdown("**Select Entrepreneurship Status**")
+show_yes = st.sidebar.checkbox("Yes", value=True)
+show_no = st.sidebar.checkbox("No", value=True)
+
+selected_statuses = []
+if show_yes:
+    selected_statuses.append("Yes")
+if show_no:
+    selected_statuses.append("No")
+
+# Nếu không chọn gì, mặc định chọn cả 2 để tránh lỗi dữ liệu rỗng
+if not selected_statuses:
+    selected_statuses = ['Yes', 'No']
+
 
 # Color mapping
 color_map = {'Yes': '#FFD700', 'No': '#004080'}
