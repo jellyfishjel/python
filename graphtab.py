@@ -17,11 +17,34 @@ df = load_data()
 # Sidebar Filters
 st.sidebar.title("Global Filters")
 
-# Gender Filter - Multiselect
+# Gender Filter - Multiselect with auto-deselect logic
 gender_options = ['All'] + sorted(df['Gender'].dropna().unique())
-selected_genders = st.sidebar.multiselect("Select Gender(s)", gender_options, default=['All'])
+
+# Session state to keep track of selection
+if "selected_genders" not in st.session_state:
+    st.session_state.selected_genders = ['All']
+
+selected_genders = st.sidebar.multiselect(
+    "Select Gender(s)", 
+    gender_options, 
+    default=st.session_state.selected_genders
+)
+
+# Logic to auto-deselect "All" or others
+if 'All' in selected_genders and len(selected_genders) > 1:
+    selected_genders = [g for g in selected_genders if g != 'All']
+elif 'All' in selected_genders and selected_genders != st.session_state.selected_genders:
+    selected_genders = ['All']
+elif not selected_genders:
+    selected_genders = ['All']
+
+# Update session state
+st.session_state.selected_genders = selected_genders
+
+# Apply gender filter
 if 'All' not in selected_genders:
     df = df[df['Gender'].isin(selected_genders)]
+
 
 # Job Level Filter
 job_levels = sorted(df['Current_Job_Level'].dropna().unique())
